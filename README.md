@@ -8,10 +8,10 @@ For usage, please refer to github/SZU-BDI/app-hybrid-demo
 
 Combine with app-hybrid-demo, we need to complete these tasks:
 
-1, auto check update and sync app-hybrid-core and copy to $my_project\build\
-2, build and pack target apk/ipa base on $my_project\config.json
-2+, developer test.
-3, sign and deploy binary to app store. [user/pass/cert will be prompted]
+1. auto check update and sync app-hybrid-core and copy to $my_project\build\
+2. build and pack target apk/ipa base on $my_project\config.json
+3. developer test.
+4. sign and deploy binary to app store. [user/pass/cert will be prompted]
 
 # Folders
 
