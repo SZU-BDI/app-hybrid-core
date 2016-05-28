@@ -16,9 +16,9 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 
 * lib-ios/
 * lib-ios/szu-bdi-hybrid-core/
-* testproj-android/
-		the test project for android core
+* testproj-android/<br/>
+ the test project for android core
 * lib-android/
 * lib-android/szu.bdi.hybrid.core/
-* testproj-ios/
-		the test project for ios core
+* testproj-ios/<br/>
+ the test project for ios core
