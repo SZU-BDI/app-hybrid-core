@@ -1,0 +1,1 @@
+a mini ios project to build a app that only a WebView + JS-BRIDGE + _app_activity_open()
