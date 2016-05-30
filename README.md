@@ -22,3 +22,7 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 * lib-android/szu.bdi.hybrid.core/
 * testproj-ios/<br/>
  the test project for ios core
+
+# Documentation
+
+https://szu-bdi.gitbooks.io/app-hybrid/content/
