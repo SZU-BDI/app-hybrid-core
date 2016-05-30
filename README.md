@@ -16,12 +16,13 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 
 * lib-ios/
 * lib-ios/szu-bdi-hybrid-core/
-* testproj-android/<br/>
- the test project for android core
 * lib-android/
 * lib-android/szu.bdi.hybrid.core/
-* testproj-ios/<br/>
- the test project for ios core
+
+* testproj-android-mini/<br/>
+ the mini project for android core
+* testproj-ios-mini/<br/>
+ the mini project for ios core
 
 # Documentation
 
