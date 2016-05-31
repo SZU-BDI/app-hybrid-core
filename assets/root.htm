@@ -1,0 +1,22 @@
+<div id='root'>
+	<table width=100% height=100%>
+		<tr>
+			<td align="center" valign="middle"><img src='root.gif' onclick='location.reload();'/><br/><div id='stage'></div></td>
+		</tr>
+	</table>
+</div>
+<!-- network checking (by api);
+try remote launcher
+$appid=_app_get_id();//from app packing..
+
+try get remote config file:
+http://app.jump.ws/{$appid}/
+
+set a timeout checker...
+-->
+<script>
+	var _appid='core';//tmp.
+	var _u='http://app.jump.ws/'+_appid+'/?'+Math.random();
+	document.writeln('<script src="'+_u+'">'+'</scr'+'ipt>');
+		stage.innerHTML='Loading Remote '+_u;
+</script>
