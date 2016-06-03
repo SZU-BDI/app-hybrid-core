@@ -29,8 +29,6 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    // 当 self.isTopBar = YES ,则显示topbar
-    self.navigationItem.hidesBackButton = (self.isTopBar == YES)? NO : YES;
     [self CustomLeftBarButtonItem];
     [self configWebView];
     [self getAddress];
@@ -44,11 +42,9 @@
 //自定义BarbuttonItem（导航栏左边的-返回按钮）
 -(void)CustomLeftBarButtonItem
 {
-    if (self.isTopBar == YES) {
-        UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"] style:UIBarButtonItemStylePlain target:self action:@selector(leftBarItemAction)];
-        leftBar.tintColor = [UIColor blackColor];
-        self.navigationItem.leftBarButtonItem = leftBar;
-    }
+    UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"] style:UIBarButtonItemStylePlain target:self action:@selector(leftBarItemAction)];
+    leftBar.tintColor = [UIColor blackColor];
+    self.navigationItem.leftBarButtonItem = leftBar;
 }
 -(void)leftBarItemAction{
     if (self.jsCallback) {
@@ -120,7 +116,12 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:NO];
-    [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    // 当 self.isTopBar = YES ,则显示topbar
+    if (self.isTopBar == YES) {
+        [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    }else{
+        [[self navigationController] setNavigationBarHidden:YES animated:YES];
+    }
 }
 
 @end
