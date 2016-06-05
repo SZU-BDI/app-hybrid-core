@@ -1,4 +1,4 @@
-package com.hybrid.core;
+package com.hybrid.coretest;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,13 +14,11 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
 
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
@@ -30,9 +27,6 @@ import com.github.lzyzsd.jsbridge.DefaultHandler;
 // import com.google.android.gms.appindexing.Action;
 // import com.google.android.gms.appindexing.AppIndex;
 // import com.google.android.gms.common.api.GoogleApiClient;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 
@@ -89,7 +83,7 @@ public class NewActivity extends Activity {
             this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
-        setContentView(R.layout.activity_newactivity);
+//        setContentView(R.layout.activity_newactivity);
 
         mWebView = (BridgeWebView) findViewById(R.id.webView1);
 

@@ -1,4 +1,4 @@
-package com.hybrid.core;
+package com.hybrid.coretest;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.hybrid.core;
+package com.hybrid.coretest;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
