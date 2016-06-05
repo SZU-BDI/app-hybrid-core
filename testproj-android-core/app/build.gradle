@@ -5,44 +5,24 @@ android {
     buildToolsVersion '23.0.3'
 
     defaultConfig {
-        applicationId 'com.hybrid.core'
-        minSdkVersion 19 //IMPORTANT FOR KITKAT 4.4.2, before KITKAT have security problem.
+        applicationId 'info.cmptech.hybrid.core'
+        minSdkVersion 19 //API 19 FOR KITKAT 4.4.2, before KITKAT have security problem.
         targetSdkVersion 21
-//        versionCode 11
-//        versionName "1"
     }
-//    buildTypes {
-//        release {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
-//    }
-//    lintOptions {
-//        checkReleaseBuilds false
-//        abortOnError false
-//    }
-//    sourceSets {
-//        main {
-//            java.srcDirs = ['src/main/java', 'src/main/java/NewStylePassword', 'src/main/java/Fragment', 'src/main/java/MyImageButton', 'src/main/java/com.bignerdranch.android.mfailab/Receivers', 'src/main/java/2', 'src/main/java/com.bignerdranch.android.mfailab/GestruePassword', 'src/main/java/com.bignerdranch.android.mfailab/Fragments', 'src/main/java/com.bignerdranch.android.mfailab/ButtonStyles', 'src/main/java/com.bignerdranch.android.mfailab/ActivitiesForExtends', 'src/main/java/com.bignerdranch.android.mfailab/InternetClassesAndThreads', 'src/main/java/com.bignerdranch.android.mfailab/SharedPreference', 'src/main/java/com.bignerdranch.android.mfailab/ExitApplication', 'src/main/java/com.bignerdranch.android.mfailab/Keyboard', 'src/main/java/com.bignerdranch.android.mfailab/setting']
-//            res.srcDirs = ['src/main/res', 'src/main/res/drawable/Function', 'src/main/res/xml']
-//        }
-//    }
-//    productFlavors {
-//    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('../lib-android/gson-2.3.1.jar')
+//    compile 'com.google.code.gson:gson:2.3.1'
+
+    //TODO bugfix JsBridge
+    compile project(':../lib-android:JsBridge')
+
     //compile files('libs/core.jar')
-    compile files('gson-2.3.1.jar')//TODO move to core dir
     //compile files('libs/robotium-solo-5.3.1.jar')
     //compile files('libs/universal-image-loader-1.8.6-with-sources.jar')
     //compile files('libs/printerlibs.jar')
 
-    //TODO move to ../
-    compile project(':HybridJsBridge')
-
-//    compile 'com.android.support:appcompat-v7:23.4.+'
     compile 'com.android.support:appcompat-v7:21.0.3'
-//    compile 'com.google.code.gson:gson:2.3.1'
 }

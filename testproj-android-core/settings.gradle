@@ -1,1 +1,1 @@
-include ':app',':HybridJsBridge'
+include ':app',':../lib-android:JsBridge'
