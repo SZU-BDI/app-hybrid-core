@@ -8,9 +8,6 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-//import com.asiaweiluy.live.v1.MyApplication;
-import com.hybrid.core.R;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
