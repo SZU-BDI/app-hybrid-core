@@ -46,6 +46,14 @@ import java.lang.ref.WeakReference;
 
 public class UIRoot extends Activity implements View.OnClickListener {
 
+    final private static String LOGTAG = "UIRoot";
+//    final private static String LOGTAG = "" + (new Object() {
+//        public String getClassName() {
+//            String clazzName = this.getClass().getName();
+//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
+//        }
+//    }.getClassName());
+
     public String printJson;
     private String mURL;
     private String text;
@@ -58,18 +66,19 @@ public class UIRoot extends Activity implements View.OnClickListener {
     private Handler mHandler;
 
     public static boolean isruning = false;//用于判断当前activity是否是active的。因为遇到异常android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@41e29c18
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
 //    private GoogleApiClient client;
     // is not valid; is your activity running?
-
-
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOGTAG, " onCreate()");
+
         setContentView(R.layout.activity_uiroot);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
 /*
@@ -88,26 +97,19 @@ public class UIRoot extends Activity implements View.OnClickListener {
         });
         */
 
-       // mURL = getIntent().getData().toString();
+        // mURL = getIntent().getData().toString();
 
-         mURL= "file:///android_asset/root.htm";
-
-
-
-
+        mURL = "file:///android_asset/root.htm";
 
         Log.d(TAG, "----------url-------=" + mURL);
         progressDialog = new ProgressDialog(this);
-     //   progressDialog.setTitle(getText(R.string.Login_reminder_information));
-      //  progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
+        //   progressDialog.setTitle(getText(R.string.Login_reminder_information));
+        //  progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
         progressDialog.setCanceledOnTouchOutside(false);
-
 
         mWebView = (BridgeWebView) findViewById(R.id.webView);
 
-
         mWebView.setDefaultHandler(new DefaultHandler());
-
 
         mWebView.getSettings().setJavaScriptEnabled(true);
         WebSettings mWebSettings = mWebView.getSettings();
@@ -122,7 +124,6 @@ public class UIRoot extends Activity implements View.OnClickListener {
             mWebSettings.setDisplayZoomControls(false);
         }
         mWebSettings.setUseWideViewPort(true);//支持任意比例缩放
-
 
         if (mWebView != null) {
 
@@ -156,28 +157,25 @@ public class UIRoot extends Activity implements View.OnClickListener {
                 }
             });
 
-
             mWebView.loadUrl(mURL);
-
 
             mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
 
                 @Override
                 public void handler(String data, CallBackFunction function) {
-                    Log.i("app_Activity_Open",data);
+                    Log.i("app_Activity_Open", data);
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(data);
 
-                     String Topbar =jsonObject.optString("topbar");
-                        String Mode=jsonObject.optString("mode");
-                        String Address=jsonObject.optString("address");
-
+                        String Topbar = jsonObject.optString("topbar");
+                        String Mode = jsonObject.optString("mode");
+                        String Address = jsonObject.optString("address");
 
                         Intent intent = new Intent(UIRoot.this, NewActivity.class);
-                         intent.putExtra("Topbar", Topbar);
-                         intent.putExtra("Mode", Mode);
-                         intent.putExtra("Address", Address);
+                        intent.putExtra("Topbar", Topbar);
+                        intent.putExtra("Mode", Mode);
+                        intent.putExtra("Address", Address);
                         startActivity(intent);
 
                     } catch (JSONException e) {
@@ -185,12 +183,11 @@ public class UIRoot extends Activity implements View.OnClickListener {
                     }
                     function.onCallBack("Activity opened");
 
-                      //  function.onCallBack(new Gson().toJson(p));
+                    //  function.onCallBack(new Gson().toJson(p));
 
                 }
 
             });
-
 
             mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
 
@@ -213,7 +210,7 @@ public class UIRoot extends Activity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                     String tit = jsonObject.optString("title");
-                  //  title_TextView.setText(tit);
+                    //  title_TextView.setText(tit);
                     //  Log.i(TAG, "handler = submitFromWeb, data from web = " + tit);
                     function.onCallBack("_app_activity_set_title, response data from Java :" + tit);
 
@@ -228,7 +225,6 @@ public class UIRoot extends Activity implements View.OnClickListener {
 //        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
     }
-
 
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
@@ -286,7 +282,6 @@ public class UIRoot extends Activity implements View.OnClickListener {
         }
         return super.onKeyDown(keyCode, event);
     }
-
 
     /**
      * This method is designed to hide how Javascript is injected into
@@ -349,8 +344,6 @@ public class UIRoot extends Activity implements View.OnClickListener {
         }
     }
 
-
-
     @Override
     public void onStart() {
         super.onStart();
@@ -370,7 +363,6 @@ public class UIRoot extends Activity implements View.OnClickListener {
 //        );
 //        AppIndex.AppIndexApi.start(client, viewAction);
     }
-
 
     public class JavaScriptInterface {
         Context mContext1;
@@ -399,10 +391,8 @@ public class UIRoot extends Activity implements View.OnClickListener {
 
             switch (msg.what) {
 
-
             }
         }
-
 
     }
 

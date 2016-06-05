@@ -1,6 +1,5 @@
 package com.hybrid.core;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -27,28 +26,27 @@ import java.io.InputStreamReader;
  * The app is created for test.
  */
 public class AppHelper {
-    public  static final String Extra_openwebsite_key="com.hybrid.core";
+    public static final String Extra_openwebsite_key = "com.hybrid.core";
 
-    private static String TAG="sdfg";
+    private static String TAG = "AppHelper";
 
-    public static String postJSONtoInternet(JSONObject mjsonobject,String url1){
-        try{
-            StringEntity se = new StringEntity( mjsonobject.toString());
-            HttpClient httpClient=new DefaultHttpClient();
+    public static String postJSONtoInternet(JSONObject mjsonobject, String url1) {
+        try {
+            StringEntity se = new StringEntity(mjsonobject.toString());
+            HttpClient httpClient = new DefaultHttpClient();
             httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,20000);
-            HttpPost httpPost=new HttpPost(url1);
+            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
+            HttpPost httpPost = new HttpPost(url1);
             httpPost.setEntity(se);
-            HttpResponse httpResponse=httpClient.execute(httpPost);
-            if(httpResponse.getStatusLine().getStatusCode()!=200){
-                Log.d(TAG, "-----------------------!200_----------->>>>>>"+"--------------!200-----------------"+httpResponse.getStatusLine().getStatusCode()+"\n"+EntityUtils.toString(httpResponse.getEntity(),"UTF-8"));
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                Log.d(TAG, "-----------------------!200_----------->>>>>>" + "--------------!200-----------------" + httpResponse.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(httpResponse.getEntity(), "UTF-8"));
 
-            }else {
-                String result= EntityUtils.toString(httpResponse.getEntity(),"UTF-8");
+            } else {
+                String result = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 return result;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -56,25 +54,21 @@ public class AppHelper {
 
     }
 
-
-
-
-    public static String posttoInternet(String url1){
-        try{
-            HttpClient httpClient=new DefaultHttpClient();
+    public static String posttoInternet(String url1) {
+        try {
+            HttpClient httpClient = new DefaultHttpClient();
             httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,20000);
+            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
             HttpGet request = new HttpGet(url1);
             HttpResponse httpResponse = httpClient.execute(request);
-            if(httpResponse.getStatusLine().getStatusCode()!=200){
-                Log.d(TAG, "-----------获取入口信息------------!200_----------->>>>>>"+"--------------!200-----------------"+httpResponse.getStatusLine().getStatusCode()+"sdfs"+url1);
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                Log.d(TAG, "-----------获取入口信息------------!200_----------->>>>>>" + "--------------!200-----------------" + httpResponse.getStatusLine().getStatusCode() + "sdfs" + url1);
 
-            }else {
-                String result= EntityUtils.toString(httpResponse.getEntity(),"UTF-8");
+            } else {
+                String result = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 return result;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -134,31 +128,31 @@ public class AppHelper {
 
 */
 
-    public static void SendWebsiteByIntent(Context mcontext,Uri url,Class mclass){
+    public static void SendWebsiteByIntent(Context mcontext, Uri url, Class mclass) {
         boolean flag = false;
-        ConnectivityManager cwjManager = (ConnectivityManager)mcontext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cwjManager = (ConnectivityManager) mcontext.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cwjManager.getActiveNetworkInfo() != null)
             flag = cwjManager.getActiveNetworkInfo().isAvailable();
-        if (flag){
-            Intent intent = new Intent(mcontext,mclass);
+        if (flag) {
+            Intent intent = new Intent(mcontext, mclass);
             intent.setData(url);
-            mcontext.startActivity(intent);}
-        else {
+            mcontext.startActivity(intent);
+        } else {
             Toast.makeText(mcontext, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
         }
     }
 
-    public static void SendWebsiteByIntent_with_title(Context context,Uri url,Class mclass,String text){
+    public static void SendWebsiteByIntent_with_title(Context context, Uri url, Class mclass, String text) {
         boolean flag = false;
-        ConnectivityManager cwjManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cwjManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cwjManager.getActiveNetworkInfo() != null)
             flag = cwjManager.getActiveNetworkInfo().isAvailable();
-        if (flag){
-            Intent intent = new Intent(context,mclass);
-            intent.putExtra(Extra_openwebsite_key,text);
+        if (flag) {
+            Intent intent = new Intent(context, mclass);
+            intent.putExtra(Extra_openwebsite_key, text);
             intent.setData(url);
-            context.startActivity(intent);}
-        else {
+            context.startActivity(intent);
+        } else {
             Toast.makeText(context, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
         }
 
