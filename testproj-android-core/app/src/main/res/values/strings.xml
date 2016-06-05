@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+
+    <!-- 程序名称及活动标题-->
+    <string name="app_name">hybrid Core</string>
+    <string name="title_activity_open_website">返回</string>
+    <string name="text_progressdialog_open_website">页面加载中，请稍后。。。</string>
+
+
+    <!--登录界面的内容-->
+
+
+    <!--下面两条是登录过程对话框显示的信息-->
+    <string name="Login_Network_Status_unavailable">当前网络不可用</string>
+
+    <!--用于checkNetWork函数检查后的Toast提示-->
+
+
+    <string name="Login_Network_CheckStatus_whether_unavailable">当前网络不可用</string>
+
+
+    <string name="Fragments_NoScanResult_ToastText">与服务器的连接出了点儿小问题，请重新扫描一次</string>
+    <!--用于登录等Client请求超时等异常发生后的Toast提示-->
+
+
+    <string name="HttpUtil_NoInternet_ToastText">网络连接失败</string>
+
+    <string name="Fragments_NotConnect_ToastText">网络连接异常，请稍后再试</string>
+
+
+    <!-- 会员业务部分及二维码相关-->
+
+    <!--底部导航栏显示的文字-->
+    <string name="Member_Biz">会员业务</string>
+
+    <!--fragment内部自定义按钮显示的文字-->
+    <string name="memberbusiness_transfer_to_account">转账到账户</string>
+
+    <string name="memberbusiness_transfer_to_cash">转账到现金</string>
+
+    <!--   跟二维码相关的两个自定义按钮显示的文字-->
+    <string name="memberbusiness_scan_bitmap">扫一扫</string>
+
+    <string name="memberbusiness_create_bitmap">支付码</string>
+
+    <!--二维码扫描视图中的textView显示的文字-->
+    <string name="scan_text">将二维码放入框内, 即可自动扫描</string>
+    <string name="memberbusiness_scan_bitmap_activity_textView">扫描二维码</string>
+    <string name="memberbusiness_create_bitmap_activity_textView">生成二维码</string>
+    <string name="memberbusiness_create_bitmap_activity_editView">二维码内容信息</string>
+
+    <string name="bitmap_scan_failed">Scan failed!</string>
+
+
+    <!--自身业务相关-->
+
+    <!--底部导航栏显示的文字-->
+    <string name="Own_Biz">自身业务</string>
+    <!--fragment内部自定义按钮显示的文字-->
+    <string name="selfbusiness_balancestream">余额流水</string>
+
+    <string name="selfbusiness_askfor_deposit">存款申请</string>
+
+    <string name="selfbusiness_askfor_withdraw">取款申请</string>
+
+    <string name="selfbusiness_account_collection">账户收款</string>
+
+    <string name="selfbusiness_money_exchange">货币兑换</string>
+
+    <string name="selfbusiness_loanbusiness">贷款业务</string>
+
+    <string name="selfbusiness_modify_password">修改密码</string>
+
+
+    <!--充值业务相关-->
+
+    <!--底部导航栏显示的文字-->
+    <string name="chargebusiness">充值业务</string>
+    <!--fragment内部自定义按钮显示的文字-->
+    <string name="chargebusiness_keybuy">购买充值码</string>
+
+
+    <!--经营位置相关-->
+
+    <!--底部导航栏显示的文字-->
+    <string name="App_Center">应用中心</string>
+    <!--fragment内部自定义按钮显示的文字-->
+    <string name="location">经营位置</string>
+    <string name="location_branch">分行</string>
+
+    <string name="location_agency">代理</string>
+
+
+    <!--账户配置相关-->
+
+    <!--底部导航栏显示的文字-->
+    <string name="Profile">帐户配置</string>
+
+
+    <!--设置页面相关-->
+
+    <!--版本更新-->
+    <string name="update">温馨提示</string>
+    <string name="update_message">有新的版本更新，是否前往应用商店更新？</string>
+    <string name="update_yes">更新</string>
+    <string name="update_cancle">取消</string>
+
+    <string name="setting_advise">Your advise</string>
+    <string name="setting">设置</string>
+    <!-- 最顶部按钮的文字切换-->
+    <string name="setting_textView">选择是否开启手势密码</string>
+    <string name="setting_ninePassword_ok">手势密码已经设好</string>
+    <!--多选框的文字切换-->
+    <string name="setting_checkBoxText_open">已开启</string>
+
+    <string name="setting_checkBoxText_close">已关闭</string>
+    <!-- 各按钮对应文本-->
+    <string name="setting_pwd_login">登录密码</string>
+    <string name="setting_pwd_pay">支付密码</string>
+    <string name="setting_pwd_gesture">手势密码</string>
+
+
+    <string name="setting_about_us">关于我们</string>
+    <string name="setting_user_nickname">昵称</string>
+    <string name="setting_user_number">联系电话</string>
+    <string name="Password_Change">密码修改</string>
+    <!--修改语言按钮-->
+    <string name="change_lang">语言</string>
+    <string name="printer_Setting">打印机设置</string>
+
+    <string name="SetFragment_Changelanguange_DialogText">您确定要修改语言吗？</string>
+
+
+    <!--最底部按钮显示的文字-->
+    <string name="SetFragment_LogoutSafely">安全退出</string>
+
+    <!--点击安全退出后，对话框及其中按钮的文字信息-->
+    <string name="SetFragment_LogoutSafely_DialogText">您确定要退出登录吗？</string>
+
+    <string name="SetFragment_LogoutSafely_Dialog_Sure">确定</string>
+
+    <string name="SetFragment_LogoutSafely_Dialog_Cancel">取消</string>
+
+    <!--修改手势密码按钮显示的文字-->
+    <string name="SetFragment_NineBitMap_changepwd">修改手势密码</string>
+    <!--点击修改手势密码按钮后，对话框及其中按钮的文字信息-->
+    <string name="SetFragment_ChangeNinePwd_DialogText">您确定要修改手势密码吗？</string>
+
+    <string name="SetFragment_ChangeNinePwd_Dialog_Sure">确定</string>
+
+    <string name="SetFragment_ChangeNinePwd_Dialog_Cancel">取消</string>
+
+    <string name="Verify_gesture_password_change">修改手势密码</string>
+    <string name="Verify_gesture_password_relogin">登录其他账号</string>
+
+
+    <!--第一次登陆时要求设置手势密码-->
+
+
+    <string name="setting_buttonText">设置手势密码</string>
+
+    <string name="GesturesPasswordSettingActivity_Dialog_positive_text">前往设置手势密码</string>
+
+    <!-- 手势密码界面的显示信息-->
+
+
+    <string name="plz_draw_code">请输入您的手势密码</string>
+    <string name="plz_draw_code_before_change_it">请先验证您的手势密码</string>
+
+    <string name="pwd_setted">密码设置成功！</string>
+
+    <string name="pwd_error">密码错误，还可输入</string>
+    <string name="pwd_error_time">次</string>
+    <string name="Gspwd_error_dialog_remind">手势密码已失效</string>
+    <string name="Gspwd_error_dialog_detail">请重新登陆，并重新设置手势密码</string>
+    <string name="Gspwd_error_dialog_Sure">确定</string>
+
+
+    <!-- 设置和验证手势密码 -->
+
+
+    <string name="setup_gesture_code">设置手势密码</string>
+
+
+    <string name="setup_gesture_pattern_again">再次绘制解锁图案</string>
+
+    <!--  <string name="forget_gesture_code">忘记手势密码?</string>
+
+      <string name="use_other_account_login">用其他账号登录</string>-->
+
+    <string name="set_gesture_pattern">绘制解锁图案</string>
+
+    <string name="set_gesture_pattern_reason">设置手势密码，防止他人未经授权查看</string>
+
+    <string name="reset_gesture_code">重新设置手势密码</string>
+    <string name="rule_of_set_gesture_code"> 最少链接4个点, 请重新输入</string>
+    <string name="alert_of_secondtimeset_gesture_code"> 与上一次绘制不一致，请重新绘制</string>
+
+
+    <!-- 退出程序相关-->
+
+
+    <string name="system_exit">再按一次退出程序</string>
+
+    <string name="WebActivity_finishi">再按一次返回主菜单</string>
+
+    <!-- 用于操作栏的Menu中显示-->
+
+
+    <string name="action_exit">退出程序</string>
+    <string name="action_setting">设置</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_start_ad">Start_ad</string>
+    <string name="title_activity_about_us">About_us</string>
+    <string name="title_activity_dialog_for_same_theme">Dialog_for_same_theme</string>
+
+
+    <string name="content_of_about_us_1">"\u3000\u3000This mobile application dedicates providing online service to the members of Asia Wei Luy, for more information please click "open in browser" button below. </string>
+
+    <string name="location_fragment_checkbox_branch">分行</string>
+    <string name="location_fragment_checkbox_agency">代理</string>
+
+    <!--地图部分-->
+    <string name="map_choose_app">Choose An App to navigate</string>
+    <string name="map_open_GPS">Please open the GPS</string>
+    <string name="map_app_support">Support for the Map App is coming...</string>
+    <string name="map_mylocation">MyLocation</string>
+    <string name="Google_play_service_missing">Google Play services missing,please check your phone</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="title_activity_location_">Location_Activity</string>
+
+    <!--&lt;!&ndash;url&ndash;&gt;-->
+    <!--<string name="url_for_change">http://devace.sinaapp.com/</string>-->
+
+
+    <!--蓝牙打印相关-->
+    <string name="none_paired">No devices have been paired</string>
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_found">No devices found</string>
+    <string name="btnSearch">Connect  Bluetooth  Printer</string>
+    <string name="btnSend">Print</string>
+    <string name="btn_test">Print  Test  Page</string>
+    <string name="btnClose">Close</string>
+    <string name="txt_content">&quot;&quot;</string>
+    <string name="menu_settings">set</string>
+    <string name="strLang">en</string>
+    <string name="button_scan">Scan for devices</string>
+
+
+    <string name="button_bt_search_Printer">Search printer</string>
+    <string name="button_bt_connect_Printer">Connect printer</string>
+    <string name="button_bt_disconnect_Printer">Disconnect printer</string>
+
+
+
+</resources>
