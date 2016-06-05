@@ -40,6 +40,9 @@ import java.lang.ref.WeakReference;
  * Created by Muhammad Azhar on 6/5/2016.
  */
 public class NewActivity extends Activity {
+
+    final private static String LOGTAG = "NewActivityTest";//TODO ...
+
     public String printJson;
     private String mURL;
     private String text;

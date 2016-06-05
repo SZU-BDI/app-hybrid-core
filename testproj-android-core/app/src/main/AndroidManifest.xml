@@ -17,10 +17,10 @@
         tools:replace="android:allowBackup">
 
         <activity
-            android:name=".UIRoot"
+            android:name=".UiRoot"
             android:label="@string/app_name"
+            android:theme="@style/android:Theme.Light.NoTitleBar"
             >
-            <!--android:theme="@style/android:Theme.Light.NoTitleBar"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

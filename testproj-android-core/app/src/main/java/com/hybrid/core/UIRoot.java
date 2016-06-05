@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,15 +17,12 @@ import android.util.JsonToken;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.lzyzsd.jsbridge.BridgeHandler;
@@ -44,7 +40,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.ref.WeakReference;
 
-public class UIRoot extends Activity implements View.OnClickListener {
+public class UiRoot extends Activity implements View.OnClickListener {
 
     final private static String LOGTAG = "UIRoot";
 //    final private static String LOGTAG = "" + (new Object() {
@@ -77,10 +73,12 @@ public class UIRoot extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(LOGTAG, " onCreate()");
+        Log.d(LOGTAG, " UiRoot onCreate()");
 
         setContentView(R.layout.activity_uiroot);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
+
+
+//        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
 /*
         Button title_btn_back = (Button) findViewById(R.id.title_btn);
         final TextView title_TextView = (TextView) findViewById(R.id.title_textView);
@@ -133,7 +131,7 @@ public class UIRoot extends Activity implements View.OnClickListener {
 
                     //if (isruning)
                     {
-                        AlertDialog.Builder b2 = new AlertDialog.Builder(UIRoot.this);
+                        AlertDialog.Builder b2 = new AlertDialog.Builder(UiRoot.this);
                         b2.setMessage(message)
                                 .setPositiveButton("ok", new AlertDialog.OnClickListener() {
                                     @Override
@@ -172,7 +170,7 @@ public class UIRoot extends Activity implements View.OnClickListener {
                         String Mode = jsonObject.optString("mode");
                         String Address = jsonObject.optString("address");
 
-                        Intent intent = new Intent(UIRoot.this, NewActivity.class);
+                        Intent intent = new Intent(UiRoot.this, NewActivity.class);
                         intent.putExtra("Topbar", Topbar);
                         intent.putExtra("Mode", Mode);
                         intent.putExtra("Address", Address);
@@ -347,6 +345,7 @@ public class UIRoot extends Activity implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+        Log.v(LOGTAG, "UiRoot.onStart");
 
 //        // ATTENTION: This was auto-generated to implement the App Indexing API.
 //        // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -374,16 +373,16 @@ public class UIRoot extends Activity implements View.OnClickListener {
 
         @JavascriptInterface
         public void _close_activity() {
-            UIRoot.this.finish();
+            UiRoot.this.finish();
         }
 
     }
 
     class MHandler extends Handler {
-        WeakReference<UIRoot> mActivity;
+        WeakReference<UiRoot> mActivity;
 
-        MHandler(UIRoot activity) {
-            mActivity = new WeakReference<UIRoot>(activity);
+        MHandler(UiRoot activity) {
+            mActivity = new WeakReference<UiRoot>(activity);
         }
 
         @Override
