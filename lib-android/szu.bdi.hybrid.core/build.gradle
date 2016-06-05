@@ -5,7 +5,7 @@ android {
     buildToolsVersion '23.0.3'
 
     defaultConfig {
-        applicationId 'info.cmptech.hybrid.core'
+        applicationId 'szu.bdi.hybrid.core'
         minSdkVersion 19 //API 19 FOR KITKAT 4.4.2, before KITKAT have security problem.
         targetSdkVersion 21
     }
