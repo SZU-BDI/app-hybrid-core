@@ -30,6 +30,8 @@ public class AppHelper {
 
     private static String TAG = "AppHelper";
 
+    public static Context context;
+
     public static String postJSONtoInternet(JSONObject mjsonobject, String url1) {
         try {
             StringEntity se = new StringEntity(mjsonobject.toString());

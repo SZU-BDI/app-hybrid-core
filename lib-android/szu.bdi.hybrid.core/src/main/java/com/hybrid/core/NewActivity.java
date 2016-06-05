@@ -51,7 +51,7 @@ public class NewActivity extends Activity {
     private String TAG = "sdf";
     private long exitTime = 0;
     private ProgressDialog progressDialog;
-    private Activity selfActivity = this;
+//    private Activity selfActivity = this;
     private Handler mHandler;
 
     public static boolean isruning = false;//用于判断当前activity是否是active的。因为遇到异常android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@41e29c18

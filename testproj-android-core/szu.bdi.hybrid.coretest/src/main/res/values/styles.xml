@@ -1,0 +1,40 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--</style>-->
+
+
+    <style parent="android:Theme.Light" name="AppBaseTheme">
+
+    <!-- Theme customizations available in newer API levels can go in res/values-vXX/styles.xml, while customizations related to backward-compatibility can go here. -->
+    </style>
+
+
+
+    <style parent="@android:style/Widget.TextView" name="textview">
+
+    <item name="android:layout_width">wrap_content</item>
+
+    <item name="android:layout_height">wrap_content</item>
+
+    <item name="android:textColor">@android:color/black</item>
+
+    <item name="android:textSize">14sp</item>
+
+    <!--<item name="android:fontFamily">sans-serif-light</item>-->
+
+    </style>
+    <style name="MyActionBarStyle" parent="android:Theme.Light">
+        <item name="android:windowTitleSize">50dp</item>
+        <item name="android:windowTitleBackgroundStyle">@style/StatusBarBackground</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- <item name="titleTextStyle">@style/MyTitleStyle</item>-->
+    </style>
+
+    <style name="StatusBarBackground">
+        <item name="android:background">#013465</item>
+    </style>
+
+</resources>

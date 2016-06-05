@@ -296,7 +296,7 @@ public class UiRoot extends Activity implements View.OnClickListener {
      *
      * @param javascript
      */
-    //本地代码调用服务器端javascript代码
+
     public void loadJavascript(String javascript) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // In KitKat+ you should use the evaluateJavascript method
