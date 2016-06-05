@@ -1,0 +1,64 @@
+apply plugin: 'com.android.application'
+
+android {
+//    compileSdkVersion 23
+//    buildToolsVersion '23.0.1'
+//    useLibrary 'org.apache.http.legacy'
+    compileSdkVersion 21
+    buildToolsVersion '23.0.1'
+
+    defaultConfig {
+        applicationId 'com.hybrid.core'
+        minSdkVersion 9
+//        targetSdkVersion 23
+        targetSdkVersion 21
+        versionCode 11
+        versionName "1"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java/NewStylePassword', 'src/main/java/Fragment', 'src/main/java/MyImageButton', 'src/main/java/com.bignerdranch.android.mfailab/Receivers', 'src/main/java/2', 'src/main/java/com.bignerdranch.android.mfailab/GestruePassword', 'src/main/java/com.bignerdranch.android.mfailab/Fragments', 'src/main/java/com.bignerdranch.android.mfailab/ButtonStyles', 'src/main/java/com.bignerdranch.android.mfailab/ActivitiesForExtends', 'src/main/java/com.bignerdranch.android.mfailab/InternetClassesAndThreads', 'src/main/java/com.bignerdranch.android.mfailab/SharedPreference', 'src/main/java/com.bignerdranch.android.mfailab/ExitApplication', 'src/main/java/com.bignerdranch.android.mfailab/Keyboard', 'src/main/java/com.bignerdranch.android.mfailab/setting']
+            res.srcDirs = ['src/main/res', 'src/main/res/drawable/Function', 'src/main/res/xml']
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //compile files('libs/core.jar')
+    //compile files('libs/gson-2.3.1.jar')
+    //compile files('libs/robotium-solo-5.3.1.jar')
+    //compile files('libs/universal-image-loader-1.8.6-with-sources.jar')
+    //compile files('libs/printerlibs.jar')
+
+    compile project(':HybridJsBridge')
+
+    //compile 'com.android.support:appcompat-v7:24.0.0-alpha1'
+//    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+
+
+//    compile 'com.android.support:appcompat-v7:21.0.1'
+
+    //compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
+
+    //    compile 'com.google.android.gms:play-services:8.4.0'
+    //compile 'com.android.support:support-v4:24.0.0-alpha1'
+    //compile 'com.umeng.analytics:analytics:latest.integration'
+//    compile 'com.google.android.gms:play-services-ads:8.4.0'
+//    compile 'com.google.android.gms:play-services-identity:8.4.0'
+//    compile 'com.google.android.gms:play-services-gcm:8.4.0'
+//    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+}
