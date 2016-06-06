@@ -340,6 +340,7 @@
 				TargetAttributes = {
 					1FFA55F81CFFF51600F52140 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 9966L897A3;
 					};
 					1FFA56111CFFF51600F52140 = {
 						CreatedOnToolsVersion = 7.3;
@@ -554,8 +555,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Hybrid-v2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.cmptech.Hybrid-v2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -566,8 +568,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Hybrid-v2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.cmptech.Hybrid-v2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -602,6 +605,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = "Hybrid-v2UITests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.cmptech.Hybrid-v2UITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -613,6 +617,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = "Hybrid-v2UITests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.cmptech.Hybrid-v2UITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
