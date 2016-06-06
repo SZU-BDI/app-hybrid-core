@@ -6,8 +6,8 @@
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-#import "HybridUiBase.h"
+#import "HybridUi.h"
 
-@interface UiRoot : HybridUiBase
+@interface UiRoot : HybridUi
 
 @end

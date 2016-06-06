@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Hybrid-v2.xcscheme</key>
+		<key>testproj-ios-core.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,17 +12,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>1FFA55F81CFFF51600F52140</key>
+		<key>3F4179C01D0515A600B934C5</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>1FFA56111CFFF51600F52140</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>1FFA561C1CFFF51700F52140</key>
+		<key>3F4179D91D0515A600B934C5</key>
 		<dict>
 			<key>primary</key>
 			<true/>

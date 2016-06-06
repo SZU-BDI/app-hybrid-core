@@ -26,12 +26,12 @@
     return self;
 }
 
--(void)setHybridUiBase:(HybridUiBase *)hbui AndName:(NSString *)name{
+-(void)setHybridUiBase:(HybridUi *)hbui AndName:(NSString *)name{
     #warning TODO if dic==null throw exception('config is not found')
     [_dictUi setObject:hbui forKey:name];
 }
 
--(HybridUiBase *)getHybridUiBase:(NSString *)name{
+-(HybridUi *)getHybridUiBase:(NSString *)name{
     return _dictUi[name];
 }
 

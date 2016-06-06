@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "HybridUiBase.h"
+#import "HybridUi.h"
 #import "HybridApi.h"
 
 @interface HybridConf : NSObject
 
-- (void)setHybridUiBase:(HybridUiBase *)hbui AndName:(NSString *)name;
-- (HybridUiBase *)getHybridUiBase:(NSString *)name;
+- (void)setHybridUiBase:(HybridUi *)hbui AndName:(NSString *)name;
+- (HybridUi *)getHybridUiBase:(NSString *)name;
 
 - (void)setHybridApi:(HybridApi *)hbapi AndName:(NSString *)name;
 - (HybridApi *)getHybridApi:(NSString *)name;

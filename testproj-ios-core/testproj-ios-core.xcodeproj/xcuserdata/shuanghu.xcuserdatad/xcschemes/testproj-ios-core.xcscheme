@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1FFA55F81CFFF51600F52140"
-               BuildableName = "Hybrid-v2.app"
-               BlueprintName = "Hybrid-v2"
-               ReferencedContainer = "container:Hybrid-v2.xcodeproj">
+               BlueprintIdentifier = "3F4179C01D0515A600B934C5"
+               BuildableName = "testproj-ios-core.app"
+               BlueprintName = "testproj-ios-core"
+               ReferencedContainer = "container:testproj-ios-core.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,30 +32,20 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1FFA56111CFFF51600F52140"
-               BuildableName = "Hybrid-v2Tests.xctest"
-               BlueprintName = "Hybrid-v2Tests"
-               ReferencedContainer = "container:Hybrid-v2.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1FFA561C1CFFF51700F52140"
-               BuildableName = "Hybrid-v2UITests.xctest"
-               BlueprintName = "Hybrid-v2UITests"
-               ReferencedContainer = "container:Hybrid-v2.xcodeproj">
+               BlueprintIdentifier = "3F4179D91D0515A600B934C5"
+               BuildableName = "testproj-ios-coreTests.xctest"
+               BlueprintName = "testproj-ios-coreTests"
+               ReferencedContainer = "container:testproj-ios-core.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FFA55F81CFFF51600F52140"
-            BuildableName = "Hybrid-v2.app"
-            BlueprintName = "Hybrid-v2"
-            ReferencedContainer = "container:Hybrid-v2.xcodeproj">
+            BlueprintIdentifier = "3F4179C01D0515A600B934C5"
+            BuildableName = "testproj-ios-core.app"
+            BlueprintName = "testproj-ios-core"
+            ReferencedContainer = "container:testproj-ios-core.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -75,10 +65,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FFA55F81CFFF51600F52140"
-            BuildableName = "Hybrid-v2.app"
-            BlueprintName = "Hybrid-v2"
-            ReferencedContainer = "container:Hybrid-v2.xcodeproj">
+            BlueprintIdentifier = "3F4179C01D0515A600B934C5"
+            BuildableName = "testproj-ios-core.app"
+            BlueprintName = "testproj-ios-core"
+            ReferencedContainer = "container:testproj-ios-core.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -94,10 +84,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FFA55F81CFFF51600F52140"
-            BuildableName = "Hybrid-v2.app"
-            BlueprintName = "Hybrid-v2"
-            ReferencedContainer = "container:Hybrid-v2.xcodeproj">
+            BlueprintIdentifier = "3F4179C01D0515A600B934C5"
+            BuildableName = "testproj-ios-core.app"
+            BlueprintName = "testproj-ios-core"
+            ReferencedContainer = "container:testproj-ios-core.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

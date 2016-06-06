@@ -8,7 +8,7 @@
 
 #import "ApiActivityClose.h"
 #import "HybridService.h"
-#import "HybridUiBase.h"
+#import "HybridUi.h"
 
 @interface ApiActivityClose ()
 @property (nonatomic, copy) NSMutableDictionary *callbackData;
@@ -27,7 +27,7 @@
     return ^(id data, WVJBResponseCallback responseCallback) {
         NSLog(@"ApiActivityClose -->  _app_actibity_close");
         
-        HybridUiBase *ui = (HybridUiBase *)self.hybridUi;
+        HybridUi *ui = (HybridUi *)self.hybridUi;
         [_callbackData setValue:ui.address forKey:@"address"];
         if (ui.jsCallback) {
             ui.jsCallback(_callbackData);

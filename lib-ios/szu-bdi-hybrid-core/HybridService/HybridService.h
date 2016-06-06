@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "HybridUiBase.h"
+#import "HybridUi.h"
 #import "HybridApi.h"
 
 @interface HybridService : NSObject
@@ -16,7 +16,7 @@
 //
 //- (HybridApi *) getHybridApi:(NSString *)name;
 
-+ (HybridUiBase *) buildHybridUiBase:(NSString *)name;
++ (HybridUi *) buildHybridUiBase:(NSString *)name;
 
 + (HybridApi *) buildHybridApi:(NSString *)name;
 

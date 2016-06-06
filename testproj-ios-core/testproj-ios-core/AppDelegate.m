@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "HybridUiBase.h"
+#import "HybridUi.h"
 #import "HybridService.h"
 
 @interface AppDelegate ()
@@ -23,7 +23,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     // get the Ui by service:
-    HybridUiBase *ui = [HybridService buildHybridUiBase:@"UiRoot"];
+    HybridUi *ui = [HybridService buildHybridUiBase:@"UiRoot"];
 
     // set the app window root as nav(binded with the hybrid(ui-root)):
     self.window.rootViewController = ui.topBar;
