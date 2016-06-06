@@ -32,6 +32,7 @@ public class TestApp2 extends Application {
 
 //        Intent bg = new Intent(_ctx, UiRoot.class);
 //        this.startService(bg);
+        //TODO have to run a backgroup service to check network from time to time...
 
         Log.v(LOGTAG, "Application.onCreate");
     }

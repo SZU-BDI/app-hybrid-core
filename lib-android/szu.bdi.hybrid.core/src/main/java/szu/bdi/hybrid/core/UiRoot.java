@@ -29,9 +29,6 @@ import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.github.lzyzsd.jsbridge.DefaultHandler;
-//import com.google.android.gms.appindexing.Action;
-//import com.google.android.gms.appindexing.AppIndex;
-//import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +36,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.ref.WeakReference;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+//import com.google.android.gms.appindexing.Action;
+//import com.google.android.gms.appindexing.AppIndex;
+//import com.google.android.gms.common.api.GoogleApiClient;
 
 public class UiRoot extends Activity implements View.OnClickListener {
 
@@ -76,6 +79,12 @@ public class UiRoot extends Activity implements View.OnClickListener {
         Log.d(LOGTAG, " UiRoot onCreate()");
 
         setContentView(R.layout.activity_uiroot);
+//NOTES: for main thread using network, should make do a policy config
+//        if (android.os.Build.VERSION.SDK_INT > 9) {
+//            Log.d(LOGTAG, "setThreadPolicy for " + android.os.Build.VERSION.SDK_INT);
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//        }
 
 
 //        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
@@ -97,8 +106,14 @@ public class UiRoot extends Activity implements View.OnClickListener {
 
         // mURL = getIntent().getData().toString();
 
-        mURL = "file:///android_asset/root.htm";//TODO
 
+        mURL = "file:///android_asset/root.htm";//TODO
+//        mURL = "http://baidu.com/";
+        try {
+            InetAddress i = InetAddress.getByName(mURL);
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
         Log.d(TAG, "----------url-------=" + mURL);
         progressDialog = new ProgressDialog(this);
         //   progressDialog.setTitle(getText(R.string.Login_reminder_information));
