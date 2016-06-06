@@ -1,9 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="com.hybrid.core"
+    package="szu.bdi.hybrid.core"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!--tools:replace="android:allowBackup"-->
+<!--    <application-->
+    <!--android:name=".tester.TestApp"-->
+        <!--android:allowBackup="true"-->
+        <!--android:icon="@mipmap/ic_launcher"-->
+        <!--android:label="@string/app_name"-->
+        <!--android:theme="@style/MyActionBarStyle"-->
+        <!-->-->
+
+        <!--<activity-->
+            <!--android:name=".UiRoot"-->
+            <!--android:label="@string/app_name"-->
+            <!--android:theme="@style/android:Theme.Light.NoTitleBar"-->
+            <!-->-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
+        <!--&lt;!&ndash;<activity&ndash;&gt;-->
+        <!--&lt;!&ndash;android:name=".NewActivity"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:configChanges="locale"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:label="New Activity"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:screenOrientation="portrait">&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;  android:theme="@style/android:Theme.Light.NoTitleBar"> &ndash;&gt;&ndash;&gt;-->
+
+        <!--&lt;!&ndash;</activity>&ndash;&gt;-->
+
+
+        <!--&lt;!&ndash; ATTENTION: This was auto-generated to add Google Play services to your project for-->
+             <!--App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. &ndash;&gt;-->
+        <!--&lt;!&ndash;<meta-data&ndash;&gt;-->
+        <!--&lt;!&ndash;android:name="com.google.android.gms.version"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:value="@integer/google_play_services_version" />&ndash;&gt;-->
+
+    <!--</application>-->
  </manifest>

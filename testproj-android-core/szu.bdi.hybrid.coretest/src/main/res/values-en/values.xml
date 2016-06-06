@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-        <!-- 程序名称及活动标题-->
-        <string name="app_name">Hybrid core</string>
+        <string name="app_name">$app_name</string>
         <string name="Login_Network_Status_unavailable">Network disconnected</string>
         <string name="Login_Network_CheckStatus_whether_unavailable">Network is not work</string>
         <string name="HttpUtil_NoInternet_ToastText">Internet connection failed</string>
 
         <string name="Fragments_NotConnect_ToastText">Connection problem happened，please have a try later</string>
 
-
-
-
         <string name="Fragments_NoScanResult_ToastText">some thing wrong happened,please scan again.</string>
 
 
 
-
-
-
-
-        <!--  会员业务部分及二维码相关-->
         <string name="Member_Biz">Member Business</string>
         <string name="memberbusiness_transfer_to_account">Account to Account</string>
         <string name="memberbusiness_transfer_to_cash">Account to Cash</string>
@@ -35,13 +26,6 @@
         <string name="title_activity_scan_bit_map">Back</string>
         <string name="title_activity_create_bit_map">Back</string>
         <string name="title_activity_mipca_activity_capture">Back</string>
-
-
-
-
-
-
-
 
 
 

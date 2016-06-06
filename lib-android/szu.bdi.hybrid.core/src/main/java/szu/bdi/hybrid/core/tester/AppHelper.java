@@ -1,9 +1,6 @@
-package com.hybrid.coretest;
+package szu.bdi.hybrid.core.tester;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -21,6 +18,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 
 /**
  * 作者：Created by LYC on 2015/4/10.
@@ -131,35 +129,35 @@ public class AppHelper {
 
 */
 
-    public static void SendWebsiteByIntent(Context mcontext, Uri url, Class mclass) {
-        boolean flag = false;
-        ConnectivityManager cwjManager = (ConnectivityManager) mcontext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cwjManager.getActiveNetworkInfo() != null)
-            flag = cwjManager.getActiveNetworkInfo().isAvailable();
-        if (flag) {
-            Intent intent = new Intent(mcontext, mclass);
-            intent.setData(url);
-            mcontext.startActivity(intent);
-        } else {
-            Toast.makeText(mcontext, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
-        }
-    }
+//    public static void SendWebsiteByIntent(Context mcontext, Uri url, Class mclass) {
+//        boolean flag = false;
+//        ConnectivityManager cwjManager = (ConnectivityManager) mcontext.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        if (cwjManager.getActiveNetworkInfo() != null)
+//            flag = cwjManager.getActiveNetworkInfo().isAvailable();
+//        if (flag) {
+//            Intent intent = new Intent(mcontext, mclass);
+//            intent.setData(url);
+//            mcontext.startActivity(intent);
+//        } else {
+//            Toast.makeText(mcontext, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
+//        }
+//    }
 
-    public static void SendWebsiteByIntent_with_title(Context context, Uri url, Class mclass, String text) {
-        boolean flag = false;
-        ConnectivityManager cwjManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cwjManager.getActiveNetworkInfo() != null)
-            flag = cwjManager.getActiveNetworkInfo().isAvailable();
-        if (flag) {
-            Intent intent = new Intent(context, mclass);
-            intent.putExtra(Extra_openwebsite_key, text);
-            intent.setData(url);
-            context.startActivity(intent);
-        } else {
-            Toast.makeText(context, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
-        }
-
-    }
+//    public static void SendWebsiteByIntent_with_title(Context context, Uri url, Class mclass, String text) {
+//        boolean flag = false;
+//        ConnectivityManager cwjManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        if (cwjManager.getActiveNetworkInfo() != null)
+//            flag = cwjManager.getActiveNetworkInfo().isAvailable();
+//        if (flag) {
+//            Intent intent = new Intent(context, mclass);
+//            intent.putExtra(Extra_openwebsite_key, text);
+//            intent.setData(url);
+//            context.startActivity(intent);
+//        } else {
+//            Toast.makeText(context, R.string.Login_Network_Status_unavailable, Toast.LENGTH_LONG).show();
+//        }
+//
+//    }
 
     public static String getSystemProperty(String propName) {
         String line;

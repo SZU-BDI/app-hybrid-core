@@ -1,4 +1,4 @@
-package com.hybrid.coretest;
+package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -97,7 +97,7 @@ public class UiRoot extends Activity implements View.OnClickListener {
 
         // mURL = getIntent().getData().toString();
 
-        mURL = "file:///android_asset/root.htm";
+        mURL = "file:///android_asset/root.htm";//TODO
 
         Log.d(TAG, "----------url-------=" + mURL);
         progressDialog = new ProgressDialog(this);

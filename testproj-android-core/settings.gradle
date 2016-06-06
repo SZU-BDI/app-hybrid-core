@@ -1,1 +1,1 @@
-include ':szu.bdi.hybrid.coretest',':../lib-android:szu.bdi.hybrid.core',':../lib-android:JsBridge'
+include ':../lib-android:szu.bdi.hybrid.core',':../lib-android:JsBridge',':szu.bdi.hybrid.coretest'
