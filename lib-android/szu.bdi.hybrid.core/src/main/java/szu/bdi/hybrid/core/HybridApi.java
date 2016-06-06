@@ -1,7 +1,5 @@
 package szu.bdi.hybrid.core;
 
-/**
- * Created by wjc on 6/6/16.
- */
+//TODO
 public class HybridApi {
 }

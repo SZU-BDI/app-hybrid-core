@@ -2,24 +2,25 @@ package szu.bdi.hybrid.coretest;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.StrictMode;
 import android.util.Log;
 
 //import com.hybrid.core.UiRoot;
 
 public class TestApp2 extends Application {
-    //    final private static String LOGTAG = "" + (new Object() {
-//        public String getClassName() {
-//            String clazzName = this.getClass().getName();
-//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
-//        }
-//    }.getClassName());
-    final private static String LOGTAG = "TestApp";
+    final private static String LOGTAG = "" + (new Object() {
+        public String getClassName() {
+            String clazzName = this.getClass().getName();
+            return clazzName.substring(0, clazzName.lastIndexOf('$'));
+        }
+    }.getClassName());
+//    final private static String LOGTAG = "TestApp";
 
     @Override
     public void onCreate() {
         super.onCreate();
         Context _ctx = //AppHelper.appContext =
-         getApplicationContext();
+                getApplicationContext();
 //        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
 //            AppHelper.showMsg(getApplicationContext(),
 //                    "Your Phone is too old...May have some problem");
@@ -33,7 +34,23 @@ public class TestApp2 extends Application {
 //        Intent bg = new Intent(_ctx, UiRoot.class);
 //        this.startService(bg);
         //TODO have to run a backgroup service to check network from time to time...
-
+        //NOTES: for main thread (could) using network, can do a policy config hack..
+        int _sdk_int = android.os.Build.VERSION.SDK_INT;
+        if (_sdk_int > 9) {
+            Log.d(LOGTAG, "setThreadPolicy for " + _sdk_int);
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         Log.v(LOGTAG, "Application.onCreate");
+//        new Handler().postDelayed(new Runnable() {
+//            public void run() {
+//                int pid = android.os.Process.myPid();
+//                Log.d(LOGTAG, "kill and quit pid=" + pid);
+//
+//                android.os.Process.killProcess(pid);
+//                System.exit(0);
+//            }
+//        }, (playMedia) ? 5000 : 3000);
+
     }
 }

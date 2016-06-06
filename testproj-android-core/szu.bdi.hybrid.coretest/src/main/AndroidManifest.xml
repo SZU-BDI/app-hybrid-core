@@ -5,37 +5,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <!--android:allowBackup="true"-->
+    <!--android:icon="@mipmap/ic_launcher"-->
+    <!--android:label="@string/app_name"-->
+    <!--android:theme="@style/MyActionBarStyle"-->
     <!--tools:replace="android:allowBackup"-->
+
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-
         android:name=".TestApp2"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/MyActionBarStyle"
-        tools:replace="android:allowBackup"
         >
-
-        <!--android:label="@string/app_name"-->
+        <!--android:label="@string/app_name"
+               android:label="EntryActivityLabelTodo"
+-->
         <activity
-            android:name="szu.bdi.hybrid.coretest.ProxyActivity"
-            android:label="todo_label"
+            android:name=".EntryActivity"
             android:theme="@style/android:Theme.Light.NoTitleBar"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <!--<activity-->
-            <!--android:name=".NewActivity"-->
-            <!--android:configChanges="locale"-->
-            <!--android:label="New Activity"-->
-            <!--android:screenOrientation="portrait">-->
-            <!--&lt;!&ndash;  android:theme="@style/android:Theme.Light.NoTitleBar"> &ndash;&gt;-->
+        <!--android:name=".NewActivity"-->
+        <!--android:configChanges="locale"-->
+        <!--android:label="New Activity"-->
+        <!--android:screenOrientation="portrait">-->
+        <!--&lt;!&ndash;  android:theme="@style/android:Theme.Light.NoTitleBar"> &ndash;&gt;-->
 
         <!--</activity>-->
 

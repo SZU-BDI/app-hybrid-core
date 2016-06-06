@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +14,6 @@ import android.os.Message;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
@@ -39,10 +37,6 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-//import com.google.android.gms.appindexing.Action;
-//import com.google.android.gms.appindexing.AppIndex;
-//import com.google.android.gms.common.api.GoogleApiClient;
-
 public class UiRoot extends Activity implements View.OnClickListener {
 
     final private static String LOGTAG = "UIRoot";
@@ -53,25 +47,18 @@ public class UiRoot extends Activity implements View.OnClickListener {
 //        }
 //    }.getClassName());
 
-    public String printJson;
+//    public String printJson;
     private String mURL;
-    private String text;
-    private Handler handler;
+//    private String text;
+//    private Handler handler;
     private BridgeWebView mWebView;
-    private String TAG = "sdf";
-    private long exitTime = 0;
-    private ProgressDialog progressDialog;
-    private Activity selfActivity = this;
-    private Handler mHandler;
+//    private long exitTime = 0;
+//    private ProgressDialog progressDialog;
+//    private Activity selfActivity = this;
+//    private Handler mHandler;
 
-    public static boolean isruning = false;//用于判断当前activity是否是active的。因为遇到异常android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@41e29c18
+//    public static boolean isruning = false;//用于判断当前activity是否是active的。因为遇到异常android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@41e29c18
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-//    private GoogleApiClient client;
-    // is not valid; is your activity running?
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +101,11 @@ public class UiRoot extends Activity implements View.OnClickListener {
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
         }
-        Log.d(TAG, "----------url-------=" + mURL);
-        progressDialog = new ProgressDialog(this);
-        //   progressDialog.setTitle(getText(R.string.Login_reminder_information));
-        //  progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
-        progressDialog.setCanceledOnTouchOutside(false);
+//        Log.d(TAG, "----------url-------=" + mURL);
+//        progressDialog = new ProgressDialog(this);
+//        //   progressDialog.setTitle(getText(R.string.Login_reminder_information));
+//        //  progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
+//        progressDialog.setCanceledOnTouchOutside(false);
 
         mWebView = (BridgeWebView) findViewById(R.id.webView);
 
@@ -206,7 +193,7 @@ public class UiRoot extends Activity implements View.OnClickListener {
 
                 @Override
                 public void handler(String data, CallBackFunction function) {
-                    Log.i(TAG, "handler = _app_activity_close");
+                    Log.i(LOGTAG, "handler = _app_activity_close");
                     finish();
                 }
 
@@ -249,12 +236,12 @@ public class UiRoot extends Activity implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        isruning = true;
+//        isruning = true;
     }
 
     public void onPause() {
         super.onPause();
-        isruning = false;
+//        isruning = false;
     }
 
     public void onStop() {
@@ -278,23 +265,23 @@ public class UiRoot extends Activity implements View.OnClickListener {
 //        client.disconnect();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
-            mWebView.goBack(); //goBack()表示返回WebView的上一页面
-            return true;
-        }
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if ((System.currentTimeMillis() - exitTime) > 2000) {
-                Toast.makeText(getApplicationContext(), getText(R.string.WebActivity_finishi), Toast.LENGTH_SHORT).show();
-                exitTime = System.currentTimeMillis();
-            } else {
-                finish();
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
+//            mWebView.goBack(); //goBack()表示返回WebView的上一页面
+//            return true;
+//        }
+//        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+//            if ((System.currentTimeMillis() - exitTime) > 2000) {
+//                Toast.makeText(getApplicationContext(), getText(R.string.WebActivity_finishi), Toast.LENGTH_SHORT).show();
+//                exitTime = System.currentTimeMillis();
+//            } else {
+//                finish();
+//            }
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     /**
      * This method is designed to hide how Javascript is injected into
@@ -414,6 +401,6 @@ public class UiRoot extends Activity implements View.OnClickListener {
     public void onDestroy() {
         super.onDestroy();
 //        WorkService.delHandler(mHandler);
-        mHandler = null;
+//        mHandler = null;
     }
 }

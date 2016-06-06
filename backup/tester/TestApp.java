@@ -1,4 +1,4 @@
-package szu.bdi.hybrid.core.tester;
+package szu.bdi.hybrid.coretest.tester;
 
 import android.app.Application;
 import android.content.Context;
