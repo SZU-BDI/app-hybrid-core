@@ -122,8 +122,9 @@
 				1F7B0A0C1D0155DC002D13A4 /* HybridUiBase.h */,
 				1F7B0A0D1D0155DC002D13A4 /* HybridUiBase.m */,
 			);
-			path = HybridUiBase;
-			sourceTree = "<group>";
+			name = HybridUiBase;
+			path = "../lib-ios/szu-bdi-hybrid-core/HybridUiBase";
+			sourceTree = SOURCE_ROOT;
 		};
 		1F7B0A0F1D016273002D13A4 /* HybridService */ = {
 			isa = PBXGroup;
@@ -131,8 +132,9 @@
 				1F7B0A101D016273002D13A4 /* HybridService.h */,
 				1F7B0A111D016273002D13A4 /* HybridService.m */,
 			);
-			path = HybridService;
-			sourceTree = "<group>";
+			name = HybridService;
+			path = "../lib-ios/szu-bdi-hybrid-core/HybridService";
+			sourceTree = SOURCE_ROOT;
 		};
 		1F7B0A171D018008002D13A4 /* _app_activity_close */ = {
 			isa = PBXGroup;
@@ -140,20 +142,21 @@
 				1F7B0A181D01802A002D13A4 /* ApiActivityClose.h */,
 				1F7B0A191D01802A002D13A4 /* ApiActivityClose.m */,
 			);
-			path = _app_activity_close;
-			sourceTree = "<group>";
+			name = _app_activity_close;
+			path = "../lib-ios/_app_activity_close";
+			sourceTree = SOURCE_ROOT;
 		};
 		1FFA55F01CFFF51600F52140 = {
 			isa = PBXGroup;
 			children = (
+				1F7B0A0F1D016273002D13A4 /* HybridService */,
+				1F7B0A0B1D0155DC002D13A4 /* HybridUiBase */,
+				1FFA56441CFFF8B300F52140 /* HybridApi */,
 				1FFA56331CFFF5E600F52140 /* JavascriptBridge */,
 				1F7B0A171D018008002D13A4 /* _app_activity_close */,
 				1FFA56551D000D5400F52140 /* _app_activity_open */,
 				1FFA564E1D0007EA00F52140 /* Assets */,
-				1FFA56441CFFF8B300F52140 /* HybridApi */,
-				1F7B0A0B1D0155DC002D13A4 /* HybridUiBase */,
 				1FFA563D1CFFF62400F52140 /* UiRoot */,
-				1F7B0A0F1D016273002D13A4 /* HybridService */,
 				1FFA55FB1CFFF51600F52140 /* Hybrid-v2 */,
 				1FFA56151CFFF51700F52140 /* Hybrid-v2Tests */,
 				1FFA56201CFFF51700F52140 /* Hybrid-v2UITests */,
@@ -222,8 +225,9 @@
 				1FFA56381CFFF5E600F52140 /* WebViewJavascriptBridgeBase.h */,
 				1FFA56391CFFF5E600F52140 /* WebViewJavascriptBridgeBase.m */,
 			);
-			path = JavascriptBridge;
-			sourceTree = "<group>";
+			name = JavascriptBridge;
+			path = "../lib-ios/szu-bdi-hybrid-core/JavascriptBridge";
+			sourceTree = SOURCE_ROOT;
 		};
 		1FFA563D1CFFF62400F52140 /* UiRoot */ = {
 			isa = PBXGroup;
@@ -243,8 +247,9 @@
 				1FFA56451CFFF8F200F52140 /* HybridApi.h */,
 				1FFA56461CFFF8F200F52140 /* HybridApi.m */,
 			);
-			path = HybridApi;
-			sourceTree = "<group>";
+			name = HybridApi;
+			path = "../lib-ios/szu-bdi-hybrid-core/HybridApi";
+			sourceTree = SOURCE_ROOT;
 		};
 		1FFA564E1D0007EA00F52140 /* Assets */ = {
 			isa = PBXGroup;
@@ -264,8 +269,9 @@
 				1FFA56561D000D7400F52140 /* ApiActivityOpen.h */,
 				1FFA56571D000D7400F52140 /* ApiActivityOpen.m */,
 			);
-			path = _app_activity_open;
-			sourceTree = "<group>";
+			name = _app_activity_open;
+			path = "../lib-ios/_app_activity_open";
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
