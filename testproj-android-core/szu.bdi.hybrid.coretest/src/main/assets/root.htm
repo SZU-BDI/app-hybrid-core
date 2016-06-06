@@ -28,8 +28,8 @@ set a timeout checker...
 	stage.innerHTML='Checking Network... ';
 	var _tm_check_root = setTimeout(function(){
 		if(window.isRootLoaded==false){
-			stage.innerHTML='<h2>Network seems down, please check network</h2>';//TODO BETTER UI
+			stage.innerHTML='<h2>Network seems down, please check network</h2><input type=button value="Try again" onclick="window.location.reload();"/>';//TODO BETTER UI
 			//make a button to reload?
 		}
-	},7000);
+	},15000);
 </script>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -30,7 +31,7 @@ public class AppHelper {
 
     private static String TAG = "AppHelper";
 
-    public static Context context;
+    public static Context appContext;//NOTES: Initialized at Application!!!
 
     public static String postJSONtoInternet(JSONObject mjsonobject, String url1) {
         try {
@@ -179,6 +180,23 @@ public class AppHelper {
             }
         }
         return line;
+    }
+
+    public static void showMsgMain(String msg) {
+        Context mContext = appContext;
+        showMsg(mContext, msg);
+    }
+
+    //@ref http://blog.csdn.net/droid_zhlu/article/details/7685084
+    //A toast is a view containing a quick little message for the user.  The toast class helps you create and show those.
+    public static void showMsg(Context mContext, String msg) {
+        try {
+            Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 }
