@@ -10,7 +10,6 @@
 		1F4C40C21D0531B800DA7D70 /* HybridUi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C40C11D0531B800DA7D70 /* HybridUi.m */; };
 		3F4179C71D0515A600B934C5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F4179C61D0515A600B934C5 /* main.m */; };
 		3F4179CA1D0515A600B934C5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F4179C91D0515A600B934C5 /* AppDelegate.m */; };
-		3F4179CD1D0515A600B934C5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F4179CC1D0515A600B934C5 /* ViewController.m */; };
 		3F4179D21D0515A600B934C5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F4179D11D0515A600B934C5 /* Images.xcassets */; };
 		3F4179D51D0515A600B934C5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F4179D31D0515A600B934C5 /* LaunchScreen.xib */; };
 		3F4179E11D0515A600B934C5 /* testproj_ios_coreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F4179E01D0515A600B934C5 /* testproj_ios_coreTests.m */; };
@@ -22,7 +21,7 @@
 		3F417A121D05174500B934C5 /* WebViewJavascriptBridge_JS.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A091D05174500B934C5 /* WebViewJavascriptBridge_JS.m */; };
 		3F417A131D05174500B934C5 /* WebViewJavascriptBridgeBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A0B1D05174500B934C5 /* WebViewJavascriptBridgeBase.m */; };
 		3F417A161D05176000B934C5 /* HybridConf.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A151D05176000B934C5 /* HybridConf.m */; };
-		3F417A1C1D0517AE00B934C5 /* UiOpen.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A191D0517AE00B934C5 /* UiOpen.m */; };
+		3F417A1C1D0517AE00B934C5 /* UiContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A191D0517AE00B934C5 /* UiContent.m */; };
 		3F417A1D1D0517AE00B934C5 /* UiRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F417A1B1D0517AE00B934C5 /* UiRoot.m */; };
 		3F417A241D0517F500B934C5 /* apitest.htm in Resources */ = {isa = PBXBuildFile; fileRef = 3F417A1F1D0517F500B934C5 /* apitest.htm */; };
 		3F417A251D0517F500B934C5 /* btn_nav bar_left arrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F417A201D0517F500B934C5 /* btn_nav bar_left arrow@2x.png */; };
@@ -49,8 +48,6 @@
 		3F4179C61D0515A600B934C5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		3F4179C81D0515A600B934C5 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3F4179C91D0515A600B934C5 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		3F4179CB1D0515A600B934C5 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		3F4179CC1D0515A600B934C5 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		3F4179D11D0515A600B934C5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3F4179D41D0515A600B934C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		3F4179DA1D0515A600B934C5 /* testproj-ios-coreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "testproj-ios-coreTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,8 +69,8 @@
 		3F417A0B1D05174500B934C5 /* WebViewJavascriptBridgeBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewJavascriptBridgeBase.m; sourceTree = "<group>"; };
 		3F417A141D05176000B934C5 /* HybridConf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HybridConf.h; sourceTree = "<group>"; };
 		3F417A151D05176000B934C5 /* HybridConf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HybridConf.m; sourceTree = "<group>"; };
-		3F417A181D0517AE00B934C5 /* UiOpen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UiOpen.h; sourceTree = "<group>"; };
-		3F417A191D0517AE00B934C5 /* UiOpen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UiOpen.m; sourceTree = "<group>"; };
+		3F417A181D0517AE00B934C5 /* UiContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UiContent.h; sourceTree = "<group>"; };
+		3F417A191D0517AE00B934C5 /* UiContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UiContent.m; sourceTree = "<group>"; };
 		3F417A1A1D0517AE00B934C5 /* UiRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UiRoot.h; sourceTree = "<group>"; };
 		3F417A1B1D0517AE00B934C5 /* UiRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UiRoot.m; sourceTree = "<group>"; };
 		3F417A1F1D0517F500B934C5 /* apitest.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = apitest.htm; sourceTree = "<group>"; };
@@ -113,14 +110,14 @@
 		3F4179B81D0515A600B934C5 = {
 			isa = PBXGroup;
 			children = (
+				3F417A051D05174500B934C5 /* JavascriptBridge */,
 				3F417A1E1D0517F500B934C5 /* Assets */,
-				3F417A171D0517AE00B934C5 /* UiRoot */,
 				3F4179F61D05174500B934C5 /* _app_activity_close */,
 				3F4179F91D05174500B934C5 /* _app_activity_open */,
 				1F4C40BF1D0531B800DA7D70 /* HybridUi */,
 				3F4179FC1D05174500B934C5 /* HybridApi */,
 				3F4179FF1D05174500B934C5 /* HybridService */,
-				3F417A051D05174500B934C5 /* JavascriptBridge */,
+				3F417A171D0517AE00B934C5 /* UiRoot */,
 				3F4179C31D0515A600B934C5 /* testproj-ios-core */,
 				3F4179DD1D0515A600B934C5 /* testproj-ios-coreTests */,
 				3F4179C21D0515A600B934C5 /* Products */,
@@ -139,12 +136,10 @@
 		3F4179C31D0515A600B934C5 /* testproj-ios-core */ = {
 			isa = PBXGroup;
 			children = (
-				3F417A141D05176000B934C5 /* HybridConf.h */,
-				3F417A151D05176000B934C5 /* HybridConf.m */,
 				3F4179C81D0515A600B934C5 /* AppDelegate.h */,
 				3F4179C91D0515A600B934C5 /* AppDelegate.m */,
-				3F4179CB1D0515A600B934C5 /* ViewController.h */,
-				3F4179CC1D0515A600B934C5 /* ViewController.m */,
+				3F417A141D05176000B934C5 /* HybridConf.h */,
+				3F417A151D05176000B934C5 /* HybridConf.m */,
 				3F4179D11D0515A600B934C5 /* Images.xcassets */,
 				3F4179D31D0515A600B934C5 /* LaunchScreen.xib */,
 				3F4179C41D0515A600B934C5 /* Supporting Files */,
@@ -235,8 +230,8 @@
 		3F417A171D0517AE00B934C5 /* UiRoot */ = {
 			isa = PBXGroup;
 			children = (
-				3F417A181D0517AE00B934C5 /* UiOpen.h */,
-				3F417A191D0517AE00B934C5 /* UiOpen.m */,
+				3F417A181D0517AE00B934C5 /* UiContent.h */,
+				3F417A191D0517AE00B934C5 /* UiContent.m */,
 				3F417A1A1D0517AE00B934C5 /* UiRoot.h */,
 				3F417A1B1D0517AE00B934C5 /* UiRoot.m */,
 			);
@@ -359,7 +354,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F4179CD1D0515A600B934C5 /* ViewController.m in Sources */,
 				3F417A111D05174500B934C5 /* WebViewJavascriptBridge.m in Sources */,
 				3F4179CA1D0515A600B934C5 /* AppDelegate.m in Sources */,
 				3F417A0D1D05174500B934C5 /* ApiActivityOpen.m in Sources */,
@@ -368,7 +362,7 @@
 				1F4C40C21D0531B800DA7D70 /* HybridUi.m in Sources */,
 				3F417A0C1D05174500B934C5 /* ApiActivityClose.m in Sources */,
 				3F417A1D1D0517AE00B934C5 /* UiRoot.m in Sources */,
-				3F417A1C1D0517AE00B934C5 /* UiOpen.m in Sources */,
+				3F417A1C1D0517AE00B934C5 /* UiContent.m in Sources */,
 				3F417A161D05176000B934C5 /* HybridConf.m in Sources */,
 				3F417A0E1D05174500B934C5 /* HybridApi.m in Sources */,
 				3F4179C71D0515A600B934C5 /* main.m in Sources */,

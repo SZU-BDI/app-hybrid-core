@@ -1,18 +1,18 @@
 //
 //  UiOpen.m
-//  Hybrid-v2
+//  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/3.
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-#import "UiOpen.h"
+#import "UiContent.h"
 
-@interface UiOpen ()
+@interface UiContent ()
 
 @end
 
-@implementation UiOpen
+@implementation UiContent
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -21,13 +21,13 @@
 }
 
 - (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    [super didReceiveMemoryWarning];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:NO];
-    // 当 self.isTopBar = YES ,则显示topbar
+    //  if (self.isTopBar = NO) activity hidden topbar
     if (self.isTopBar == YES) {
         [[self navigationController] setNavigationBarHidden:NO animated:YES];
     }else{

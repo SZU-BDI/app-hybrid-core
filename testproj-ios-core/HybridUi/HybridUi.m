@@ -7,8 +7,8 @@
 //
 
 #import "HybridUi.h"
-#import "HybridConf.h"
 #import "HybridApi.h"
+#import "HybridConf.h"
 #import "HybridService.h"
 
 @interface HybridUi ()<UIWebViewDelegate>
@@ -77,8 +77,6 @@
     // Edges prohibit sliding, default YES.
     self.webView.scrollView.bounces = NO;
     [self.view addSubview:self.webView];
-    
-//    [self LoadLocalhtmlName:@"root"];
 }
 
 - (void)LoadLocalhtmlName:(NSString *)loadLocalhtml{

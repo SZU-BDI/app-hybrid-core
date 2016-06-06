@@ -1,6 +1,6 @@
 //
 //  HybridService.m
-//  Hybrid-v2
+//  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/2.
 //  Copyright © 2016年 Cmptech. All rights reserved.
@@ -10,7 +10,7 @@
 #import "UiRoot.h"
 #import "ApiActivityOpen.h"
 #import "ApiActivityClose.h"
-#import "UiOpen.h"
+#import "UiContent.h"
 
 @implementation HybridService
 
@@ -27,7 +27,7 @@
         return ui;
     }
     if ([name isEqualToString:@"UiOpen"]) {
-        HybridUi *ui = [[UiOpen alloc] init];
+        HybridUi *ui = [[UiContent alloc] init];
         return ui;
     }
     

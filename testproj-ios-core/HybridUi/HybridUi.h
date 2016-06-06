@@ -15,11 +15,12 @@
 @property (nonatomic, strong) UINavigationController *topBar;
 @property (nonatomic, strong) UIWebView *webView;
 
+@property (nonatomic, copy) NSString *address;
+@property (nonatomic, strong) WVJBResponseCallback jsCallback;
+@property (nonatomic) BOOL isTopBar;
+
 - (void)LoadLocalhtmlName:(NSString *)loadLocalhtml;
 
 - (void)LoadTheUrl:(NSString *)url;
 
-@property (nonatomic, copy) NSString *address;
-@property (nonatomic, strong) WVJBResponseCallback jsCallback;
-@property (nonatomic) BOOL isTopBar;
 @end

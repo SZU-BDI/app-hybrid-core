@@ -1,6 +1,6 @@
 //
 //  UiRoot.m
-//  Hybrid-v2
+//  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/2.
 //  Copyright © 2016年 Cmptech. All rights reserved.
@@ -17,7 +17,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
     [self LoadLocalhtmlName:@"root"];
 }
 
@@ -28,7 +27,7 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:NO];
-    // root hidden topbar
+    // Root activity hidden topbar
     [[self navigationController] setNavigationBarHidden:YES animated:YES];
 }
 
