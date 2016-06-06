@@ -12,7 +12,7 @@
 #import "HybridService.h"
 
 @interface HybridUi ()<UIWebViewDelegate>
-
+@property (nonatomic, copy) NSMutableDictionary *callbackData;
 @end
 
 @implementation HybridUi
@@ -22,6 +22,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.topBar  = [[UINavigationController alloc] initWithRootViewController:self];
+        _callbackData = [[NSMutableDictionary alloc] initWithCapacity:0];
+        [self CustomLeftBarButtonItem];
     }
     return self;
 }
@@ -37,7 +39,7 @@
     [self configWebview];
     
     // Enable logging：
-//    [WebViewJavascriptBridge enableLogging];
+    [WebViewJavascriptBridge enableLogging];
     
     // initial the WebViewJavascriptBridge，With the webview binding：
     _bridge = [WebViewJavascriptBridge bridgeForWebView:_webView];
@@ -49,6 +51,20 @@
     [self registerHandlerApi];
 }
 
+// Custom topBar left back buttonItem
+-(void)CustomLeftBarButtonItem
+{
+    UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"] style:UIBarButtonItemStylePlain target:self action:@selector(leftBarItemAction)];
+    leftBar.tintColor = [UIColor blackColor];
+    self.navigationItem.leftBarButtonItem = leftBar;
+}
+-(void)leftBarItemAction{
+    [_callbackData setValue:self.address forKey:@"address"];
+    if (self.jsCallback) {
+        self.jsCallback(_callbackData);
+    }
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 - (void)configWebview{
     

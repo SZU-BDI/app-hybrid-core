@@ -28,6 +28,7 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:NO];
+    // root hidden topbar
     [[self navigationController] setNavigationBarHidden:YES animated:YES];
 }
 

@@ -9,7 +9,7 @@
 #import "UiOpen.h"
 
 @interface UiOpen ()
-@property (nonatomic, copy) NSMutableDictionary *callbackData;
+
 @end
 
 @implementation UiOpen
@@ -17,24 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    _callbackData = [[NSMutableDictionary alloc] initWithCapacity:0];
-    [self CustomLeftBarButtonItem];
     [self LoadTheUrl:self.address];
-}
-
-//自定义BarbuttonItem（导航栏左边的-返回按钮）
--(void)CustomLeftBarButtonItem
-{
-    UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"] style:UIBarButtonItemStylePlain target:self action:@selector(leftBarItemAction)];
-    leftBar.tintColor = [UIColor blackColor];
-    self.navigationItem.leftBarButtonItem = leftBar;
-}
--(void)leftBarItemAction{
-    [_callbackData setValue:self.address forKey:@"address"];
-    if (self.jsCallback) {
-        self.jsCallback(_callbackData);
-    }
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning {
