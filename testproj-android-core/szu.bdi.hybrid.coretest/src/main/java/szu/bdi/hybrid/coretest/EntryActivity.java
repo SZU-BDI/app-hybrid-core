@@ -1,6 +1,14 @@
 package szu.bdi.hybrid.coretest;
 
-public class EntryActivity extends szu.bdi.hybrid.core.HybridUi {
+/**
+ *  as the android must have a starter activity, so for now we create a empty for temp...
+ *
+ */
+
+public class EntryActivity extends szu.bdi.hybrid.core.HybridUi
+//public class EntryActivity extends Activity
+{
+//    //    final private static String LOGTAG = "HybridUi";
 //    final private static String LOGTAG = "" + (new Object() {
 //        public String getClassName() {
 //            String clazzName = this.getClass().getName();
@@ -8,16 +16,11 @@ public class EntryActivity extends szu.bdi.hybrid.core.HybridUi {
 //        }
 //    }.getClassName());
 //
+//    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
 //        Log.d(LOGTAG, ".onCreate()");
 //
-////        //NOTES: for main thread (could) using network, can do a policy config hack..
-////        int _sdk_int = android.os.Build.VERSION.SDK_INT;
-////        if (_sdk_int > 9) {
-////            Log.d(LOGTAG, "setThreadPolicy for " + _sdk_int);
-////            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-////            StrictMode.setThreadPolicy(policy);
-////        }
+//
 //    }
 }

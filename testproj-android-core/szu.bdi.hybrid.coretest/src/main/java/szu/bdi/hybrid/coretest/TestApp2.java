@@ -14,17 +14,17 @@ public class TestApp2 extends Application {
             return clazzName.substring(0, clazzName.lastIndexOf('$'));
         }
     }.getClassName());
-//    final private static String LOGTAG = "TestApp";
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Context _ctx = //AppHelper.appContext =
+        final Context _ctx = //AppHelper.appContext =
                 getApplicationContext();
 //        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
 //            AppHelper.showMsg(getApplicationContext(),
 //                    "Your Phone is too old...May have some problem");
 //        }
+
 //        Intent intent = new Intent(_ctx, UiRoot.class);
 //
 ////        intent.putExtra(Extra_openwebsite_key, text);
@@ -42,6 +42,59 @@ public class TestApp2 extends Application {
             StrictMode.setThreadPolicy(policy);
         }
         Log.v(LOGTAG, "Application.onCreate");
+
+//        Handler handler = new Handler(Looper.getMainLooper());
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                Intent intent = new Intent(_ctx, HybridUi.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+////                HybridService hs = new HybridService(_ctx);
+////                HybridUi ui = hs.getHybridUi("file://android_asset/root.htm");
+////                HybridService.getHybridUi(_ctx, "file://android_asset/root.htm");
+//            }
+//        }, 10);
+
+//        Context _ctx = getApplicationContext();
+
+//        new Handler().postDelayed(new Runnable() {
+//            public void run() {
+////                Intent intent = new Intent(_ctx, HybridUi.class);
+////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+////                startActivity(intent);
+//                HybridService hs = new HybridService(_ctx);
+//                HybridUi ui = hs.getHybridUi("file://android_asset/root.htm");
+////                ui.show();TODO
+////                HybridService.getHybridUi(_ctx, "file://android_asset/root.htm");
+//            }
+//        }, 1);
+//
+//        new Handler().postDelayed(new Runnable() {
+//            public void run() {
+//                Intent intent = new Intent(_ctx, UiContent.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+////                HybridService hs = new HybridService(_ctx);
+////                HybridUi ui = hs.getHybridUi("file://android_asset/root.htm");
+////                ui.show();TODO
+////                HybridService.getHybridUi(_ctx, "file://android_asset/root.htm");
+//            }
+//        }, 5000);
+
+//        new Handler().postDelayed(new Runnable() {
+//            public void run() {
+////                Intent intent = new Intent(_ctx, HybridUi.class);
+////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+////                startActivity(intent);
+//                HybridService.getHybridUi(_ctx, "file://android_asset/root.htm");
+//            }
+//        }, 8000);
+
+//        intent.putExtra("Topbar", Topbar);
+//        intent.putExtra("Mode", Mode);
+//        intent.putExtra("Address", Address);
+
+        //TODO start the background network status checker...
 //        new Handler().postDelayed(new Runnable() {
 //            public void run() {
 //                int pid = android.os.Process.myPid();

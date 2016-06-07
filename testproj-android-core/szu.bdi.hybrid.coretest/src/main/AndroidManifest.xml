@@ -28,16 +28,18 @@
             </intent-filter>
         </activity>
 
-        <!--<activity-->
-        <!--android:name=".NewActivity"-->
-        <!--android:configChanges="locale"-->
-        <!--android:label="New Activity"-->
-        <!--android:screenOrientation="portrait">-->
-        <!--&lt;!&ndash;  android:theme="@style/android:Theme.Light.NoTitleBar"> &ndash;&gt;-->
-
-        <!--</activity>-->
-
-
+        <!-- register the HybridUI -->
+        <activity
+            android:name="szu.bdi.hybrid.core.HybridUi"
+            >
+            <!--             android:configChanges="locale"
+            android:label="New Activity"
+            android:screenOrientation="portrait" android:theme="@style/android:Theme.Light.NoTitleBar"> -->
+        </activity>
+        <activity
+            android:name="szu.bdi.hybrid.core.TestActivity"
+            >
+        </activity>
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
              App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <!--<meta-data-->
