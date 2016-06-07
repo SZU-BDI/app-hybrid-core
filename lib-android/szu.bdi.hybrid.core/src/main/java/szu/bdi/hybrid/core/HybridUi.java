@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,20 +141,16 @@ public class HybridUi extends Activity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-                Log.v(LOGTAG, "TODO onJsAlert " + url + "," + message);
-                return false;
-//                final String msg = message;
-////                new Handler().postDelayed(new Runnable() {
-////                    public void run() {
-//                        AlertDialog.Builder b2;
-//                        b2 = new AlertDialog.Builder(_ctx);
-//                        b2.setMessage(msg).setPositiveButton("Close", new AlertDialog
-//                                .OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                result.confirm();
-//                            }
-//                        });
+                final String msg = message;
+                AlertDialog.Builder b2;
+                b2 = new AlertDialog.Builder(_ctx);
+                b2.setMessage(msg).setPositiveButton("Close", new AlertDialog
+                        .OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.confirm();
+                    }
+                });
 //                       /* b2.setNegativeButton("cancel", new AlertDialog.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialog, int which) {
@@ -160,11 +158,9 @@ public class HybridUi extends Activity {
 //                            }
 //                        });*/
 //                        /*b2.setCancelable(false);*/
-//                        b2.create();
-//                        b2.show();
-////                    }
-////                }, 500);
-//                return true;
+                b2.create();
+                b2.show();
+                return true;
             }
         });
 
