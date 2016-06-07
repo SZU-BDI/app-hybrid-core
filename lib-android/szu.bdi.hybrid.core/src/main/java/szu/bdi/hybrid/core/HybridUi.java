@@ -112,12 +112,19 @@ public class HybridUi extends Activity {
 //                ex.printStackTrace();
 //            }
             setTitle("TODO setTitle()");
-            ActionBar actionBar = getActionBar();
-            try {
-                //after enable, onOptionsItemSelected() should work
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            } catch (NullPointerException ex) {
-                ex.printStackTrace();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+                try {
+//                    ActionBar actionBar = getSupportActionBar();
+//                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    ActionBar actionBar = getActionBar();//>=API 11
+                    //after enable, onOptionsItemSelected() should work
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+//                }
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                } catch (NoSuchMethodError ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
