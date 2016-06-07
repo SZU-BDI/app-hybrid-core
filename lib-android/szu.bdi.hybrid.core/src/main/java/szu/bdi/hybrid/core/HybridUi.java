@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+//import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -53,10 +55,10 @@ public class HybridUi extends Activity {
 //        handler.post(new Runnable() {
 //            @Override
 //            public void run() {
-                Intent intent = new Intent(HybridUi.this, TestActivity.class);
+        Intent intent = new Intent(HybridUi.this, HybridUiWithTitleBar.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivityForResult(intent, 1);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivityForResult(intent, 1);
 //            }
 //        });
     }
@@ -75,6 +77,13 @@ public class HybridUi extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOGTAG, ".onCreate()");
+
+        //Hide title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+//Hide status bar.  todo by param
+//        if(true)
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         final Context _ctx = this;
 

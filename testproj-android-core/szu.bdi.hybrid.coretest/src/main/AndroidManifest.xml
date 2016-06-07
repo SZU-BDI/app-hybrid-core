@@ -20,8 +20,8 @@
 -->
         <activity
             android:name=".EntryActivity"
-            android:theme="@style/android:Theme.Light.NoTitleBar"
             >
+            <!--android:theme="@style/android:Theme.Light.NoTitleBar"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -36,10 +36,18 @@
             android:label="New Activity"
             android:screenOrientation="portrait" android:theme="@style/android:Theme.Light.NoTitleBar"> -->
         </activity>
+        <!--<activity-->
+        <!--android:name="szu.bdi.hybrid.core.TestActivity"-->
+        <!--android:label="Test New Activity"-->
+        <!--android:screenOrientation="portrait">-->
+        <!--</activity>-->
         <activity
-            android:name="szu.bdi.hybrid.core.TestActivity"
-            >
+            android:name="szu.bdi.hybrid.core.HybridUiWithTitleBar"
+            android:label="TodoTitleBar"
+            android:screenOrientation="portrait">
         </activity>
+
+        <!--android:configChanges="locale"-->
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
              App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <!--<meta-data-->
