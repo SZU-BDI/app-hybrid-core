@@ -1,13 +1,16 @@
 package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.Window;
-//import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -19,6 +22,8 @@ import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+//import android.view.WindowManager;
 
 //TODO bugfix the jsbridge...
 
@@ -55,7 +60,7 @@ public class HybridUi extends Activity {
 //        handler.post(new Runnable() {
 //            @Override
 //            public void run() {
-        Intent intent = new Intent(HybridUi.this, HybridUiWithTitleBar.class);
+        Intent intent = new Intent(HybridUi.this, HybridUi.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivityForResult(intent, 1);
@@ -65,6 +70,7 @@ public class HybridUi extends Activity {
 
     protected CallBackFunction _cb = null;//TODO !!!
 
+    //work with this.startActivityForResult() + popupActivity(setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOGTAG, "onActivityResult !!!! " + resultCode);
         if (_cb != null && resultCode > 0) {
@@ -74,12 +80,46 @@ public class HybridUi extends Activity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.onBackPressed();
+                break;
+        }
+        return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOGTAG, ".onCreate()");
 
         //Hide title bar
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (false) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        } else {
+//            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+//            requestWindowFeature(Window.FEATURE_LEFT_ICON);
+            //setContentView(R.layout.); //or whatever layout is shows
+//            setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.abc_btn_check_material);
+            //getActionBar().setIcon(R.drawable.abc_btn_radio_material);
+//            getActionBar().setIcon(R.drawable.back3x);
+//            try {
+////                getActionBar().setDisplayHomeAsUpEnabled(true);
+//                //getActionBar().setdis
+//            } catch (NullPointerException ex) {
+//                ex.printStackTrace();
+//            }
+            setTitle("TODO setTitle()");
+            ActionBar actionBar = getActionBar();
+            try {
+                //after enable, onOptionsItemSelected() should work
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            } catch (NullPointerException ex) {
+                ex.printStackTrace();
+            }
+        }
 
 //Hide status bar.  todo by param
 //        if(true)
@@ -127,6 +167,14 @@ public class HybridUi extends Activity {
         setContentView(mWebView);
 
         mURL = "file:///android_asset/root.htm";
+        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                Log.i(LOGTAG, "handler = _app_activity_close");
+                HybridUi.this.onBackPressed();
+            }
+        });
         mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
 
                     @Override
@@ -205,6 +253,12 @@ public class HybridUi extends Activity {
 //        }, 5000);
     }
 
+    @Override
+    public void onBackPressed() {        // to prevent irritating accidental logouts
+
+        setResult(1, new Intent());
+        finish();
+    }
 }
 
 //TODO Dynamic binding with the Srevice...
