@@ -6,6 +6,8 @@ Please refer to github/SZU-BDI/app-hybrid-demo
 
 # Target
 
+**WRITE YOUR OWN MOBILE APP**
+
 Combine with app-hybrid-demo, we need to complete these tasks:
 
 1. auto check update and sync app-hybrid-core and copy to $my_project/../build/
