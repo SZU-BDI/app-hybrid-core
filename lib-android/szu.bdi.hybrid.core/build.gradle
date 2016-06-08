@@ -18,11 +18,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile files('../gson-2.3.1.jar')
-//    compile 'com.google.code.gson:gson:2.3.1'
-
-    //TODO bugfix or write new JsBridge
-    //compile project(':../lib-android:JsBridge')
-    compile project(':../../app-hybrid-core/lib-android:JsBridge')
+    compile project(':JsBridge')
 
     //compile files('libs/core.jar')
     //compile files('libs/robotium-solo-5.3.1.jar')

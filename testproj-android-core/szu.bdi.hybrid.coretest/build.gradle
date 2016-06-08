@@ -14,19 +14,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    //compile files('../gson-2.3.1.jar')
-    //    compile 'com.google.code.gson:gson:2.3.1'
-    //TODO write a better JsBridge...
-//    compile project(':../lib-android:JsBridge')
-    compile project(':../../app-hybrid-core/lib-android:JsBridge')
-    //compile project(':JsBridge')
-    //    compile project(':../lib-android:szu.bdi.hybrid.core')
-    //compile files('libs/core.jar')
-    //compile files('libs/robotium-solo-5.3.1.jar')
-    //compile files('libs/universal-image-loader-1.8.6-with-sources.jar')
-    //compile files('libs/printerlibs.jar')
     compile 'com.android.support:appcompat-v7:21.0.3'
-    //Warning:Dependency testproj-android-core.../lib-android:szu.bdi.hybrid.core:unspecified on project szu.bdi.hybrid.coretest resolves to an APK archive which is not supported as a compilation dependency. File: /Users/wjc/Downloads/github/app-hybrid-core/lib-android/szu.bdi.hybrid.core/build/outputs/apk/szu.bdi.hybrid.core-release-unsigned.apk
-    //compile project(':../lib-android:szu.bdi.hybrid.core')
-    compile project(':../lib-android:szu.bdi.hybrid.core')
+
+    compile project(':JsBridge')
+    compile project(':szu.bdi.hybrid.core')
 }
