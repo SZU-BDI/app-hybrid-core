@@ -17,7 +17,8 @@ dependencies {
     //compile files('../gson-2.3.1.jar')
     //    compile 'com.google.code.gson:gson:2.3.1'
     //TODO write a better JsBridge...
-    compile project(':../lib-android:JsBridge')
+//    compile project(':../lib-android:JsBridge')
+    compile project(':../../app-hybrid-core/lib-android:JsBridge')
     //compile project(':JsBridge')
     //    compile project(':../lib-android:szu.bdi.hybrid.core')
     //compile files('libs/core.jar')
