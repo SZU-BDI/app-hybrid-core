@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 
@@ -34,10 +35,10 @@ public class HybridService {
 //        handler.post(new Runnable() {
 //            @Override
 //            public void run() {
-                Intent intent = new Intent(_f_ctx, HybridUi.class);
+        Intent intent = new Intent(_f_ctx, HybridUi.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
-                _f_ctx.startActivity(intent);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        _f_ctx.startActivity(intent);
 //            }
 //        });
 //        //        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
@@ -75,9 +76,10 @@ public class HybridService {
     }
 
     @SuppressLint("JavascriptInterface")
-    public static BridgeWebView BuildWebViewWithJsBridgeSupport(Context _ctx) {
-        //TODO rewrite or bugfix the WebView later.
-        BridgeWebView wv = new BridgeWebView(_ctx);
+    public static WebView BuildWebViewWithJsBridgeSupport(Context ctx) {
+        final Context _ctx = ctx;
+
+        final BridgeWebView wv = new BridgeWebView(_ctx);
 
         WebSettings mWebSettings = wv.getSettings();
 
@@ -109,6 +111,8 @@ public class HybridService {
 //                return "testreturnfromsend";
 //            }
 //        }, "AndroidWebView");
+
+
         return wv;
     }
 

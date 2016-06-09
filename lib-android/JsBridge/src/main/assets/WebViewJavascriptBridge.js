@@ -17,65 +17,10 @@
     var responseCallbacks = {};
     var uniqueId = 1;
 
-    var base64encodechars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    function base64encode(str) {
-        if (str === undefined) {
-            return str;
-        }
-
-        var out, i, len;
-        var c1, c2, c3;
-        len = str.length;
-        i = 0;
-        out = "";
-        while (i < len) {
-            c1 = str.charCodeAt(i++) & 0xff;
-            if (i == len) {
-                out += base64encodechars.charAt(c1 >> 2);
-                out += base64encodechars.charAt((c1 & 0x3) << 4);
-                out += "==";
-                break;
-            }
-            c2 = str.charCodeAt(i++);
-            if (i == len) {
-                out += base64encodechars.charAt(c1 >> 2);
-                out += base64encodechars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xf0) >> 4));
-                out += base64encodechars.charAt((c2 & 0xf) << 2);
-                out += "=";
-                break;
-            }
-            c3 = str.charCodeAt(i++);
-            out += base64encodechars.charAt(c1 >> 2);
-            out += base64encodechars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xf0) >> 4));
-            out += base64encodechars.charAt(((c2 & 0xf) << 2) | ((c3 & 0xc0) >> 6));
-            out += base64encodechars.charAt(c3 & 0x3f);
-        }
-        return out;
-    }
-
-
     function _createQueueReadyIframe(doc) {
         messagingIframe = doc.createElement('iframe');
         messagingIframe.style.display = 'none';
         doc.documentElement.appendChild(messagingIframe);
-    }
-
-    function isAndroid() {
-        var ua = navigator.userAgent.toLowerCase();
-        var isA = ua.indexOf("android") > -1;
-        if (isA) {
-            return true;
-        }
-        return false;
-    }
-
-    function isIphone() {
-        var ua = navigator.userAgent.toLowerCase();
-        var isIph = ua.indexOf("iphone") > -1;
-        if (isIph) {
-            return true;
-        }
-        return false;
     }
 
     //set default messageHandler
@@ -124,19 +69,17 @@
     function _fetchQueue() {
         var messageQueueString = JSON.stringify(sendMessageQueue);
         sendMessageQueue = [];
-        //add by hq
-        if (isIphone()) {
-            return messageQueueString;
-            //android can't read directly the return data, so we can reload iframe src to communicate with java
-        } else if (isAndroid()) {
-            messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
-        }
+        //android can't read directly the return data, so we can reload iframe src to communicate with java
+        messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
     }
+
+	function o2s(object){ if(null==object)return "null"; var type = typeof object; if('object'== type){ if (Array == object.constructor) type = 'array'; else if (RegExp == object.constructor) type = 'regexp'; else type = 'object'; } switch(type){ case 'undefined': case 'unknown': return; break; case 'function': case 'boolean': case 'regexp': return object.toString(); break; case 'number': return isFinite(object) ? object.toString() : 'null'; break; case 'string': return '"' + object.replace(/(\\|\")/g,"\\$1").replace(/\n|\r|\t/g, function(){ var a = arguments[0]; return (a == '\n') ? '\\n': (a == '\r') ? '\\r': (a == '\t') ? '\\t': "" }) + '"'; break; case 'object': var pp="";var value =""; var results = []; try{ for (var property in object) { pp=object[property]; value = o2s(pp); if (value !== undefined) results.push('"'+property + '":' + value); }; } catch(e){ } return '{' + results.join(',') + '}'; break; case 'array': var results = []; if(object.length>=0){ for(var i = 0; i < object.length; i++){ var value = o2s(object[i]); if (value !== undefined) results.push(value); }; return '[' + results.join(',') + ']'; } else{ for(k in object) { var kk=k; var value = o2s(object[k]); if (value !== undefined) results.push('"'+kk+'":'+value); } return '{' + results.join(',') + '}'; } break; } }
 
     //提供给native使用,
     function _dispatchMessageFromNative(messageJSON) {
         setTimeout(function() {
-            var message = JSON.parse(messageJSON);
+//            var message = JSON.parse(messageJSON);
+var message = o2s(messageJSON);
             var responseCallback;
             //java call finished, now need to call js callback function
             if (message.responseId) {

@@ -13,7 +13,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:name=".TestApp2"
+        android:name=".CoreTestApp"
         >
         <!--android:icon="@drawable/logo"-->
         <!--TOOL:  http://www.iconres.com/tool/drawable.php-->

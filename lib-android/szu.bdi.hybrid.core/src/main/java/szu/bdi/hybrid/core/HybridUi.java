@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
+import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -44,6 +45,7 @@ public class HybridUi extends Activity {
     private String mURL;
 
     private BridgeWebView mWebView;
+//    private WebView mWebView;
 
     public class JavaScriptInterface {
         Context mContext1;
@@ -53,31 +55,12 @@ public class HybridUi extends Activity {
         }
     }
 
-    protected void temp1(CallBackFunction cb) {
-//        final CallBackFunction _cb = cb;
-        this._cb = cb;
-        Log.v(LOGTAG, "temp1!!!!");
-
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-        Intent intent = new Intent(HybridUi.this, HybridUi.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivityForResult(intent, 1);
-//            }
-//        });
-    }
-
-    protected CallBackFunction _cb = null;//TODO !!!
+    protected CallBackFunction _cb = null;
 
     //work with this.startActivityForResult() + popupActivity(setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(LOGTAG, "onActivityResult !!!! " + resultCode);
         if (_cb != null && resultCode > 0) {
-            Log.v(LOGTAG, "onActivityResult ???? " + resultCode);
-            _cb.onCallBack(new Gson().toJson("AAAA"));
+            _cb.onCallBack(new Gson().toJson("OK"));//TODO
         }
     }
 
@@ -133,9 +116,56 @@ public class HybridUi extends Activity {
 
         final Context _ctx = this;
 
-        //mWebView = HybridService.BuildWebViewWithJsBridgeSupport(_ctx);//TODO
+//        mWebView = HybridService.BuildWebViewWithJsBridgeSupport(_ctx);//TODO
 
+        //com.github.lzyzsd.jsbridge
         mWebView = HybridService.BuildOldJsBridge(_ctx);
+
+        //fail for API < 11
+//        https://www.processon.com/view/link/57597a42e4b080e40c822f16
+        if (false)
+            mWebView.addJavascriptInterface(new Object() {
+                @JavascriptInterface
+                public String js2jv(String id, String handler_s, String param_s) {
+                    Log.v(LOGTAG, "_js2js_cb =>" + id + "," + handler_s + "," + param_s);
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        //TODO
+                        jsonObject = new JSONObject("{t:111}");
+                        jsonObject.putOpt("k", new JSONObject("{t1:222}"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+//                    HybridUi.this.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            //mWebView.loadUrl("javascript:alert(222);");
+//                        }
+//                    });
+//                HybridUi.this.runOnUiThread();
+//                new Handler().postDelayed(new Runnable() {
+//                    public void run() {
+//                        Log.v(LOGTAG, "=> js2jv_cb =>, TODO");
+////                        wv.loadUrl("javascript:JsBridgeHybrid.js2jv_cb(" + id + "," + jsonObject.toString() + ");");
+//                        //if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+//                          //  wv.loadUrl("javascript:alert(222);");
+//                        //}
+//                    }
+//                }, 2000);
+                    //if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                    //Log.v(LOGTAG, "=> js2jv_cb =>" + id + ", TODO");
+                    //wv.loadUrl("javascript:JsBridgeHybrid.js2jv_cb(" + id + "," + jsonObject.toString() + ");");
+                    //}
+                    return "TODO js2jv";
+                }
+
+                @JavascriptInterface
+                public String jv2js_cb(String id, String result_s) {
+                    Log.v(LOGTAG, "_js2js_cb =>" + id + "," + result_s);
+                    return "TODO";
+                }
+
+            }, "JsBridgeHybrid_");
 
         //if not set, the js alert won't effect...(maybe the default return is true)
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -167,22 +197,23 @@ public class HybridUi extends Activity {
         setContentView(mWebView);
 
         mURL = "file:///android_asset/root.htm";
-        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
+        if (true) { //TODO ...
+            mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
 
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                Log.i(LOGTAG, "handler = _app_activity_close");
-                HybridUi.this.onBackPressed();
-            }
-        });
-        mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
+                @Override
+                public void handler(String data, CallBackFunction function) {
+                    Log.i(LOGTAG, "handler = _app_activity_close");
+                    HybridUi.this.onBackPressed();
+                }
+            });
+            mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
 
-                    @Override
-                    public void handler(String data, CallBackFunction cb) {
-                        Log.v("_app_activity_open", data);
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(data);
+                        @Override
+                        public void handler(String data, CallBackFunction cb) {
+                            Log.v("_app_activity_open", data);
+                            JSONObject jsonObject = null;
+                            try {
+                                jsonObject = new JSONObject(data);
 ////
 ////                    String Topbar = jsonObject.optString("topbar");
 ////                    String Mode = jsonObject.optString("mode");
@@ -226,17 +257,20 @@ public class HybridUi extends Activity {
 //                                }
 //                            });
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            HybridUi.this._cb = cb;
+
+                            Intent intent = new Intent(HybridUi.this, HybridUi.class);
+                            startActivityForResult(intent, 1);
                         }
-                        HybridUi.this.temp1(cb);
-//                function.onCallBack("Activity opened");
-                        //cb.onCallBack(new Gson().toJson("AAAA"));//TODO
+
                     }
 
-                }
+            );
+        }
 
-        );
         Log.v(LOGTAG, "load mURL=" + mURL);
         mWebView.loadUrl(mURL);
 
@@ -261,7 +295,7 @@ public class HybridUi extends Activity {
     }
 }
 
-//TODO Dynamic binding with the Srevice...
+//TODO Dynamic binding with the Service...
 
 //        mWebView.setWebChromeClient(new WebChromeClient() {
 //            @Override

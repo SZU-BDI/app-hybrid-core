@@ -4,7 +4,6 @@ include ':JsBridge'
 project(':JsBridge').projectDir = new File(settingsDir, '../lib-android/JsBridge')
 
 include ':szu.bdi.hybrid.core'
-project(':szu.bdi.hybrid.core').projectDir =
-        new File(settingsDir, '../lib-android/szu.bdi.hybrid.core')
+project(':szu.bdi.hybrid.core').projectDir = new File(settingsDir, '../lib-android/szu.bdi.hybrid.core')
 
 
