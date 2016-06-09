@@ -26,7 +26,11 @@
     //set default messageHandler
     function init(messageHandler) {
         if (WebViewJavascriptBridge._messageHandler) {
-            throw new Error('WebViewJavascriptBridge.init called twice');
+            //throw new Error('WebViewJavascriptBridge.init called twice');
+            if("undefined"!=typeof console){
+             console.log('WebViewJavascriptBridge.init called twice');
+            }
+            return;
         }
         WebViewJavascriptBridge._messageHandler = messageHandler;
         var receivedMessages = receiveMessageQueue;
