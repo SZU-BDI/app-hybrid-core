@@ -77,13 +77,14 @@
         messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
     }
 
-	function o2s(object){ if(null==object)return "null"; var type = typeof object; if('object'== type){ if (Array == object.constructor) type = 'array'; else if (RegExp == object.constructor) type = 'regexp'; else type = 'object'; } switch(type){ case 'undefined': case 'unknown': return; break; case 'function': case 'boolean': case 'regexp': return object.toString(); break; case 'number': return isFinite(object) ? object.toString() : 'null'; break; case 'string': return '"' + object.replace(/(\\|\")/g,"\\$1").replace(/\n|\r|\t/g, function(){ var a = arguments[0]; return (a == '\n') ? '\\n': (a == '\r') ? '\\r': (a == '\t') ? '\\t': "" }) + '"'; break; case 'object': var pp="";var value =""; var results = []; try{ for (var property in object) { pp=object[property]; value = o2s(pp); if (value !== undefined) results.push('"'+property + '":' + value); }; } catch(e){ } return '{' + results.join(',') + '}'; break; case 'array': var results = []; if(object.length>=0){ for(var i = 0; i < object.length; i++){ var value = o2s(object[i]); if (value !== undefined) results.push(value); }; return '[' + results.join(',') + ']'; } else{ for(k in object) { var kk=k; var value = o2s(object[k]); if (value !== undefined) results.push('"'+kk+'":'+value); } return '{' + results.join(',') + '}'; } break; } }
+//function o2s(object){ if(null==object)return "null"; var type = typeof object; if('object'== type){ if (Array == object.constructor) type = 'array'; else if (RegExp == object.constructor) type = 'regexp'; else type = 'object'; } switch(type){ case 'undefined': case 'unknown': return; break; case 'function': case 'boolean': case 'regexp': return object.toString(); break; case 'number': return isFinite(object) ? object.toString() : 'null'; break; case 'string': return '"' + object.replace(/(\\|\")/g,"\\$1").replace(/\n|\r|\t/g, function(){ var a = arguments[0]; return (a == '\n') ? '\\n': (a == '\r') ? '\\r': (a == '\t') ? '\\t': "" }) + '"'; break; case 'object': var pp="";var value =""; var results = []; try{ for (var property in object) { pp=object[property]; value = o2s(pp); if (value !== undefined) results.push('"'+property + '":' + value); }; } catch(e){ } return '{' + results.join(',') + '}'; break; case 'array': var results = []; if(object.length>=0){ for(var i = 0; i < object.length; i++){ var value = o2s(object[i]); if (value !== undefined) results.push(value); }; return '[' + results.join(',') + ']'; } else{ for(k in object) { var kk=k; var value = o2s(object[k]); if (value !== undefined) results.push('"'+kk+'":'+value); } return '{' + results.join(',') + '}'; } break; } }
+function s2o(strJson){ try{ var myjson=null; return (new Function('return '+strJson))(); }catch(ex){} };
 
     //提供给native使用,
     function _dispatchMessageFromNative(messageJSON) {
         setTimeout(function() {
 //            var message = JSON.parse(messageJSON);
-var message = o2s(messageJSON);
+var message = s2o(messageJSON);
             var responseCallback;
             //java call finished, now need to call js callback function
             if (message.responseId) {

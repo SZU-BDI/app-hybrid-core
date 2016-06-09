@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
@@ -59,7 +60,9 @@ public class HybridUi extends Activity {
 
     //work with this.startActivityForResult() + popupActivity(setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(LOGTAG, "onActivityResult resultCode=" + resultCode);
         if (_cb != null && resultCode > 0) {
+            Log.v(LOGTAG, "onCallBack OK");
             _cb.onCallBack(new Gson().toJson("OK"));//TODO
         }
     }
@@ -202,7 +205,7 @@ public class HybridUi extends Activity {
 
                 @Override
                 public void handler(String data, CallBackFunction function) {
-                    Log.i(LOGTAG, "handler = _app_activity_close");
+                    Log.v(LOGTAG, "handler = _app_activity_close");
                     HybridUi.this.onBackPressed();
                 }
             });
@@ -289,9 +292,20 @@ public class HybridUi extends Activity {
 
     @Override
     public void onBackPressed() {        // to prevent irritating accidental logouts
-
+        Log.v(LOGTAG, "onBackPressed set Result 1");
         setResult(1, new Intent());
         finish();
+    }
+
+    //in case old androids dont have onBackPress()
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.v(LOGTAG, "onKeyDown KEYCODE_BACK");
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
 

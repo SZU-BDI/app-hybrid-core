@@ -194,6 +194,7 @@ alert(o2s(rt));
 }
 function test_app_activity_close(){
 window.cmpjsbridge.callHandler('_app_activity_close', {},function( rt ){
+console.log(rt);
 alert(o2s(rt));
 });
 }
