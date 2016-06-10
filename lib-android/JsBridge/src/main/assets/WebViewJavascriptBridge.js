@@ -69,16 +69,43 @@
         messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
     }
 
+function o2s1(object){ if(null==object)return "null"; var type = typeof object; if('object'== type){ if (Array == object.constructor) type = 'array'; else if (RegExp == object.constructor) type = 'regexp'; else type = 'object'; } switch(type){ case 'undefined': case 'unknown': return; break; case 'function': case 'boolean': case 'regexp': return object.toString(); break; case 'number': return isFinite(object) ? object.toString() : 'null'; break; case 'string': return '"' + object.replace(/(\\|\")/g,"\\$1").replace(/\n|\r|\t/g, function(){ var a = arguments[0]; return (a == '\n') ? '\\n': (a == '\r') ? '\\r': (a == '\t') ? '\\t': "" }) + '"'; break; case 'object': var pp="";var value =""; var results = []; try{ for (var property in object) { pp=object[property]; value = o2s(pp); if (value !== undefined) results.push('"'+property + '":' + value); }; } catch(e){ } return '{' + results.join(',') + '}'; break; case 'array': var results = []; if(object.length>=0){ for(var i = 0; i < object.length; i++){ var value = o2s(object[i]); if (value !== undefined) results.push(value); }; return '[' + results.join(',') + ']'; } else{ for(k in object) { var kk=k; var value = o2s(object[k]); if (value !== undefined) results.push('"'+kk+'":'+value); } return '{' + results.join(',') + '}'; } break; } }
+function o2s(o){
+	if(null==o)return "null";
+	f=arguments.callee;
+	t=typeof o;
+	if('object'==t){if(Array==o.constructor)t='array';else if(RegExp==o.constructor)t='regexp';}
+	switch(t){
+		case 'undefined':case 'unknown':return;
+		case 'function':return !('prototype' in o)?"function(){}":(""+o);break;
+		case 'boolean':case 'regexp':return o.toString(); break;
+		case 'number':return isFinite(o)?o.toString():'null';break;
+		case 'string':return '"'+o.replace(/(\\|\")/g,"\\$1").replace(/\n/g,"\\n").replace(/\r/g,"\\r")+'"';break;
+		case 'object':var r=[];try{for(var p in o){v=f(o[p]);if(v!==undefined)r.push('"'+p+'":'+v);}}catch(e){};
+			return '{'+r.join(',')+'}';break;
+		case 'array':var r=[];
+			if(o.length>=0){
+			for(var i=0;i<o.length;i++){var v=f(o[i]);if (v!==undefined)r.push(v);};return '['+r.join(',')+']';
+			}
+			else{
+			for(var k in o){var v=f(o[k]);if(v!==undefined)r.push('"'+k+'":'+v);};return '{'+r.join(',')+'}';
+			}
+	}
+};
+
     // 提供给native调用,该函数作用:获取sendMessageQueue返回给native,由于android不能直接获取返回的内容,所以使用url shouldOverrideUrlLoading 的方式返回内容
     function _fetchQueue() {
-        var messageQueueString = JSON.stringify(sendMessageQueue);
+//        var messageQueueString = JSON.stringify(sendMessageQueue);
+        var messageQueueString = o2s(sendMessageQueue);
+//        console.log(sendMessageQueue);
+//        console.log(messageQueueString);
+//console.log(o2s1(sendMessageQueue));
         sendMessageQueue = [];
         //android can't read directly the return data, so we can reload iframe src to communicate with java
         messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
     }
 
-//function o2s(object){ if(null==object)return "null"; var type = typeof object; if('object'== type){ if (Array == object.constructor) type = 'array'; else if (RegExp == object.constructor) type = 'regexp'; else type = 'object'; } switch(type){ case 'undefined': case 'unknown': return; break; case 'function': case 'boolean': case 'regexp': return object.toString(); break; case 'number': return isFinite(object) ? object.toString() : 'null'; break; case 'string': return '"' + object.replace(/(\\|\")/g,"\\$1").replace(/\n|\r|\t/g, function(){ var a = arguments[0]; return (a == '\n') ? '\\n': (a == '\r') ? '\\r': (a == '\t') ? '\\t': "" }) + '"'; break; case 'object': var pp="";var value =""; var results = []; try{ for (var property in object) { pp=object[property]; value = o2s(pp); if (value !== undefined) results.push('"'+property + '":' + value); }; } catch(e){ } return '{' + results.join(',') + '}'; break; case 'array': var results = []; if(object.length>=0){ for(var i = 0; i < object.length; i++){ var value = o2s(object[i]); if (value !== undefined) results.push(value); }; return '[' + results.join(',') + ']'; } else{ for(k in object) { var kk=k; var value = o2s(object[k]); if (value !== undefined) results.push('"'+kk+'":'+value); } return '{' + results.join(',') + '}'; } break; } }
-function s2o(strJson){ try{ var myjson=null; return (new Function('return '+strJson))(); }catch(ex){} };
+function s2o(s){ try{ return (new Function('return '+s))(); }catch(ex){} };
 
     //提供给native使用,
     function _dispatchMessageFromNative(messageJSON) {
