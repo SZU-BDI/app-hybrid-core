@@ -2,30 +2,39 @@ package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 public class HybridService {
     final private static String LOGTAG = "HybridService";
 
-    Context _ctx;
+    //Singleton
+    private static HybridService ourInstance = new HybridService();
 
-    public HybridService(Context ctx) {
-        this._ctx = ctx;
+    public static HybridService getInstance() {
+        return ourInstance;
     }
+//    private HybridService() {
+//    }
 
-    public HybridUi getHybridUi(String addr) {
-        final Context _f_ctx = _ctx;
-//        Intent intent = new Intent(_ctx, HybridUi.class);
+//    Context _ctx;
+
+//    public HybridService(Context ctx) {
+//        this._ctx = ctx;
+//    }
+
+    public static HybridUi getHybridUi(String uiName) {
+
+        //Find instance in the Config, get the config
+
+        //according to config, to set the
+
+        //return ourInstance.
+//        final Context _f_ctx = _ctx;
+//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
 ////        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 //
@@ -35,10 +44,10 @@ public class HybridService {
 //        handler.post(new Runnable() {
 //            @Override
 //            public void run() {
-        Intent intent = new Intent(_f_ctx, HybridUi.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        _f_ctx.startActivity(intent);
+//        Intent intent = new Intent(_f_ctx, HybridUiActivity.class);
+////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        _f_ctx.startActivity(intent);
 //            }
 //        });
 //        //        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
@@ -61,11 +70,12 @@ public class HybridService {
 //            } catch (JSONException e) {
 //                e.printStackTrace();
 //            }
-        return null;
+        HybridUi ui = new HybridUi();
+        return ui;
     }
 
     public static HybridApi getHybridApi(String uiName) {
-        //HybridUi ui=new HybridUi();
+        //HybridUiActivity ui=new HybridUiActivity();
         return null;
     }
 
@@ -112,40 +122,7 @@ public class HybridService {
 //            }
 //        }, "AndroidWebView");
 
-
         return wv;
-    }
-
-    public static String assetFile2Str(Context c, String urlStr) {
-        InputStream in = null;
-        try {
-            in = c.getAssets().open(urlStr);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            StringBuilder sb = new StringBuilder();
-            do {
-                line = bufferedReader.readLine();
-                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                    sb.append(line);
-                }
-            } while (line != null);
-
-            bufferedReader.close();
-            in.close();
-
-            return sb.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-                in = null;
-            }
-        }
-        return null;
     }
 
 }
