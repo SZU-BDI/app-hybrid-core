@@ -21,7 +21,6 @@ import android.webkit.WebView;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
-import com.google.gson.Gson;
 
 //import android.view.WindowManager;
 
@@ -59,7 +58,7 @@ public class HybridUiActivity extends Activity {
         Log.v(LOGTAG, "onActivityResult resultCode=" + resultCode);
         if (_cb != null && resultCode > 0) {
             Log.v(LOGTAG, "onCallBack OK");
-            _cb.onCallBack(new Gson().toJson("OK"));//TODO
+            _cb.onCallBack("{'STS':'OK'}");
         }
     }
 
@@ -130,7 +129,7 @@ public class HybridUiActivity extends Activity {
 //        mWebView = HybridService.BuildWebViewWithJsBridgeSupport(_ctx);//TODO
 
         //com.github.lzyzsd.jsbridge
-        mWebView = HybridService.BuildOldJsBridge(_ctx);
+        mWebView = HybridTools.BuildOldJsBridge(_ctx);
 
         //NOTES: if not set, the js alert won't effect...(maybe the default return is true)
         mWebView.setWebChromeClient(new WebChromeClient() {

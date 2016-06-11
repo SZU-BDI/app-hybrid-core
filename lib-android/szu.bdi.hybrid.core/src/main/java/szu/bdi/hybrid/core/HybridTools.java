@@ -1,10 +1,13 @@
 package szu.bdi.hybrid.core;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
+
+import com.github.lzyzsd.jsbridge.BridgeWebView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -92,6 +95,33 @@ public class HybridTools {
         }
         return return_s;
     }
+
+    public static JSONObject s2o(String s) {
+        try {
+            return new JSONObject(s);
+        } catch (Exception ex) {
+        }
+//        JSONArray rto = new JSONArray();
+//        rto.put(s);
+//        return rto.optJSONObject(0);
+        JSONObject rt = new JSONObject();
+        try {
+            rt.put("STS", "KO");
+            rt.put("errmsg", "wrong json");
+            rt.put("s", "" + s);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return rt;
+    }
+
+    public static String o2s(JSONObject o) {
+        return o.toString();
+    }
+//    //TODO....
+//    public static String o2s(Object o) {
+//        return o.toString();
+//    }
 
     //Wrap the raw webPost for our cmp api call
     public static JSONObject apiPost(String url, JSONObject jo) {
@@ -200,6 +230,17 @@ public class HybridTools {
         return assetFile2Str(_appContext, s);
     }
 
+    public static JSONObject jsonConfig = new JSONObject();
+
+    public static void setJsonConfig(String K, Object V) {
+        try {
+            jsonConfig.put(K, V);
+        } catch (JSONException e) {
+            Log.d(LOGTAG, "setConfig " + K);
+            e.printStackTrace();
+        }
+    }
+
     public static boolean isEmptyString(String s) {
         if (s == null || "".equals(s)) return true;
         if ("null".equals(s)) return true;//tmp solution for json optString() return string "null"
@@ -210,7 +251,117 @@ public class HybridTools {
         if (o == null) return true;
         return false;
     }
+
+    public static HybridUi getHybridUi(String uiName) {
+
+        HybridUi ui = new HybridUi();
+        //TODO setHybridConfig from jsonContenxt['uiName']
+        return ui;
+    }
+
+    public static void showUi(HybridUi ui, Context ctx) {
+        if (ctx == null) ctx = getAppContext();
+        final Context _ctx = ctx;
+        Intent intent = new Intent(_ctx, ui.getClass());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        _ctx.startActivity(intent);
+    }
+
+    public static HybridApi getHybridApi(String uiName) {
+        //HybridUiActivity ui=new HybridUiActivity();
+        return null;
+    }
+
+    public static BridgeWebView BuildOldJsBridge(Context _ctx) {
+        BridgeWebView wv;
+        wv = new BridgeWebView(_ctx);
+        return wv;
+    }
+
+    //TODO rewrite JsBridge
+//    @SuppressLint("JavascriptInterface")
+//    public static WebView BuildWebViewWithJsBridgeSupport(Context ctx) {
+//        final Context _ctx = ctx;
+//
+//        final BridgeWebView wv = new BridgeWebView(_ctx);
+//
+//        WebSettings mWebSettings = wv.getSettings();
+//
+//        if (Build.VERSION.SDK_INT >= 11) {
+//            mWebSettings.setDisplayZoomControls(false);
+//        }
+//
+//        wv.setVerticalScrollBarEnabled(false);
+//        wv.setHorizontalScrollBarEnabled(false);
+//
+//        mWebSettings.setJavaScriptEnabled(true);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            wv.setWebContentsDebuggingEnabled(true);
+//        }
+////        String jsContent = assetFile2Str(wv.getContext(), "JsBridge.js");
+////        if (jsContent != null) wv.loadUrl("javascript:" + jsContent);
+//
+////        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+////            this.loadUrl(javascriptCommand);
+////        }
+//
+//        //TODO
+//        //thread handling is not yet ok... wait...
+////        wv.addJavascriptInterface(new JavascriptInterface() {
+////            @JavascriptInterface
+////            public String _send(String cmd_s, String id_s, String param_s) {
+////                Log.v(LOGTAG, "cmd_s=" + cmd_s + ",param_s=" + param_s);
+////                return "testreturnfromsend";
+////            }
+////        }, "AndroidWebView");
+//
+//        return wv;
+//    }
 }
+
+//Find instance in the Config, get the config
+
+//according to config, to set the
+
+//return ourInstance.
+//        final Context _f_ctx = _ctx;
+//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
+////        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+//
+//        _ctx.startActivity(intent);
+
+//        android.os.Handler handler = new android.os.Handler(Looper.getMainLooper());
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//        Intent intent = new Intent(_f_ctx, HybridUiActivity.class);
+////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        _f_ctx.startActivity(intent);
+//            }
+//        });
+//        //        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
+//
+//        @Override
+//        public void handler(String data, CallBackFunction function) {
+//            Log.i(TAG, "handler = _app_activity_close");
+//            finish();
+//        }
+//
+//    });
+//
+//    mWebView.registerHandler("_app_activity_set_title", new BridgeHandler() {
+//
+//        @Override
+//        public void handler(String title, CallBackFunction function) {
+//            JSONObject jsonObject = null;
+//            try {
+//                jsonObject = new JSONObject(title);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
 
 //run backgroup service
 //        Intent bg = new Intent(_ctx, BackService.class);

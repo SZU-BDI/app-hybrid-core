@@ -6,25 +6,30 @@ import android.content.Intent;
 //import static android.content.Intent.*;
 
 //UI as the Activity Wrapper
-public class HybridUi {
+public class HybridUi extends HybridUiActivity {
     Intent _intent = null;
     Context _ctx = null;
 
     public void show(Context ctx) {
+//        _ctx = ctx;
+//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
+////intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        _intent = intent;
+//        _ctx.startActivity(intent);
         _ctx = ctx;
-        Intent intent = new Intent(_ctx, HybridUiActivity.class);
+        Intent intent = new Intent(_ctx, this.getClass());
 //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         _intent = intent;
         _ctx.startActivity(intent);
-
     }
 
     public void show() {
         this.show(HybridTools.getAppContext());
     }
 
-    //not design yet...  在 HybridService 放一个全局池，然后当 HybridUi 被发动应该带上ID，
+    //not design yet...  在 HybridTools 放一个全局池，然后当 HybridUi 被发动应该带上ID，
     // 然后该activity启动时堆到这个池，然后下次可以驱动关闭。。。还有没有更好方法？
 //    public void hide() {
 //        Intent intent = new Intent(_ctx, HybridUiActivity.class);
