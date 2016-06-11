@@ -67,10 +67,22 @@ public class HybridUiActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.onBackPressed();
+                onBackPressed();
                 break;
         }
         return true;
+    }
+
+    boolean bClose;
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        bClose = intent.getExtras().getBoolean("bClose");
+        if (bClose == false) {
+            //finish();
+            onBackPressed();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
