@@ -8,7 +8,7 @@
 
 #import "ApiActivityOpen.h"
 #import "HybridTools.h"
-#import "HybridUi.h"
+#import "WebViewUi.h"
 
 @interface ApiActivityOpen ()
 @property (nonatomic, copy) NSDictionary *js_param;
@@ -31,7 +31,7 @@
         
         if ([_js_model isEqualToString:@"WebView"]) {
             
-            HybridUi *ui = [HybridTools buildHybridUiBase:@"UiContent"];
+            WebViewUi *ui = (WebViewUi *)[HybridTools buildHybridUiBase:@"WebViewUi"];
             // 传递回调函数
             ui.jsCallback = responseCallback;
             // 判断有无yopbar

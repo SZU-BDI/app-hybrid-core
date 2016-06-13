@@ -8,7 +8,7 @@
 
 #import "ApiActivityClose.h"
 #import "HybridTools.h"
-#import "HybridUi.h"
+#import "WebViewUi.h"
 
 @interface ApiActivityClose ()
 @property (nonatomic, copy) NSDictionary *callbackData;
@@ -20,7 +20,8 @@
     return ^(id data, WVJBResponseCallback responseCallback) {
         NSLog(@"ApiActivityClose -->  (_app_actibity_close)");
         
-        HybridUi *ui = (HybridUi *)self.hybridUi;
+        WebViewUi *ui = (WebViewUi *)self.hybridUi;
+        
         if (ui.address) {
             _callbackData = [[NSDictionary alloc] initWithObjects:@[ui.address] forKeys:@[@"address"]];
         }

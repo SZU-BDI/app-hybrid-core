@@ -23,7 +23,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     // get the Ui by service:
-    HybridUi *ui = [HybridTools buildHybridUiBase:@"UiRoot"];
+    HybridUi *ui = [HybridTools buildHybridUiBase:@"WebViewUi"];
 
     // set the app window root as nav(binded with the hybrid(ui-root)):
     self.window.rootViewController = ui.topBar;
