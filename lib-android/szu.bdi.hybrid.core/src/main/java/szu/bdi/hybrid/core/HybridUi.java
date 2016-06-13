@@ -1,52 +1,50 @@
 package szu.bdi.hybrid.core;
 
-import android.content.Context;
-import android.content.Intent;
+import android.app.Activity;
 
-//import static android.content.Intent.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-//UI as the Activity Wrapper
-public class HybridUi extends HybridUiActivity {
-    Intent _intent = null;
-    Context _ctx = null;
+public class HybridUi extends Activity {
+    public JSONObject pageData = new JSONObject();
 
-    public void show(Context ctx) {
+    public JSONObject initPageData(String s) {
+        pageData = HybridTools.s2o(s);
+        return pageData;
+    }
+
+    public void setUiData(String k, Object v) {
+        try {
+            pageData.put(k, v);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Object getUiData(String k) {
+        return pageData.opt(k);
+    }
+
+    //    Intent _intent = null;
+//    Context _ctx = null;
+
+//    public void show(Context ctx) {
+////        _ctx = ctx;
+////        Intent intent = new Intent(_ctx, HybridUiActivity.class);
+//////intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+////        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+////        _intent = intent;
+////        _ctx.startActivity(intent);
 //        _ctx = ctx;
-//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
+//        Intent intent = new Intent(_ctx, this.getClass());
 ////intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        _intent = intent;
 //        _ctx.startActivity(intent);
-        _ctx = ctx;
-        Intent intent = new Intent(_ctx, this.getClass());
-//intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        _intent = intent;
-        _ctx.startActivity(intent);
-    }
-
-    public void show() {
-        this.show(HybridTools.getAppContext());
-    }
-
-    //not design yet...  在 HybridTools 放一个全局池，然后当 HybridUi 被发动应该带上ID，
-    // 然后该activity启动时堆到这个池，然后下次可以驱动关闭。。。还有没有更好方法？
-//    public void hide() {
-//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
-////        intent.addFlags(Intent);
-//        _intent = intent;
-////        _ctx.s(intent);
 //    }
+//
+//    public void show() {
+//        this.show(HybridTools.getAppContext());
+//    }
+
 }
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Intent intent = new Intent(_ctx, HybridUiActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//                intent.putExtra("bClose", true);
-//                _intent = intent;
-//                _ctx.startActivity(intent);
-//            }
-//        }, 3000);

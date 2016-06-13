@@ -1,7 +1,7 @@
 package szu.bdi.hybrid.core;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -194,7 +194,7 @@ public class HybridTools {
     }
 
     //copy from jsbridge, maybe improve or find more elegant version...
-    public static String assetFile2Str(Context c, String urlStr) {
+    public static String getFileIntoStr(Context c, String urlStr) {
         InputStream in = null;
         try {
             in = c.getAssets().open(urlStr);
@@ -226,8 +226,8 @@ public class HybridTools {
         return null;
     }
 
-    public static String assetFile2Str(String s) {
-        return assetFile2Str(_appContext, s);
+    public static String getFileIntoStr(String s) {
+        return getFileIntoStr(_appContext, s);
     }
 
     public static JSONObject jsonConfig = new JSONObject();
@@ -254,18 +254,25 @@ public class HybridTools {
 
     public static HybridUi getHybridUi(String uiName) {
 
-        HybridUi ui = new HybridUi();
+        HybridUi ui = new WebViewUi();
+//TODO
         //TODO setHybridConfig from jsonContenxt['uiName']
+        ui.initPageData("{topbar:'Y',addr:'file://android_asset/root.htm'}");
+
         return ui;
     }
 
-    public static void showUi(HybridUi ui, Context ctx) {
-        if (ctx == null) ctx = getAppContext();
-        final Context _ctx = ctx;
-        Intent intent = new Intent(_ctx, ui.getClass());
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        _ctx.startActivity(intent);
-    }
+//    public static void showUi(HybridUi ui, Context ctx) {
+//        if (ctx == null) ctx = getAppContext();
+//        final Context _ctx = ctx;
+//        Intent intent = new Intent(_ctx, ui.getClass());
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        _ctx.startActivity(intent);
+//    }
+//
+//    public static void showUi(HybridUi ui) {
+//        showUi(ui, null);
+//    }
 
     public static HybridApi getHybridApi(String uiName) {
         //HybridUiActivity ui=new HybridUiActivity();
@@ -276,6 +283,28 @@ public class HybridTools {
         BridgeWebView wv;
         wv = new BridgeWebView(_ctx);
         return wv;
+    }
+
+    public static void appAlert(Context ctx, String msg, AlertDialog.OnClickListener clickListener) {
+        AlertDialog.Builder b2;
+        b2 = new AlertDialog.Builder(ctx);
+        b2.setMessage(msg).setPositiveButton("Close", clickListener);
+        b2.setCancelable(false);//click other place would cause cancel
+        b2.create();
+        b2.show();
+    }
+
+    public static void appConfirm(
+            Context ctx, String msg,
+            AlertDialog.OnClickListener okListener,
+            AlertDialog.OnClickListener cancelListener) {
+        AlertDialog.Builder b2;
+        b2 = new AlertDialog.Builder(ctx);
+        b2.setMessage(msg).setPositiveButton("Close", okListener)
+                .setNegativeButton("cancel", cancelListener);
+        b2.setCancelable(false);
+        b2.create();
+        b2.show();
     }
 
     //TODO rewrite JsBridge
@@ -299,7 +328,7 @@ public class HybridTools {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            wv.setWebContentsDebuggingEnabled(true);
 //        }
-////        String jsContent = assetFile2Str(wv.getContext(), "JsBridge.js");
+////        String jsContent = getFileIntoStr(wv.getContext(), "JsBridge.js");
 ////        if (jsContent != null) wv.loadUrl("javascript:" + jsContent);
 //
 ////        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {

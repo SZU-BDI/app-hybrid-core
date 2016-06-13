@@ -3,7 +3,6 @@ package szu.bdi.hybrid.core;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,13 +21,11 @@ import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 
-//import android.view.WindowManager;
-
-//TODO bugfix the jsbridge...
+//TODO rewrite the jsbridge...
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
-public class HybridUiActivity extends Activity {
+public class WebViewUi extends HybridUi {
 
     //    final private static String LOGTAG = "HybridUiActivity";
     final private static String LOGTAG = "" + (new Object() {
@@ -41,15 +38,16 @@ public class HybridUiActivity extends Activity {
     private String mURL;
 
     private BridgeWebView mWebView;
+
 //    private WebView mWebView;
 
-    public class JavaScriptInterface {
-        Context mContext1;
-
-        JavaScriptInterface(Context c) {
-            mContext1 = c;
-        }
-    }
+//    public class JavaScriptInterface {
+//        Context mContext1;
+//
+//        JavaScriptInterface(Context c) {
+//            mContext1 = c;
+//        }
+//    }
 
     protected CallBackFunction _cb = null;
 
@@ -58,10 +56,15 @@ public class HybridUiActivity extends Activity {
         Log.v(LOGTAG, "onActivityResult resultCode=" + resultCode);
         if (_cb != null && resultCode > 0) {
             Log.v(LOGTAG, "onCallBack OK");
-            _cb.onCallBack("{'STS':'OK'}");
+//            _cb.onCallBack("{\"STS\":\"OK\"}");//OK
+//            _cb.onCallBack("{STS:\"OK\"}");//OK
+            //_cb.onCallBack("What the hell");//KO, proves the result need the JSON format
+            _cb.onCallBack("{STS:\"OK\"}");//TODO return the param of current Ui?
         }
     }
 
+    //NOTES: when user click the left-upper button on the top bar
+    //@ref setDisplayHomeAsUpEnabled()
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -72,17 +75,16 @@ public class HybridUiActivity extends Activity {
         return true;
     }
 
-    boolean bClose;
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        bClose = intent.getExtras().getBoolean("bClose");
-        if (bClose == false) {
-            //finish();
-            onBackPressed();
-        }
-    }
+//    boolean bClose;
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//        super.onNewIntent(intent);
+//        bClose = intent.getExtras().getBoolean("bClose");
+//        if (bClose == false) {
+//            //finish();
+//            onBackPressed();
+//        }
+//    }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -90,7 +92,9 @@ public class HybridUiActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(LOGTAG, ".onCreate()");
 
-        //Hide title bar
+        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
+
+        //Hide title bar, TODO base on param...
         if (false) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         } else {
@@ -135,42 +139,28 @@ public class HybridUiActivity extends Activity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-                final String msg = message;
-                AlertDialog.Builder b2;
-                b2 = new AlertDialog.Builder(_ctx);
-                b2.setMessage(msg).setPositiveButton("Close", new AlertDialog
-                        .OnClickListener() {
+                HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         result.confirm();
                     }
                 });
-                b2.create();
-                b2.show();
                 return true;
             }
 
             @Override
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult jsrst) {
-                final String msg = message;
-                AlertDialog.Builder b2;
-                b2 = new AlertDialog.Builder(_ctx);
-                b2.setMessage(msg).setPositiveButton("Close", new AlertDialog
-                        .OnClickListener() {
+                HybridTools.appConfirm(_ctx, message, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         jsrst.confirm();
                     }
-                });
-                b2.setNegativeButton("cancel", new AlertDialog.OnClickListener() {
+                }, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         jsrst.cancel();
                     }
                 });
-//                b2.setCancelable(false);
-                b2.create();
-                b2.show();
                 return true;
             }
         });
@@ -183,7 +173,7 @@ public class HybridUiActivity extends Activity {
             @Override
             public void handler(String data, CallBackFunction function) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
-                HybridUiActivity.this.onBackPressed();
+                WebViewUi.this.onBackPressed();
             }
         });
         mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
@@ -192,14 +182,15 @@ public class HybridUiActivity extends Activity {
                     public void handler(String data, CallBackFunction cb) {
                         Log.v("_app_activity_open", data);
 
-                        HybridUiActivity.this._cb = cb;
+                        WebViewUi.this._cb = cb;
 
-                        Intent intent = new Intent(HybridUiActivity.this, HybridUiActivity.class);
-                        startActivityForResult(intent, 1);
+                        Intent intent = new Intent(WebViewUi.this, WebViewUi.class);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivityForResult(intent, 1);//@ref onActivityResult()
+                        Log.v("_app_activity_open", "startActivityForResult");
                     }
 
                 }
-
         );
 
         Log.v(LOGTAG, "load mURL=" + mURL);
