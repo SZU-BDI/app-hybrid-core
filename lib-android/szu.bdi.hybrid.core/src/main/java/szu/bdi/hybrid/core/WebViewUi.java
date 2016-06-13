@@ -3,6 +3,7 @@ package szu.bdi.hybrid.core;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +22,9 @@ import android.webkit.WebView;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 //TODO rewrite the jsbridge...
 
@@ -52,15 +56,17 @@ public class WebViewUi extends HybridUi {
 
     protected CallBackFunction _cb = null;
 
-    //work with this.startActivityForResult() + popupActivity(setResult() + finish())
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(LOGTAG, "onActivityResult resultCode=" + resultCode);
+    //work with this.startActivityForResult() + (setResult() + finish())
+    protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
+        Log.v(LOGTAG, "resultCode=" + resultCode);
+        Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
         if (_cb != null && resultCode > 0) {
             Log.v(LOGTAG, "onCallBack OK");
 //            _cb.onCallBack("{\"STS\":\"OK\"}");//OK
 //            _cb.onCallBack("{STS:\"OK\"}");//OK
             //_cb.onCallBack("What the hell");//KO, proves the result need the JSON format
-            _cb.onCallBack("{STS:\"OK\"}");//TODO return the param of current Ui?
+            _cb.onCallBack(rtIntent.getStringExtra("rt"));
+//            _cb.onCallBack("{STS:\"TODO\"}");//TODO return the param of current Ui?
         }
     }
 
@@ -105,15 +111,20 @@ public class WebViewUi extends HybridUi {
 
         switch (topbar) {
             case "F":
+                //F: full screen w- top status
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 break;
             case "Y":
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                //Y: top bar w+ top status (default)
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
                 break;
             case "M":
+                //M: only top bar w- top status
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             case "N":
+                //N: FullScreen w+ top status
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
                 break;
         }
         setTitle("TODO setTitle()");
@@ -122,9 +133,9 @@ public class WebViewUi extends HybridUi {
             //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
             actionBar.setDisplayHomeAsUpEnabled(true);
         } catch (NullPointerException ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
         } catch (NoSuchMethodError ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
         }
 //        //Hide title bar, TODO base on param...
 //        if (false) {
@@ -161,6 +172,7 @@ public class WebViewUi extends HybridUi {
 //        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         final Context _ctx = this;
+        final Activity _activity = this;
 
 //        mWebView = HybridService.BuildWebViewWithJsBridgeSupport(_ctx);//TODO
 
@@ -199,7 +211,12 @@ public class WebViewUi extends HybridUi {
 
         setContentView(mWebView);
 
-        mURL = "file:///android_asset/root.htm";//TODO
+        String url = HybridTools.optString(getUiData("url"));
+        if (url == null || "".equals(url)) {
+            url = "file:///android_asset/error.htm";
+        }
+        mURL = url;
+
         mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
 
             @Override
@@ -213,19 +230,14 @@ public class WebViewUi extends HybridUi {
                     @Override
                     public void handler(String data, CallBackFunction cb) {
                         Log.v("_app_activity_open", data);
-
-                        WebViewUi.this._cb = cb;
-//                        new Handler().postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-                        Intent intent = new Intent(WebViewUi.this, WebViewUi.class);
-                        intent.putExtra("uiData", data);
-
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivityForResult(intent, 1);//@ref onActivityResult()
-                        Log.v("_app_activity_open", "startActivityForResult");
-//                            }
-//                        }, 11);
+                        WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
+                        JSONObject dataJSONObject = HybridTools.s2o(data);
+                        try {
+                            dataJSONObject.put("url", "file:///android_asset/root.htm");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity);
                     }
 
                 }
@@ -239,7 +251,9 @@ public class WebViewUi extends HybridUi {
     @Override
     public void onBackPressed() {        // to prevent irritating accidental logouts
         Log.v(LOGTAG, "onBackPressed set Result 1");
-        setResult(1, new Intent());
+        Intent rtIntent = new Intent();
+        rtIntent.putExtra("rt", "{STS:\"TMP\"}");
+        setResult(1, rtIntent);
         finish();
     }
 

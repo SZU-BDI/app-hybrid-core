@@ -1,5 +1,6 @@
 package szu.bdi.hybrid.core;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -274,18 +275,18 @@ public class HybridTools {
         return ui;
     }
 
-    public static void showUi(HybridUi ui, Context ctx) {
-        if (ctx == null) ctx = getAppContext();
-        final Context _ctx = ctx;
-        Intent intent = new Intent(_ctx, ui.getClass());
-        intent.putExtra("uiData", ui.uiData.toString());
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        _ctx.startActivity(intent);
-    }
-
-    public static void showUi(HybridUi ui) {
-        showUi(ui, null);
-    }
+//    public static void showUi(HybridUi ui, Context ctx) {
+//        if (ctx == null) ctx = getAppContext();
+//        final Context _ctx = ctx;
+//        Intent intent = new Intent(_ctx, ui.getClass());
+//        intent.putExtra("uiData", ui.uiData.toString());
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        _ctx.startActivity(intent);
+//    }
+//
+//    public static void showUi(HybridUi ui) {
+//        showUi(ui, null);
+//    }
 
     public static HybridApi getHybridApi(String uiName) {
         //HybridUiActivity ui=new HybridUiActivity();
@@ -320,6 +321,16 @@ public class HybridTools {
         b2.show();
     }
 
+    public static void startUi(String name, String initParam, Activity caller) {
+//        if (ctx == null) ctx = getAppContext();
+//        Context _ctx = ctx;
+        Intent intent = new Intent(caller, WebViewUi.class);//TODO the class from config
+//        intent.putExtra("uiData", ui.uiData.toString());
+        intent.putExtra("uiData", initParam);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //caller.startActivity(intent);
+        caller.startActivityForResult(intent, 1);//onActivityResult()
+    }
     //TODO rewrite JsBridge
 //    @SuppressLint("JavascriptInterface")
 //    public static WebView BuildWebViewWithJsBridgeSupport(Context ctx) {
