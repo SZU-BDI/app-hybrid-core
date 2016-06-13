@@ -321,10 +321,10 @@ public class HybridTools {
         b2.show();
     }
 
-    public static void startUi(String name, String initParam, Activity caller) {
+    public static void startUi(String name, String initParam, Activity caller, Class targetClass) {
 //        if (ctx == null) ctx = getAppContext();
 //        Context _ctx = ctx;
-        Intent intent = new Intent(caller, WebViewUi.class);//TODO the class from config
+        Intent intent = new Intent(caller, targetClass);//TODO the class from config
 //        intent.putExtra("uiData", ui.uiData.toString());
         intent.putExtra("uiData", initParam);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

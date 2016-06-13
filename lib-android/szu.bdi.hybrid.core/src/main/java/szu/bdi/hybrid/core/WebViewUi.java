@@ -237,7 +237,7 @@ public class WebViewUi extends HybridUi {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity);
+                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity, WebViewUi.class);
                     }
 
                 }

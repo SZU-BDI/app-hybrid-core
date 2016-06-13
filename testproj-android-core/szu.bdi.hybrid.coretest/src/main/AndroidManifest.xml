@@ -38,7 +38,10 @@
             <!--android:value=".EntryActivity"/>-->
             <!-- TODO design a theme of Blue (the color as ACE) -->
         </activity>
-
+        <activity
+            android:name="szu.bdi.hybrid.core.WebViewUi"
+            >
+        </activity>
     </application>
 
 </manifest>

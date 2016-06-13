@@ -44,9 +44,5 @@ public class CoreTestApp extends Application {
         }
         Log.v(LOGTAG, "Application.onCreate");
 
-//        intent.putExtra("Topbar", Topbar);
-//        intent.putExtra("Mode", Mode);
-//        intent.putExtra("Address", Address);
-
     }
 }
