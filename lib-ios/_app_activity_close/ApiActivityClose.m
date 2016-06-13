@@ -7,7 +7,7 @@
 //
 
 #import "ApiActivityClose.h"
-#import "HybridService.h"
+#import "HybridTools.h"
 #import "HybridUi.h"
 
 @interface ApiActivityClose ()

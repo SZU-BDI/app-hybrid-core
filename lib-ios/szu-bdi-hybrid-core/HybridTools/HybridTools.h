@@ -1,5 +1,5 @@
 //
-//  HybridService.h
+//  HybridTools.h
 //  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/2.
@@ -10,7 +10,7 @@
 #import "HybridUi.h"
 #import "HybridApi.h"
 
-@interface HybridService : NSObject
+@interface HybridTools : NSObject
 
 //- (HybridUiBase *) getHybridUiBase:(NSString *)name;
 //

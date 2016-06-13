@@ -17,6 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    NSLog(@"UiRoot 初始化完毕");
     [self LoadLocalhtmlName:@"root"];
 }
 
@@ -29,6 +30,10 @@
     [super viewWillAppear:NO];
     // Root activity hidden topbar
     [[self navigationController] setNavigationBarHidden:YES animated:YES];
+}
+
+- (void)dealloc{
+    NSLog(@"UiRoot dealloc");
 }
 
 @end

@@ -1,18 +1,18 @@
 //
-//  HybridService.m
+//  HybridTools.m
 //  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/2.
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-#import "HybridService.h"
+#import "HybridTools.h"
 #import "UiRoot.h"
 #import "ApiActivityOpen.h"
 #import "ApiActivityClose.h"
 #import "UiContent.h"
 
-@implementation HybridService
+@implementation HybridTools
 
 //- (HybridUiBase *) getHybridUiBase:(NSString *)name;
 
@@ -26,7 +26,7 @@
         HybridUi *ui = [[UiRoot alloc] init];
         return ui;
     }
-    if ([name isEqualToString:@"UiOpen"]) {
+    if ([name isEqualToString:@"UiContent"]) {
         HybridUi *ui = [[UiContent alloc] init];
         return ui;
     }

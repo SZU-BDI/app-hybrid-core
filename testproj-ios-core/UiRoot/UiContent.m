@@ -1,5 +1,5 @@
 //
-//  UiOpen.m
+//  UiContent.m
 //  testproj-ios-core
 //
 //  Created by 双虎 on 16/6/3.
@@ -17,7 +17,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self LoadTheUrl:self.address];
+//    [self LoadTheUrl:self.address];
+    NSLog(@"UiContent 初始化完毕");
+    if (self.isTopBar == YES) {
+        [self LoadLocalhtmlName:@"root"];
+    }else{
+        [self LoadTheUrl:self.address];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -33,6 +39,10 @@
     }else{
         [[self navigationController] setNavigationBarHidden:YES animated:YES];
     }
+}
+
+- (void)dealloc{
+    NSLog(@"UiRoot dealloc");
 }
 
 @end

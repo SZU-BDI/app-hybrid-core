@@ -9,7 +9,7 @@
 #import "HybridUi.h"
 #import "HybridApi.h"
 #import "HybridConf.h"
-#import "HybridService.h"
+#import "HybridTools.h"
 
 @interface HybridUi ()<UIWebViewDelegate>
 @property (nonatomic, copy) NSMutableDictionary *callbackData;
@@ -101,7 +101,7 @@
 - (void)registerHandlerApi{
     
     // get the appConfig:
-    NSDictionary *appConfig = [HybridService getAppConfig:@"ApiConf"];
+    NSDictionary *appConfig = [HybridTools getAppConfig:@"ApiConf"];
     
     // get the appConfig all keys:
     NSArray *appConfigkeys = [appConfig allKeys];
@@ -110,7 +110,7 @@
     for (NSString *key in appConfigkeys) {
         
         // Get the value through the key:
-        HybridApi *api = [HybridService buildHybridApi:appConfig[key]];
+        HybridApi *api = [HybridTools buildHybridApi:appConfig[key]];
         
         // 把当前控制器（ui）赋值给 api的成员变量
         api.hybridUi = self;
