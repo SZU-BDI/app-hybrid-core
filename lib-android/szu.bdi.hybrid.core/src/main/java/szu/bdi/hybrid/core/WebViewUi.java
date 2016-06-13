@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -27,13 +28,13 @@ import com.github.lzyzsd.jsbridge.CallBackFunction;
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class WebViewUi extends HybridUi {
 
-    //    final private static String LOGTAG = "HybridUiActivity";
-    final private static String LOGTAG = "" + (new Object() {
-        public String getClassName() {
-            String clazzName = this.getClass().getName();
-            return clazzName.substring(0, clazzName.lastIndexOf('$'));
-        }
-    }.getClassName());
+    final private static String LOGTAG = "WebViewUi";
+//    final private static String LOGTAG = "" + (new Object() {
+//        public String getClassName() {
+//            String clazzName = this.getClass().getName();
+//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
+//        }
+//    }.getClassName());
 
     private String mURL;
 
@@ -89,40 +90,71 @@ public class WebViewUi extends HybridUi {
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(LOGTAG, ".onCreate()");
         super.onCreate(savedInstanceState);
-        Log.d(LOGTAG, ".onCreate()");
+        Intent iin = getIntent();
+        String s_uiData = iin.getStringExtra("uiData");
+        Log.v(LOGTAG, "s_uiData=" + s_uiData);
+        this.uiData = HybridTools.s2o(s_uiData);
+        Log.v(LOGTAG, "uiData=" + uiData);
+
+        //Log.v(LOGTAG, "pageData=" + pageData.toString());
 
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
+        String topbar = HybridTools.optString(getUiData("topbar"));
 
-        //Hide title bar, TODO base on param...
-        if (false) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        } else {
-//            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-//            requestWindowFeature(Window.FEATURE_LEFT_ICON);
-            //setContentView(R.layout.); //or whatever layout is shows
-//            setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.abc_btn_check_material);
-            //getActionBar().setIcon(R.drawable.abc_btn_radio_material);
-//            getActionBar().setIcon(R.drawable.back3x);
+        switch (topbar) {
+            case "F":
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                break;
+            case "Y":
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                break;
+            case "M":
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            case "N":
+                break;
+        }
+        setTitle("TODO setTitle()");
+        try {
+            ActionBar actionBar = getActionBar();
+            //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodError ex) {
+            ex.printStackTrace();
+        }
+//        //Hide title bar, TODO base on param...
+//        if (false) {
+//            requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        } else {
+////            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+////            requestWindowFeature(Window.FEATURE_LEFT_ICON);
+//            //setContentView(R.layout.); //or whatever layout is shows
+////            setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.abc_btn_check_material);
+//            //getActionBar().setIcon(R.drawable.abc_btn_radio_material);
+////            getActionBar().setIcon(R.drawable.back3x);
+////            try {
+//////                getActionBar().setDisplayHomeAsUpEnabled(true);
+////                //getActionBar().setdis
+////            } catch (NullPointerException ex) {
+////                ex.printStackTrace();
+////            }
+//            setTitle("TODO setTitle()");
+////            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+////            }
 //            try {
-////                getActionBar().setDisplayHomeAsUpEnabled(true);
-//                //getActionBar().setdis
+//                ActionBar actionBar = getActionBar();
+//                //setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
+//                actionBar.setDisplayHomeAsUpEnabled(true);
 //            } catch (NullPointerException ex) {
 //                ex.printStackTrace();
+//            } catch (NoSuchMethodError ex) {
+//                ex.printStackTrace();
 //            }
-            setTitle("TODO setTitle()");
-//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-//            }
-            try {
-                ActionBar actionBar = getActionBar();
-                //setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            } catch (NullPointerException ex) {
-                ex.printStackTrace();
-            } catch (NoSuchMethodError ex) {
-                ex.printStackTrace();
-            }
-        }
+//        }
 
 //Hide status bar.  todo by param
 //        if(true)
@@ -183,11 +215,17 @@ public class WebViewUi extends HybridUi {
                         Log.v("_app_activity_open", data);
 
                         WebViewUi.this._cb = cb;
-
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
                         Intent intent = new Intent(WebViewUi.this, WebViewUi.class);
+                        intent.putExtra("uiData", data);
+
 //                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivityForResult(intent, 1);//@ref onActivityResult()
                         Log.v("_app_activity_open", "startActivityForResult");
+//                            }
+//                        }, 11);
                     }
 
                 }

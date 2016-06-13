@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -97,6 +98,7 @@ public class HybridTools {
     }
 
     public static JSONObject s2o(String s) {
+        if (s == null) return null;//return new JSONObject();
         try {
             return new JSONObject(s);
         } catch (Exception ex) {
@@ -252,27 +254,38 @@ public class HybridTools {
         return false;
     }
 
+    public static String getString(Object o) {
+        if (o == null) return null;
+        return o.toString();
+    }
+
+    public static String optString(Object o) {
+        if (o == null) return "";
+        String rt = o.toString();
+        if (rt == null) return "";
+        return rt;
+    }
+
     public static HybridUi getHybridUi(String uiName) {
 
         HybridUi ui = new WebViewUi();
-//TODO
-        //TODO setHybridConfig from jsonContenxt['uiName']
         ui.initPageData("{topbar:'Y',addr:'file://android_asset/root.htm'}");
 
         return ui;
     }
 
-//    public static void showUi(HybridUi ui, Context ctx) {
-//        if (ctx == null) ctx = getAppContext();
-//        final Context _ctx = ctx;
-//        Intent intent = new Intent(_ctx, ui.getClass());
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        _ctx.startActivity(intent);
-//    }
-//
-//    public static void showUi(HybridUi ui) {
-//        showUi(ui, null);
-//    }
+    public static void showUi(HybridUi ui, Context ctx) {
+        if (ctx == null) ctx = getAppContext();
+        final Context _ctx = ctx;
+        Intent intent = new Intent(_ctx, ui.getClass());
+        intent.putExtra("uiData", ui.uiData.toString());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        _ctx.startActivity(intent);
+    }
+
+    public static void showUi(HybridUi ui) {
+        showUi(ui, null);
+    }
 
     public static HybridApi getHybridApi(String uiName) {
         //HybridUiActivity ui=new HybridUiActivity();

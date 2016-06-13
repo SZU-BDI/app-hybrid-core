@@ -1,28 +1,33 @@
 package szu.bdi.hybrid.core;
 
 import android.app.Activity;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HybridUi extends Activity {
-    public JSONObject pageData = new JSONObject();
+    final private static String LOGTAG = "HybridUi";
+
+    public JSONObject uiData = new JSONObject();
 
     public JSONObject initPageData(String s) {
-        pageData = HybridTools.s2o(s);
-        return pageData;
+        uiData = HybridTools.s2o(s);
+        Log.v(LOGTAG, "uiData=" + uiData.toString());
+        return uiData;
     }
 
     public void setUiData(String k, Object v) {
         try {
-            pageData.put(k, v);
+            uiData.put(k, v);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public Object getUiData(String k) {
-        return pageData.opt(k);
+        if (null == uiData) uiData = new JSONObject();
+        return uiData.opt(k);
     }
 
     //    Intent _intent = null;
