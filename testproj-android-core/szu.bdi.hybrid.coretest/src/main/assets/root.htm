@@ -24,14 +24,14 @@
                            ="javascript:alert(AndroidWebView._send);"
                         >alert AndroidWebView._send</a>-->
                 <a href="javascript:alert('content');">alert</a><br/>
-                <a href="javascript:test_app_activity_open_1();">Test _app_activity_open
-                    (topbar:Y)</a>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
-                <a href="javascript:test_app_activity_open_2();">Test _app_activity_open
-                    (topbar:N)</a>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
-                <a href="javascript:alert(JsBridgeHybrid_.js2jv('iii','kkk','ppp'));">JsBridgeHybrid_._js2jv(iii,kkk,ppp)</a>
-                <a href="javascript:alert(JsBridgeHybrid_.jv2js_cb('iii','rrr'));">JsBridgeHybrid_.jv2js_cb(iii,kkk)</a>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-
+                <a href="javascript:test_app_activity_open_1();">
+                    Test _app_activity_open(topbar:Y)</a>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+                <a href="javascript:test_app_activity_open_2();">
+                    Test _app_activity_open(topbar:N)</a>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+                <a href="javascript:test_app_activity_close();">
+                    Test _app_activity_close()</a>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+                <!--<a href="javascript:alert(JsBridgeHybrid_.js2jv('iii','kkk','ppp'));">JsBridgeHybrid_._js2jv(iii,kkk,ppp)</a>-->
+                <!--<a href="javascript:alert(JsBridgeHybrid_.jv2js_cb('iii','rrr'));">JsBridgeHybrid_.jv2js_cb(iii,kkk)</a>-->
                 <script>
 function s2o(strJson){ try{ var myjson=null; return (new Function('return '+strJson))(); }catch(ex){} };
 function o2s(object){
@@ -199,12 +199,13 @@ alert(o2s(rt));
 });
 }
 
-</script>
-                <img id="loading_gif" src='root.gif' onclick='location.reload();'/></td>
+
+                </script>
+                </td>
         </tr>
         <tr height="70%">
             <td align="center" valign="top">
-                <div id='stage'></div>
+                <div id='stage'><img id="loading_gif" src='root.gif' onclick='location.reload();'/></div>
             </td>
         </tr>
     </table>
@@ -223,6 +224,10 @@ set a timeout checker...
 	//var _u='http://app.jump.ws/'+_appid+'/');//production
 	var _u='http://app.jump.ws/'+_appid+'/?'+Math.random();//dev
 	window.isRootLoaded=false;
+	setTimeout(function(){
+	loading_gif.style.display='none';
+	},500);
+	/*
 	document.writeln('<script src="'+_u+'">'+'</scr'+'ipt>');
 	stage.innerHTML=''+window.location.href+'<br/>Checking Network... ';
 	var _tm_check_root = setTimeout(function(){
@@ -231,5 +236,7 @@ set a timeout checker...
 			//make a button to reload?
 		}
 	},15000);
+	*/
+
 
 </script>
