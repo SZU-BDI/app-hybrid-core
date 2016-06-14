@@ -220,14 +220,13 @@ http://app.jump.ws/{$appid}/
 set a timeout checker...
 -->
 <script>
-	var _appid='core';//tmp.
+	var _appid='coretest';//tmp.
 	//var _u='http://app.jump.ws/'+_appid+'/');//production
 	var _u='http://app.jump.ws/'+_appid+'/?'+Math.random();//dev
 	window.isRootLoaded=false;
-	setTimeout(function(){
-	loading_gif.style.display='none';
-	},500);
-	/*
+	//setTimeout(function(){
+	//loading_gif.style.display='none';
+	//},500);
 	document.writeln('<script src="'+_u+'">'+'</scr'+'ipt>');
 	stage.innerHTML=''+window.location.href+'<br/>Checking Network... ';
 	var _tm_check_root = setTimeout(function(){
@@ -236,7 +235,6 @@ set a timeout checker...
 			//make a button to reload?
 		}
 	},15000);
-	*/
 
 
 </script>
