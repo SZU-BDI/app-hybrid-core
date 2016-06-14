@@ -1,2 +1,6 @@
 *.iml
 build
+
+testproj-android-core/szu.bdi.hybrid.coretest/szu.bdi.hybrid.coretest-release.zip
+
+testproj-android-core/szu.bdi.hybrid.coretest/szu.bdi.hybrid.coretest-release.apk

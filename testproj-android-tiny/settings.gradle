@@ -1,0 +1,6 @@
+include ':szu.bdi.hybrid.tiny'
+
+include ':szu.bdi.hybrid.core2'
+project(':szu.bdi.hybrid.core2').projectDir = new File(settingsDir, '../lib-android/szu.bdi.hybrid.core2')
+
+
