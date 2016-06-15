@@ -19,9 +19,9 @@ import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.BridgeWebView;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
+import szu.bdi.hybrid.core.jsbridge.BridgeHandler;
+import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
+import szu.bdi.hybrid.core.jsbridge.CallBackFunction;
 
 import org.json.JSONException;
 import org.json.JSONObject;

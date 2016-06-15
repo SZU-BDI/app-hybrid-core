@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.github.lzyzsd.jsbridge.BridgeWebView;
+import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

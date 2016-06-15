@@ -1,4 +1,4 @@
-package com.github.lzyzsd.jsbridge;
+package szu.bdi.hybrid.core.jsbridge;
 
 import android.content.Context;
 import android.webkit.WebView;
