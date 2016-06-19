@@ -1,21 +1,19 @@
-//apply plugin: 'com.android.application'
 apply plugin: 'com.android.library'
 
-//version = "0.0.1"
+/* in gradle.properties
+ANDROID_BUILD_MIN_SDK_VERSION=9
+ANDROID_BUILD_TARGET_SDK_VERSION=23
+ANDROID_BUILD_SDK_VERSION=21
+ANDROID_BUILD_TOOLS_VERSION=23.0.3
+org.gradle.daemon=true
+ */
 
 android {
-//    compileSdkVersion 21
-//    buildToolsVersion '23.0.3'
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-//    buildToolsVersion '23.0.3'
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
-//        applicationId 'szu.bdi.hybrid.core'
-//        minSdkVersion 9 //API 19 FOR KITKAT 4.4.2, before KITKAT have security problem.
-//        targetSdkVersion 21
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-//        targetSdkVersion 21
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
 
     }
@@ -23,14 +21,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-//    compile files('../gson-2.3.1.jar')
-//    compile project(':JsBridge')
-
-    //compile files('libs/core.jar')
-    //compile files('libs/robotium-solo-5.3.1.jar')
-    //compile files('libs/universal-image-loader-1.8.6-with-sources.jar')
-    //compile files('libs/printerlibs.jar')
-
-//    compile 'com.android.support:appcompat-v7:21.0.3'
 }
