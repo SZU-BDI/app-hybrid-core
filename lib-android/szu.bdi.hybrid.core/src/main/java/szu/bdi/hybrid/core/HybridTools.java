@@ -37,6 +37,7 @@ public class HybridTools {
     final private static String LOGTAG = "HybridTools";
 
     private static Context _appContext = null;
+    public static String localWebRoot;
 
     //IMPORTANT !!!: remember in the app entry, set HybridTools.setAppContext(getApplicationContext());
     public static void setAppContext(Context appContext) {
@@ -108,17 +109,15 @@ public class HybridTools {
         try {
             return new JSONObject(s);
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
     }
 
     public static String o2s(JSONObject o) {
+        if (o == null) return null;
         return o.toString();
     }
-//    //TODO....
-//    public static String o2s(Object o) {
-//        return o.toString();
-//    }
 
     //Wrap the raw webPost for our cmp api call
     public static JSONObject apiPost(String url, JSONObject jo) {
@@ -227,15 +226,19 @@ public class HybridTools {
         return readAssetInStr(_appContext, s);
     }
 
-    public static JSONObject jsonConfig = new JSONObject();
+    private static JSONObject _jAppConfig = new JSONObject();
 
-    public static void setJsonConfig(String K, Object V) {
+    public static void setAppConfig(String K, Object V) {
         try {
-            jsonConfig.put(K, V);
+            _jAppConfig.put(K, V);
         } catch (JSONException e) {
             Log.d(LOGTAG, "setConfig " + K);
             e.printStackTrace();
         }
+    }
+
+    public static Object getAppConfig(String k, Object v) {
+        return _jAppConfig.opt(k);
     }
 
     public static boolean isEmptyString(String s) {
@@ -259,32 +262,6 @@ public class HybridTools {
         String rt = o.toString();
         if (rt == null) return "";
         return rt;
-    }
-
-    public static HybridUi getHybridUi(String uiName) {
-
-        HybridUi ui = new WebViewUi();
-        ui.initPageData("{topbar:'Y',addr:'file://android_asset/root.htm'}");
-
-        return ui;
-    }
-
-//    public static void showUi(HybridUi ui, Context ctx) {
-//        if (ctx == null) ctx = getAppContext();
-//        final Context _ctx = ctx;
-//        Intent intent = new Intent(_ctx, ui.getClass());
-//        intent.putExtra("uiData", ui.uiData.toString());
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        _ctx.startActivity(intent);
-//    }
-//
-//    public static void showUi(HybridUi ui) {
-//        showUi(ui, null);
-//    }
-
-    public static HybridApi getHybridApi(String uiName) {
-        //HybridUiActivity ui=new HybridUiActivity();
-        return null;
     }
 
     public static BridgeWebView BuildOldJsBridge(Context _ctx) {
@@ -316,10 +293,10 @@ public class HybridTools {
     }
 
     public static void startUi(String name, String initParam, Activity caller, Class targetClass) {
-//        if (ctx == null) ctx = getAppContext();
-//        Context _ctx = ctx;
-        Intent intent = new Intent(caller, targetClass);//TODO the class from config
-//        intent.putExtra("uiData", ui.uiData.toString());
+        //TODO the class from config
+        Intent intent = new Intent(caller, targetClass);
+
+//        JSONObject config=get
         intent.putExtra("uiData", initParam);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //caller.startActivity(intent);
@@ -335,7 +312,7 @@ public class HybridTools {
             boolean res = true;
             for (String file : files)
                 if (file.contains("."))
-                    res &= copyAsset(assetManager,
+                    res &= copyAssetFile(assetManager,
                             fromAssetPath + "/" + file,
                             toPath + "/" + file);
                 else
@@ -349,7 +326,7 @@ public class HybridTools {
         }
     }
 
-    public static boolean copyAsset(AssetManager assetManager, String fromAssetPath, String toPath) {
+    public static boolean copyAssetFile(AssetManager assetManager, String fromAssetPath, String toPath) {
         InputStream in = null;
         OutputStream out = null;
         try {
@@ -392,92 +369,12 @@ public class HybridTools {
             }
         }
     }
-    //TODO rewrite JsBridge
-//    @SuppressLint("JavascriptInterface")
-//    public static WebView BuildWebViewWithJsBridgeSupport(Context ctx) {
-//        final Context _ctx = ctx;
-//
-//        final BridgeWebView wv = new BridgeWebView(_ctx);
-//
-//        WebSettings mWebSettings = wv.getSettings();
-//
-//        if (Build.VERSION.SDK_INT >= 11) {
-//            mWebSettings.setDisplayZoomControls(false);
-//        }
-//
-//        wv.setVerticalScrollBarEnabled(false);
-//        wv.setHorizontalScrollBarEnabled(false);
-//
-//        mWebSettings.setJavaScriptEnabled(true);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            wv.setWebContentsDebuggingEnabled(true);
-//        }
-////        String jsContent = readAssetInStr(wv.getContext(), "JsBridge.js");
-////        if (jsContent != null) wv.loadUrl("javascript:" + jsContent);
-//
-////        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-////            this.loadUrl(javascriptCommand);
-////        }
-//
-//        //TODO
-//        //thread handling is not yet ok... wait...
-////        wv.addJavascriptInterface(new JavascriptInterface() {
-////            @JavascriptInterface
-////            public String _send(String cmd_s, String id_s, String param_s) {
-////                Log.v(LOGTAG, "cmd_s=" + cmd_s + ",param_s=" + param_s);
-////                return "testreturnfromsend";
-////            }
-////        }, "AndroidWebView");
-//
-//        return wv;
-//    }
+
+    //init (replace the app config)
+    public static void initAppConfig(JSONObject o) {
+        _jAppConfig = o;
+    }
+
 }
 
-//Find instance in the Config, get the config
-
-//according to config, to set the
-
-//return ourInstance.
-//        final Context _f_ctx = _ctx;
-//        Intent intent = new Intent(_ctx, HybridUiActivity.class);
-////        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-//
-//        _ctx.startActivity(intent);
-
-//        android.os.Handler handler = new android.os.Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//        Intent intent = new Intent(_f_ctx, HybridUiActivity.class);
-////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        _f_ctx.startActivity(intent);
-//            }
-//        });
-//        //        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
-//
-//        @Override
-//        public void handler(String data, CallBackFunction function) {
-//            Log.i(TAG, "handler = _app_activity_close");
-//            finish();
-//        }
-//
-//    });
-//
-//    mWebView.registerHandler("_app_activity_set_title", new BridgeHandler() {
-//
-//        @Override
-//        public void handler(String title, CallBackFunction function) {
-//            JSONObject jsonObject = null;
-//            try {
-//                jsonObject = new JSONObject(title);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-
-//run backgroup service
-//        Intent bg = new Intent(_ctx, BackService.class);
-//        this.startService(bg);
 

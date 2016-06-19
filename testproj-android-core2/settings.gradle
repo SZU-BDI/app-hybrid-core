@@ -1,5 +1,0 @@
-include ':szu.bdi.hybrid.testcore2'
-
-include ':szu.bdi.hybrid.core2'
-project(':szu.bdi.hybrid.core2').projectDir = new File(settingsDir, '../lib-android/szu.bdi.hybrid.core2')
-

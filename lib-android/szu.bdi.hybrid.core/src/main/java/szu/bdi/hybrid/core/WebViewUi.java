@@ -19,12 +19,12 @@ import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-import szu.bdi.hybrid.core.jsbridge.BridgeHandler;
-import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
-import szu.bdi.hybrid.core.jsbridge.CallBackFunction;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import szu.bdi.hybrid.core.jsbridge.IBridgeHandler;
+import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
+import szu.bdi.hybrid.core.jsbridge.ICallBackFunction;
 
 //TODO rewrite the jsbridge...
 
@@ -54,7 +54,7 @@ public class WebViewUi extends HybridUi {
 //        }
 //    }
 
-    protected CallBackFunction _cb = null;
+    protected ICallBackFunction _cb = null;
 
     //work with this.startActivityForResult() + (setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
@@ -100,11 +100,8 @@ public class WebViewUi extends HybridUi {
         super.onCreate(savedInstanceState);
         Intent iin = getIntent();
         String s_uiData = iin.getStringExtra("uiData");
-        Log.v(LOGTAG, "s_uiData=" + s_uiData);
-        this.uiData = HybridTools.s2o(s_uiData);
-        Log.v(LOGTAG, "uiData=" + uiData);
-
-        //Log.v(LOGTAG, "pageData=" + pageData.toString());
+        initUiData(HybridTools.s2o(s_uiData));
+        Log.v(LOGTAG, "whole data=" + wholeUiData());
 
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
         String topbar = HybridTools.optString(getUiData("topbar"));
@@ -213,27 +210,28 @@ public class WebViewUi extends HybridUi {
 
         String url = HybridTools.optString(getUiData("url"));
         if (url == null || "".equals(url)) {
-            url = "file:///android_asset/error.htm";
+            url = "file://" + HybridTools.localWebRoot + "error.htm";
         }
         mURL = url;
 
-        mWebView.registerHandler("_app_activity_close", new BridgeHandler() {
+        mWebView.registerHandler("_app_activity_close", new IBridgeHandler() {
 
             @Override
-            public void handler(String data, CallBackFunction function) {
+            public void handler(String data, ICallBackFunction function) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
                 WebViewUi.this.onBackPressed();
             }
         });
-        mWebView.registerHandler("_app_activity_open", new BridgeHandler() {
+        mWebView.registerHandler("_app_activity_open", new IBridgeHandler() {
 
                     @Override
-                    public void handler(String data, CallBackFunction cb) {
+                    public void handler(String data, ICallBackFunction cb) {
                         Log.v("_app_activity_open", data);
+
                         WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
                         JSONObject dataJSONObject = HybridTools.s2o(data);
                         try {
-                            dataJSONObject.put("url", "file:///android_asset/root.htm");
+                            dataJSONObject.put("url", "file://" + HybridTools.localWebRoot + "root.htm");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

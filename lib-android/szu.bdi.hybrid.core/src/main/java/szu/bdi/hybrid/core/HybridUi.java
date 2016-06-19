@@ -7,49 +7,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HybridUi extends Activity {
-    final private static String LOGTAG = "HybridUi";
+    private static String LOGTAG = "HybridUi";
 
-    public JSONObject uiData = new JSONObject();
+    JSONObject _uiData;
 
-    public JSONObject initPageData(String s) {
-        uiData = HybridTools.s2o(s);
-        Log.v(LOGTAG, "uiData=" + uiData.toString());
-        return uiData;
+    public void initUiData(JSONObject o) {
+        if (o == null) return;
+        _uiData = o;
+//        Log.v(LOGTAG, "initUiData _uiData=" + _uiData);
+    }
+
+    public JSONObject wholeUiData() {
+//        Log.v(LOGTAG, "wholeUiData _uiData=" + _uiData);
+        return _uiData;
     }
 
     public void setUiData(String k, Object v) {
         try {
-            uiData.put(k, v);
+            _uiData.put(k, v);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public Object getUiData(String k) {
-        if (null == uiData) uiData = new JSONObject();
-        return uiData.opt(k);
+        if (null == _uiData) return null;
+        Log.v(LOGTAG, "save _uiData=" + _uiData);
+        Log.v(LOGTAG, "save get " + k + "=>" + _uiData.opt(k));
+        return _uiData.opt(k);
     }
-
-    //    Intent _intent = null;
-//    Context _ctx = null;
-
-//    public void show(Context ctx) {
-////        _ctx = ctx;
-////        Intent intent = new Intent(_ctx, HybridUiActivity.class);
-//////intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-////        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-////        _intent = intent;
-////        _ctx.startActivity(intent);
-//        _ctx = ctx;
-//        Intent intent = new Intent(_ctx, this.getClass());
-////intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        _intent = intent;
-//        _ctx.startActivity(intent);
-//    }
-//
-//    public void show() {
-//        this.show(HybridTools.getAppContext());
-//    }
 
 }

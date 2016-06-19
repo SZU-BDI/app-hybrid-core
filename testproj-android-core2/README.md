@@ -1,3 +1,0 @@
-just attemp to make a tiny apk with WebView support.
-
-Next version is to rewrite the jsbridge...
