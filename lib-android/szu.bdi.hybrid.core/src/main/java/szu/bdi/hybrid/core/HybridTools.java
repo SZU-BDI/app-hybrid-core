@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
-
-import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,11 +22,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
 
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
@@ -99,23 +104,12 @@ public class HybridTools {
     }
 
     public static JSONObject s2o(String s) {
-        if (s == null) return null;//return new JSONObject();
+        if (s == null) return null;
         try {
             return new JSONObject(s);
         } catch (Exception ex) {
         }
-//        JSONArray rto = new JSONArray();
-//        rto.put(s);
-//        return rto.optJSONObject(0);
-        JSONObject rt = new JSONObject();
-        try {
-            rt.put("STS", "KO");
-            rt.put("errmsg", "wrong json");
-            rt.put("s", "" + s);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return rt;
+        return null;
     }
 
     public static String o2s(JSONObject o) {
@@ -197,7 +191,7 @@ public class HybridTools {
     }
 
     //copy from jsbridge, maybe improve or find more elegant version...
-    public static String getFileIntoStr(Context c, String urlStr) {
+    public static String readAssetInStr(Context c, String urlStr) {
         InputStream in = null;
         try {
             in = c.getAssets().open(urlStr);
@@ -229,8 +223,8 @@ public class HybridTools {
         return null;
     }
 
-    public static String getFileIntoStr(String s) {
-        return getFileIntoStr(_appContext, s);
+    public static String readAssetInStr(String s) {
+        return readAssetInStr(_appContext, s);
     }
 
     public static JSONObject jsonConfig = new JSONObject();
@@ -331,6 +325,73 @@ public class HybridTools {
         //caller.startActivity(intent);
         caller.startActivityForResult(intent, 1);//onActivityResult()
     }
+
+    public static boolean copyAssetFolder(AssetManager assetManager,
+                                          String fromAssetPath, String toPath) {
+        try {
+            Log.v(LOGTAG, "copyAssetFolder " + fromAssetPath + "=>" + toPath);
+            String[] files = assetManager.list(fromAssetPath);
+            new File(toPath).mkdirs();
+            boolean res = true;
+            for (String file : files)
+                if (file.contains("."))
+                    res &= copyAsset(assetManager,
+                            fromAssetPath + "/" + file,
+                            toPath + "/" + file);
+                else
+                    res &= copyAssetFolder(assetManager,
+                            fromAssetPath + "/" + file,
+                            toPath + "/" + file);
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean copyAsset(AssetManager assetManager, String fromAssetPath, String toPath) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            Log.v(LOGTAG, "copyAsset " + fromAssetPath + "=>" + toPath);
+            in = assetManager.open(fromAssetPath);
+            new File(toPath).createNewFile();
+            out = new FileOutputStream(toPath);
+            copyFile(in, out);
+            in.close();
+            in = null;
+            out.flush();
+            out.close();
+            out = null;
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
+
+    //@ref http://stackoverflow.com/questions/8258725/strict-mode-in-android-2-2
+    //StrictMode.ThreadPolicy was introduced since API Level 9 and the default thread policy had been changed since API Level 11, which in short, does not allow network operation (eg: HttpClient and HttpUrlConnection) get executed on UI thread. If you do this, you get NetworkOnMainThreadException.
+    public static void uiNeedNetworkPolicyHack() {
+        int _sdk_int = android.os.Build.VERSION.SDK_INT;
+        if (_sdk_int > 8) {
+            try {
+                Log.d(LOGTAG, "setThreadPolicy for api level " + _sdk_int);
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
     //TODO rewrite JsBridge
 //    @SuppressLint("JavascriptInterface")
 //    public static WebView BuildWebViewWithJsBridgeSupport(Context ctx) {
@@ -352,7 +413,7 @@ public class HybridTools {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            wv.setWebContentsDebuggingEnabled(true);
 //        }
-////        String jsContent = getFileIntoStr(wv.getContext(), "JsBridge.js");
+////        String jsContent = readAssetInStr(wv.getContext(), "JsBridge.js");
 ////        if (jsContent != null) wv.loadUrl("javascript:" + jsContent);
 //
 ////        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
