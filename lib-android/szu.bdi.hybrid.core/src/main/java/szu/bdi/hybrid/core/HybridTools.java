@@ -42,7 +42,8 @@ public class HybridTools {
 
     //IMPORTANT !!!: remember in the app entry, set HybridTools.setAppContext(getApplicationContext());
     public static void setAppContext(Context appContext) {
-        _appContext = appContext;
+        if (appContext != null)
+            _appContext = appContext;
     }
 
     public static Context getAppContext() {
