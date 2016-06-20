@@ -22,8 +22,8 @@ import android.webkit.WebView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import szu.bdi.hybrid.core.jsbridge.IBridgeHandler;
 import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
+import szu.bdi.hybrid.core.jsbridge.IBridgeHandler;
 import szu.bdi.hybrid.core.jsbridge.ICallBackFunction;
 
 //TODO rewrite the jsbridge...
@@ -97,7 +97,7 @@ public class WebViewUi extends HybridUi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOGTAG, ".onCreate()");
-        super.onCreate(savedInstanceState);
+//        super.onCreate(savedInstanceState);
         Intent iin = getIntent();
         String s_uiData = iin.getStringExtra("uiData");
         initUiData(HybridTools.s2o(s_uiData));
@@ -206,8 +206,6 @@ public class WebViewUi extends HybridUi {
             }
         });
 
-        setContentView(mWebView);
-
         String url = HybridTools.optString(getUiData("url"));
         if (url == null || "".equals(url)) {
             url = "file://" + HybridTools.localWebRoot + "error.htm";
@@ -243,7 +241,14 @@ public class WebViewUi extends HybridUi {
 
         Log.v(LOGTAG, "load mURL=" + mURL);
         mWebView.loadUrl(mURL);
-
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setContentView(mWebView);
+//            }
+//        }, 2000);
+        setContentView(mWebView);
+        super.onCreate(savedInstanceState);
     }
 
     @Override

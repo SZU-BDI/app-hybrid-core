@@ -38,6 +38,7 @@ public class HybridTools {
 
     private static Context _appContext = null;
     public static String localWebRoot;
+    final static String UI_MAPPING = "ui_mapping";
 
     //IMPORTANT !!!: remember in the app entry, set HybridTools.setAppContext(getApplicationContext());
     public static void setAppContext(Context appContext) {
@@ -175,7 +176,6 @@ public class HybridTools {
         }, (playMedia) ? 5000 : 2500);
     }
 
-    //NOTES: need to run in main thread...
     public static void KillAppSelf() {
         int pid = android.os.Process.myPid();
         Log.d(LOGTAG, "kill and quit pid=" + pid);
@@ -228,6 +228,15 @@ public class HybridTools {
 
     private static JSONObject _jAppConfig = new JSONObject();
 
+    //init (replace the app config)
+    public static void initAppConfig(JSONObject o) {
+        _jAppConfig = o;
+    }
+
+    public static JSONObject wholeAppConfig() {
+        return _jAppConfig;
+    }
+
     public static void setAppConfig(String K, Object V) {
         try {
             _jAppConfig.put(K, V);
@@ -237,7 +246,7 @@ public class HybridTools {
         }
     }
 
-    public static Object getAppConfig(String k, Object v) {
+    public static Object getAppConfig(String k) {
         return _jAppConfig.opt(k);
     }
 
@@ -294,11 +303,24 @@ public class HybridTools {
 
     public static void startUi(String name, String initParam, Activity caller, Class targetClass) {
         //TODO the class from config
+        Object uia = getAppConfig(UI_MAPPING);
+        if (uia == null) {
+            HybridTools.quickShowMsgMain("config.json error");
+            return;
+        }
+        Object uic = ((JSONObject) uia).optJSONObject(name);
+        if (uic == null) {
+            HybridTools.quickShowMsgMain("config.json not found " + name);
+            return;
+        }
+
+        Log.v(LOGTAG, "startUi with uic=" + uic);
         Intent intent = new Intent(caller, targetClass);
 
 //        JSONObject config=get
-        intent.putExtra("uiData", initParam);
+
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("uiData", initParam);
         //caller.startActivity(intent);
         caller.startActivityForResult(intent, 1);//onActivityResult()
     }
@@ -368,11 +390,6 @@ public class HybridTools {
                 t.printStackTrace();
             }
         }
-    }
-
-    //init (replace the app config)
-    public static void initAppConfig(JSONObject o) {
-        _jAppConfig = o;
     }
 
 }
