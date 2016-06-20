@@ -22,10 +22,6 @@ import android.webkit.WebView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
-import szu.bdi.hybrid.core.jsbridge.IBridgeHandler;
-import szu.bdi.hybrid.core.jsbridge.ICallBackFunction;
-
 //TODO rewrite the jsbridge...
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
@@ -42,7 +38,7 @@ public class WebViewUi extends HybridUi {
 
     private String mURL;
 
-    private BridgeWebView mWebView;
+    private JsBridgeWebView mWebView;
 
 //    private WebView mWebView;
 
@@ -54,7 +50,7 @@ public class WebViewUi extends HybridUi {
 //        }
 //    }
 
-    protected ICallBackFunction _cb = null;
+    protected JsBridgeWebView.ICallBackFunction _cb = null;
 
     //work with this.startActivityForResult() + (setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
@@ -212,18 +208,18 @@ public class WebViewUi extends HybridUi {
         }
         mURL = url;
 
-        mWebView.registerHandler("_app_activity_close", new IBridgeHandler() {
+        mWebView.registerHandler("_app_activity_close", new JsBridgeWebView.IBridgeHandler() {
 
             @Override
-            public void handler(String data, ICallBackFunction function) {
+            public void handler(String data, JsBridgeWebView.ICallBackFunction function) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
                 WebViewUi.this.onBackPressed();
             }
         });
-        mWebView.registerHandler("_app_activity_open", new IBridgeHandler() {
+        mWebView.registerHandler("_app_activity_open", new JsBridgeWebView.IBridgeHandler() {
 
                     @Override
-                    public void handler(String data, ICallBackFunction cb) {
+                    public void handler(String data, JsBridgeWebView.ICallBackFunction cb) {
                         Log.v("_app_activity_open", data);
 
                         WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?

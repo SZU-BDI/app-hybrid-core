@@ -31,8 +31,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import szu.bdi.hybrid.core.jsbridge.BridgeWebView;
-
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
 
@@ -274,9 +272,9 @@ public class HybridTools {
         return rt;
     }
 
-    public static BridgeWebView BuildOldJsBridge(Context _ctx) {
-        BridgeWebView wv;
-        wv = new BridgeWebView(_ctx);
+    public static JsBridgeWebView BuildOldJsBridge(Context _ctx) {
+        JsBridgeWebView wv;
+        wv = new JsBridgeWebView(_ctx);
         return wv;
     }
 
