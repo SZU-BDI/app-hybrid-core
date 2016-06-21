@@ -29,19 +29,28 @@ import java.util.Map;
 /**
  * This just the v1 implementation,
  * soon will have a v2 version for a better protocol
+ * <p>
+ * design : Q + Bi-direction-call + Protocol(enc/dec)
  */
 
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
     private final String TAG = "JsBridgeWebView";
+    //    final private static String LOGTAG = "" + (new Object() {
+//        public String getClassName() {
+//            String clazzName = this.getClass().getName();
+//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
+//        }
+//    }.getClassName());
+
 
     final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
     final static String JSB1_RETURN_DATA = JSB1_OVERRIDE_SCHEMA + "return/";
     final static String JSB1_FETCH_QUEUE = JSB1_RETURN_DATA + "_fetchQueue/";
 
-    final static String WebViewJavascriptBridge = "WebViewJavascriptBridge";//v1
-    final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WebViewJavascriptBridge + "._fetchQueue();";
-    final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:" + WebViewJavascriptBridge + "._handleMessageFromNative('%s');";
+    final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
+    final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
+    final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._handleMessageFromNative('%s');";
     final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
     //NOTES:  TODO memory cleanup?
@@ -58,7 +67,7 @@ public class JsBridgeWebView extends WebView {
     private List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
 
     public static String parseFunctionName(String jsUrl) {
-        return jsUrl.replace("javascript:" + WebViewJavascriptBridge + ".", "").replaceAll("\\(.*\\);", "");
+        return jsUrl.replace("javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + ".", "").replaceAll("\\(.*\\);", "");
     }
 
     public static String getDataFromReturnUrl(String url) {

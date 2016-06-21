@@ -29,30 +29,10 @@ import org.json.JSONObject;
 public class WebViewUi extends HybridUi {
 
     final private static String LOGTAG = "WebViewUi";
-//    final private static String LOGTAG = "" + (new Object() {
-//        public String getClassName() {
-//            String clazzName = this.getClass().getName();
-//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
-//        }
-//    }.getClassName());
-
-    private String mURL;
-
-    private JsBridgeWebView mWebView;
-
-//    private WebView mWebView;
-
-//    public class JavaScriptInterface {
-//        Context mContext1;
-//
-//        JavaScriptInterface(Context c) {
-//            mContext1 = c;
-//        }
-//    }
 
     protected JsBridgeWebView.ICallBackFunction _cb = null;
 
-    //work with this.startActivityForResult() + (setResult() + finish())
+    //@ref this.startActivityForResult() + (setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
         Log.v(LOGTAG, "resultCode=" + resultCode);
         Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
@@ -167,10 +147,9 @@ public class WebViewUi extends HybridUi {
         final Context _ctx = this;
         final Activity _activity = this;
 
-//        mWebView = HybridService.BuildWebViewWithJsBridgeSupport(_ctx);//TODO
+        JsBridgeWebView mWebView;
 
-        //com.github.lzyzsd.jsbridge
-        mWebView = HybridTools.BuildOldJsBridge(_ctx);
+        mWebView = HybridTools.BuildJsBridge(_ctx);
 
         //NOTES: if not set, the js alert won't effect...(maybe the default return is true)
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -206,6 +185,7 @@ public class WebViewUi extends HybridUi {
         if (url == null || "".equals(url)) {
             url = "file://" + HybridTools.localWebRoot + "error.htm";
         }
+        String mURL;
         mURL = url;
 
         mWebView.registerHandler("_app_activity_close", new JsBridgeWebView.IBridgeHandler() {
@@ -237,30 +217,26 @@ public class WebViewUi extends HybridUi {
 
         Log.v(LOGTAG, "load mURL=" + mURL);
         mWebView.loadUrl(mURL);
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                setContentView(mWebView);
-//            }
-//        }, 2000);
+
         setContentView(mWebView);
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    public void onBackPressed() {        // to prevent irritating accidental logouts
+    public void onBackPressed() {
         Log.v(LOGTAG, "onBackPressed set Result 1");
         Intent rtIntent = new Intent();
-        rtIntent.putExtra("rt", "{STS:\"TMP\"}");
+        rtIntent.putExtra("rt", "{STS:\"TODO\"}");//get the data from uiData
         setResult(1, rtIntent);
         finish();
     }
 
-    //in case old androids dont have onBackPress()
+    //in case old androids dont have onBackPress(), need onKeyDown() to do it
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.v(LOGTAG, "onKeyDown KEYCODE_BACK");
+        Log.v(LOGTAG, "onKeyDown " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Log.v(LOGTAG, "onKeyDown KeyEvent.KEYCODE_BACK " + KeyEvent.KEYCODE_BACK);
             onBackPressed();
             return true;
         }

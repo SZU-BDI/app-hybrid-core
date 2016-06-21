@@ -272,7 +272,8 @@ public class HybridTools {
         return rt;
     }
 
-    public static JsBridgeWebView BuildOldJsBridge(Context _ctx) {
+    //TODO might be override by child?
+    public static JsBridgeWebView BuildJsBridge(Context _ctx) {
         JsBridgeWebView wv;
         wv = new JsBridgeWebView(_ctx);
         return wv;
@@ -317,8 +318,8 @@ public class HybridTools {
         Intent intent = new Intent(caller, targetClass);
 
 //        JSONObject config=get
-
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         intent.putExtra("uiData", initParam);
         //caller.startActivity(intent);
         caller.startActivityForResult(intent, 1);//onActivityResult()
