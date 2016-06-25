@@ -49,12 +49,12 @@
 	}
 
 	//function send(data, responseCallback) {
-	//	_doSend({
+	//	_js2java({
 	//		data: data
 	//	}, responseCallback);
 	//}
 
-	function _doSend(message, responseCallback) {
+	function _js2java(message, responseCallback) {
 		if (responseCallback) {
 			var callbackId = 'cb_' + (uniqueId++) + '_' + new Date().getTime();
 			responseCallbacks[callbackId] = responseCallback;
@@ -93,7 +93,7 @@
 				if (message.callbackId) {
 					var callbackResponseId = message.callbackId;
 					responseCallback = function(responseData) {
-						_doSend({
+						_js2java({
 							responseId: callbackResponseId,
 							responseData: responseData
 						});
@@ -119,7 +119,7 @@
 	}
 
 	function callHandler(handlerName, data, responseCallback) {
-		_doSend({
+		_js2java({
 			handlerName: handlerName,
 			data: data
 		}, responseCallback);
@@ -127,10 +127,10 @@
 
 	var WebViewJavascriptBridge = window.WebViewJavascriptBridge = {
 		init: init,
-		//send: send,
 		registerHandler: registerHandler,
 		callHandler: callHandler,
 		_fetchQueue: _fetchQueue,
+		_js2java: _js2java,
 		_java2js: _java2js
 	};
 

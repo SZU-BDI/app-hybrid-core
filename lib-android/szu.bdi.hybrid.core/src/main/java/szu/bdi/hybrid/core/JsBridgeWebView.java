@@ -187,7 +187,7 @@ public class JsBridgeWebView extends WebView {
                     webView.handlerReturnData(url);
                     return true;
                 } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
-                    //@ref WebViewJavascriptBridge.js  _doSend  __QUEUE_MESSAGE__
+                    //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
                     webView.flushMessageQueue();
                     return true;
                 } else {
@@ -234,11 +234,11 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-//    public void send(String data, ICallBackFunction responseCallback) {
-//        doSend(null, data, responseCallback);
+//    public void java2js(String data, ICallBackFunction responseCallback) {
+//        _java2js(null, data, responseCallback);
 //    }
 
-    private void doSend(String handlerName, String data, ICallBackFunction responseCallback) {
+    private void _java2js(String handlerName, String data, ICallBackFunction responseCallback) {
         Jsb1Msg m = new Jsb1Msg();
         if (!TextUtils.isEmpty(data)) {
             m.setData(data);
@@ -352,7 +352,7 @@ public class JsBridgeWebView extends WebView {
 
     //    from java call js
     public void callHandler(String handlerName, String data, ICallBackFunction callBack) {
-        doSend(handlerName, data, callBack);
+        _java2js(handlerName, data, callBack);
     }
 
     public interface IBridgeHandler {
