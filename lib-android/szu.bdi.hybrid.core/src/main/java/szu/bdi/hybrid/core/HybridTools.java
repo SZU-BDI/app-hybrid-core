@@ -396,8 +396,11 @@ public class HybridTools {
         String uiData_s = o2s(callParam);
 
         intent.putExtra("uiData", uiData_s);
-
-        caller.startActivityForResult(intent, 1);//onActivityResult()
+        try {
+            caller.startActivityForResult(intent, 1);//onActivityResult()
+        } catch (Throwable t) {
+            quickShowMsgMain("Error:" + t.getMessage());
+        }
     }
 
     public static boolean copyAssetFolder(AssetManager assetManager,
