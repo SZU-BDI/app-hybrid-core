@@ -55,19 +55,19 @@ public class HybridUi extends Activity {
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 break;
-            case "Y":
-                //Y: top bar w+ top status (default)
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-                break;
             case "M":
                 //M: only top bar w- top status
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 requestWindowFeature(Window.FEATURE_ACTION_BAR);
                 break;
             case "N":
-            default:
                 //N: FullScreen w+ top status
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
+                break;
+            case "Y":
+            default:
+                //Y: top bar w+ top status (default)
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
                 break;
         }
 
