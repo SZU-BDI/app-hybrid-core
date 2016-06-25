@@ -75,8 +75,8 @@ public class HybridUi extends Activity {
 
     public Object getUiData(String k) {
         if (null == _uiData) return null;
-        Log.v(LOGTAG, "save _uiData=" + _uiData);
-        Log.v(LOGTAG, "save get " + k + "=>" + _uiData.opt(k));
+        Log.v(LOGTAG, " _uiData=" + _uiData);
+        Log.v(LOGTAG, " getUiData " + k + "=>" + _uiData.opt(k));
         return _uiData.opt(k);
     }
 

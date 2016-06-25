@@ -373,9 +373,11 @@ public class HybridTools {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
             return;
         }
-        Class targetClass = null;//WebViewUi.class;//TODO !!!! reflection
+        Class targetClass = null;
         try {
+            //reflection:
             targetClass = Class.forName(clsName);
+            Log.v(LOGTAG, "class " + clsName + " found for name " + name);
         } catch (ClassNotFoundException e) {
             HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
             return;
@@ -386,7 +388,7 @@ public class HybridTools {
         String uiData_s = o2s(callParam);
 
         intent.putExtra("uiData", uiData_s);
-        //caller.startActivity(intent);
+
         caller.startActivityForResult(intent, 1);//onActivityResult()
     }
 

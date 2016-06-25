@@ -16,6 +16,8 @@ import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import org.json.JSONObject;
+
 //TODO rewrite the jsbridge...
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
@@ -77,6 +79,8 @@ public class WebViewUi extends HybridUi {
             case "M":
                 //M: only top bar w- top status
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                break;
             case "N":
                 //N: FullScreen w+ top status
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -160,8 +164,13 @@ public class WebViewUi extends HybridUi {
         if (address == null || "".equals(address)) {
             url = "file://" + HybridTools.localWebRoot + "error.htm";
         } else {
-            //TODO check protocal !!!
-            url = "file://" + HybridTools.localWebRoot + address;
+            if (address.matches("^\\w+://.*$")) {
+                //if have schema already
+                url = address;
+            } else {
+                //shuld be local?
+                url = "file://" + HybridTools.localWebRoot + address;
+            }
         }
 
         mWebView.registerHandler("_app_activity_close", new JsBridgeWebView.IBridgeHandler() {
@@ -190,7 +199,18 @@ public class WebViewUi extends HybridUi {
 
                         String root_htm_s = "root.htm";
                         Log.v(LOGTAG, "root_htm_s=" + root_htm_s);
-                        HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
+                        //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
+                        //if no name then name = UiContent...
+                        String uiName = "UiContent";//default;
+                        JSONObject data_o = HybridTools.s2o(data);
+                        if (data_o != null) {
+                            String t = data_o.optString("name");
+                            if (!HybridTools.isEmptyString(t)) {
+                                uiName = t;
+                            }
+                        }
+
+                        HybridTools.startUi(uiName, data, _activity);
                     }
 
                 }
