@@ -20,14 +20,8 @@
         doc.documentElement.appendChild(messagingIframe);
     }
 
-    function init(messageHandler) {
-        if (WebViewJavascriptBridge._messageHandler) {
-            if("undefined"!=typeof console){
-             console.log('WebViewJavascriptBridge.init called twice');
-            }
-            return;
-        }
-        WebViewJavascriptBridge._messageHandler = messageHandler;
+    function init() {
+        console.log('WebViewJavascriptBridge.init called.');
         var receivedMessages = receiveMessageQueue;
         receiveMessageQueue = null;
         for (var i = 0; i < receivedMessages.length; i++) {
@@ -120,16 +114,15 @@ var message = s2o(messageJSON);
                     };
                 }
 
-                var handler = WebViewJavascriptBridge._messageHandler;
+                var handler = null;
                 if (message.handlerName) {
                     handler = messageHandlers[message.handlerName];
                 }
                 try {
-                    handler(message.data, responseCallback);
+                		if(handler!=null)
+                    		handler(message.data, responseCallback);
                 } catch (exception) {
-                    if (typeof console != 'undefined') {
-                        console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
-                    }
+                   	console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
                 }
             }
         });
@@ -144,7 +137,7 @@ var message = s2o(messageJSON);
         }
     }
 
-    var WebViewJavascriptBridge = window.WebViewJavascriptBridge = {
+    var WebViewJavascriptBridge = {
         init: init,
         send: send,
         registerHandler: registerHandler,
@@ -152,11 +145,10 @@ var message = s2o(messageJSON);
         _fetchQueue: _fetchQueue,
         _handleMessageFromNative: _handleMessageFromNative
     };
+    window.WebViewJavascriptBridge = WebViewJavascriptBridge;
 
-    var doc = document;
-    _createQueueReadyIframe(doc);
-    var readyEvent = doc.createEvent('Events');
-    readyEvent.initEvent('WebViewJavascriptBridgeReady');
-    readyEvent.bridge = WebViewJavascriptBridge;
-    doc.dispatchEvent(readyEvent);
+    _createQueueReadyIframe(document);
+
+		init();
+
 })();

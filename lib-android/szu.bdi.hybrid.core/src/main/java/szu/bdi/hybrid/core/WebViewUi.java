@@ -2,7 +2,6 @@ package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,16 +10,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //TODO rewrite the jsbridge...
 
@@ -44,18 +38,6 @@ public class WebViewUi extends HybridUi {
             _cb.onCallBack(rtIntent.getStringExtra("rt"));
 //            _cb.onCallBack("{STS:\"TODO\"}");//TODO return the param of current Ui?
         }
-    }
-
-    //NOTES: when user click the left-upper button on the top bar
-    //@ref setDisplayHomeAsUpEnabled()
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-        }
-        return true;
     }
 
 //    boolean bClose;
@@ -101,15 +83,7 @@ public class WebViewUi extends HybridUi {
                 break;
         }
         setTitle("TODO setTitle()");
-        try {
-            ActionBar actionBar = getActionBar();
-            //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ex) {
-//            ex.printStackTrace();
-        } catch (NoSuchMethodError ex) {
-//            ex.printStackTrace();
-        }
+
 //        //Hide title bar, TODO base on param...
 //        if (false) {
 //            requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -181,18 +155,21 @@ public class WebViewUi extends HybridUi {
             }
         });
 
-        String url = HybridTools.optString(getUiData("url"));
-        if (url == null || "".equals(url)) {
+        String address = HybridTools.optString(getUiData("address"));
+        String url = "";
+        if (address == null || "".equals(address)) {
             url = "file://" + HybridTools.localWebRoot + "error.htm";
+        } else {
+            //TODO check protocal !!!
+            url = "file://" + HybridTools.localWebRoot + address;
         }
-        String mURL;
-        mURL = url;
 
         mWebView.registerHandler("_app_activity_close", new JsBridgeWebView.IBridgeHandler() {
 
             @Override
-            public void handler(String data, JsBridgeWebView.ICallBackFunction function) {
+            public void handler(String data, JsBridgeWebView.ICallBackFunction cb) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
+                //WebViewUi.this._cb = cb;
                 WebViewUi.this.onBackPressed();
             }
         });
@@ -203,20 +180,24 @@ public class WebViewUi extends HybridUi {
                         Log.v("_app_activity_open", data);
 
                         WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
-                        JSONObject dataJSONObject = HybridTools.s2o(data);
-                        try {
-                            dataJSONObject.put("url", "file://" + HybridTools.localWebRoot + "root.htm");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity, WebViewUi.class);
+//                        JSONObject dataJSONObject = HybridTools.s2o(data);
+//                        try {
+//                            dataJSONObject.put("url", "file://" + HybridTools.localWebRoot + "root.htm");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+////                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity, WebViewUi.class);
+
+                        String root_htm_s = "root.htm";
+                        Log.v(LOGTAG, "root_htm_s=" + root_htm_s);
+                        HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
                     }
 
                 }
         );
 
-        Log.v(LOGTAG, "load mURL=" + mURL);
-        mWebView.loadUrl(mURL);
+        Log.v(LOGTAG, "load url=" + url);
+        mWebView.loadUrl(url);
 
         setContentView(mWebView);
         super.onCreate(savedInstanceState);
@@ -231,15 +212,4 @@ public class WebViewUi extends HybridUi {
         finish();
     }
 
-    //in case old androids dont have onBackPress(), need onKeyDown() to do it
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.v(LOGTAG, "onKeyDown " + keyCode);
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Log.v(LOGTAG, "onKeyDown KeyEvent.KEYCODE_BACK " + KeyEvent.KEYCODE_BACK);
-            onBackPressed();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 }

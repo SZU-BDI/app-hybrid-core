@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
@@ -69,6 +71,19 @@ public class HybridTools {
         }
     }
 
+    //NOTES:  because getSeeting will cause mis-understanding
+    public static String getSavedSetting(Context mContext, String whichSp, String field) {
+        SharedPreferences sp = mContext.getSharedPreferences(whichSp, Context.MODE_PRIVATE);
+        String s = sp.getString(field, "");
+        return s;
+    }
+
+    public static void saveSetting(Context mContext, String whichSp, String field, String value) {
+        SharedPreferences sp = (SharedPreferences) mContext.getSharedPreferences(whichSp, Context.MODE_PRIVATE);
+        if (null == value) value = "";//I want to store sth not null
+        sp.edit().putString(field, value).commit();
+    }
+
     public static String webPost(String url, String post_s) {
         String return_s = null;
 
@@ -105,10 +120,11 @@ public class HybridTools {
     }
 
     public static JSONObject s2o(String s) {
-        if (s == null) return null;
+        if (s == null || "".equals(s)) return null;
         try {
             return new JSONObject(s);
         } catch (Exception ex) {
+            Log.v(LOGTAG, "failed to parse json=" + s);
             ex.printStackTrace();
         }
         return null;
@@ -301,26 +317,75 @@ public class HybridTools {
         b2.show();
     }
 
-    public static void startUi(String name, String initParam, Activity caller, Class targetClass) {
-        //TODO the class from config
+    //    public static JSONObject deepMerge(JSONObject source, JSONObject target) throws JSONException {
+    //        for (String key: JSONObject.getNames(source)) {
+    //            Object value = source.get(key);
+    //            if (!target.has(key)) {
+    //                target.put(key, value);
+    //            } else {
+    //                if (value instanceof JSONObject) {
+    //                    JSONObject valueJson = (JSONObject)value;
+    //                    deepMerge(valueJson, target.getJSONObject(key));
+    //                } else {
+    //                    target.put(key, value);
+    //                }
+    //            }
+    //        }
+    //        return target;
+    //    }
+
+    //shallow merge
+    public static JSONObject basicMerge(JSONObject... jsonObjects) {
+        JSONObject jsonObject = new JSONObject();
+        for (JSONObject temp : jsonObjects) {
+            if (temp == null) continue;
+            Iterator<String> keys = temp.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                try {
+                    jsonObject.put(key, temp.get(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return jsonObject;
+    }
+
+    public static void startUi(String name, String overrideParam_s, Activity caller) {
         Object uia = getAppConfig(UI_MAPPING);
         if (uia == null) {
-            HybridTools.quickShowMsgMain("config.json error");
+            HybridTools.quickShowMsgMain("config.json error!!!");
             return;
         }
-        Object uic = ((JSONObject) uia).optJSONObject(name);
-        if (uic == null) {
-            HybridTools.quickShowMsgMain("config.json not found " + name);
+        JSONObject defaultParam = ((JSONObject) uia).optJSONObject(name);
+        if (defaultParam == null) {
+            HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
             return;
         }
 
-        Log.v(LOGTAG, "startUi with uic=" + uic);
+        JSONObject overrideParam = s2o(overrideParam_s);
+        JSONObject callParam = basicMerge(defaultParam, overrideParam);
+        Log.v(LOGTAG, "param after merge=" + callParam);
+
+        String clsName = callParam.optString("class");
+        if (isEmptyString(clsName)) {
+            HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
+            return;
+        }
+        Class targetClass = null;//WebViewUi.class;//TODO !!!! reflection
+        try {
+            targetClass = Class.forName(clsName);
+        } catch (ClassNotFoundException e) {
+            HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
+            return;
+        }
+
         Intent intent = new Intent(caller, targetClass);
 
-//        JSONObject config=get
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String uiData_s = o2s(callParam);
 
-        intent.putExtra("uiData", initParam);
+        intent.putExtra("uiData", uiData_s);
         //caller.startActivity(intent);
         caller.startActivityForResult(intent, 1);//onActivityResult()
     }

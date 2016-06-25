@@ -29,8 +29,15 @@ import java.util.Map;
 /**
  * This just the v1 implementation,
  * soon will have a v2 version for a better protocol
- * <p>
+ * <p/>
  * design : Q + Bi-direction-call + Protocol(enc/dec)
+ *
+ * NOTES:
+ *
+ * 1, using Queue and make sure runing in a same ui-thread.
+ * 2, registerHandler and callHandler is the only protocol
+ *
+ *
  */
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -43,13 +50,13 @@ public class JsBridgeWebView extends WebView {
 //        }
 //    }.getClassName());
 
-
     final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
     final static String JSB1_RETURN_DATA = JSB1_OVERRIDE_SCHEMA + "return/";
     final static String JSB1_FETCH_QUEUE = JSB1_RETURN_DATA + "_fetchQueue/";
 
     final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
     final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
+    //TODO _handleMessageFromNative 要重新设计为比如 java2js
     final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._handleMessageFromNative('%s');";
     final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
@@ -229,9 +236,9 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    public void send(String data, ICallBackFunction responseCallback) {
-        doSend(null, data, responseCallback);
-    }
+//    public void send(String data, ICallBackFunction responseCallback) {
+//        doSend(null, data, responseCallback);
+//    }
 
     private void doSend(String handlerName, String data, ICallBackFunction responseCallback) {
         Jsb1Msg m = new Jsb1Msg();
@@ -335,8 +342,8 @@ public class JsBridgeWebView extends WebView {
     }
 
     public void loadUrl(String jsUrl, ICallBackFunction returnCallback) {
-        this.loadUrl(jsUrl);
         responseCallbacks.put(parseFunctionName(jsUrl), returnCallback);
+        this.loadUrl(jsUrl);
     }
 
     public void registerHandler(String handlerName, IBridgeHandler handler) {
@@ -345,20 +352,17 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-//    public void callHandler(String handlerName, String data, ICallBackFunction callBack) {
-//        doSend(handlerName, data, callBack);
-//    }
-
-    public static interface IBridgeHandler {
-
-        void handler(String data, ICallBackFunction function);
-
+    //    from java call js
+    public void callHandler(String handlerName, String data, ICallBackFunction callBack) {
+        doSend(handlerName, data, callBack);
     }
 
-    public static interface ICallBackFunction {
+    public interface IBridgeHandler {
+        void handler(String data, ICallBackFunction function);
+    }
 
-        public void onCallBack(String data);
-
+    public interface ICallBackFunction {
+        void onCallBack(String data);
     }
 
     //JsBridge V1 Protocol
