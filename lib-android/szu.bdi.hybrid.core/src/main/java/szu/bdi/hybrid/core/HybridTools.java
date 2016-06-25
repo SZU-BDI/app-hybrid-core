@@ -385,6 +385,14 @@ public class HybridTools {
 
         Intent intent = new Intent(caller, targetClass);
 
+        try {
+            if (!isEmptyString(name)) {
+                callParam.put("name", name);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         String uiData_s = o2s(callParam);
 
         intent.putExtra("uiData", uiData_s);
