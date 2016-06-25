@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -58,76 +60,38 @@ public class WebViewUi extends HybridUi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOGTAG, ".onCreate()");
-        super.onCreate(savedInstanceState);
+        Intent iin = getIntent();
+        String s_uiData = iin.getStringExtra("uiData");
 
-//        super.onCreate(savedInstanceState);
+        initUiData(HybridTools.s2o(s_uiData));
 
-//        Intent iin = getIntent();
-//        String s_uiData = iin.getStringExtra("uiData");
-//
-//        initUiData(HybridTools.s2o(s_uiData));
-//
-//        Log.v(LOGTAG, "whole data=" + wholeUiData());
-//
-//        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
-//        String topbar = HybridTools.optString(getUiData("topbar"));
-//
-//        switch (topbar) {
-//            case "F":
-//                //F: full screen w- top status
-//                requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                break;
-//            case "Y":
-//                //Y: top bar w+ top status (default)
-//                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-//                break;
-//            case "M":
-//                //M: only top bar w- top status
-//                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-//                break;
-//            case "N":
-//                //N: FullScreen w+ top status
-//                requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                break;
-//        }
-//
-//        setTitle("TODO setTitle()");
+        Log.v(LOGTAG, "whole data=" + wholeUiData());
+        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
+        String topbar = HybridTools.optString(getUiData("topbar"));
 
-//        //Hide title bar, TODO base on param...
-//        if (false) {
-//            requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        } else {
-////            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-////            requestWindowFeature(Window.FEATURE_LEFT_ICON);
-//            //setContentView(R.layout.); //or whatever layout is shows
-////            setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.abc_btn_check_material);
-//            //getActionBar().setIcon(R.drawable.abc_btn_radio_material);
-////            getActionBar().setIcon(R.drawable.back3x);
-////            try {
-//////                getActionBar().setDisplayHomeAsUpEnabled(true);
-////                //getActionBar().setdis
-////            } catch (NullPointerException ex) {
-////                ex.printStackTrace();
-////            }
-//            setTitle("TODO setTitle()");
-////            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-////            }
-//            try {
-//                ActionBar actionBar = getActionBar();
-//                //setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
-//                actionBar.setDisplayHomeAsUpEnabled(true);
-//            } catch (NullPointerException ex) {
-//                ex.printStackTrace();
-//            } catch (NoSuchMethodError ex) {
-//                ex.printStackTrace();
-//            }
-//        }
+        switch (topbar) {
+            case "F":
+                //F: full screen w- top status
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                break;
+            case "M":
+                //M: only top bar w- top status
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                break;
+            case "N":
+                //N: FullScreen w+ top status
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                break;
+            case "Y":
+            default:
+                //Y: top bar w+ top status (default)
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                break;
+        }
 
-//Hide status bar.  todo by param
-//        if(true)
-//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setTitle("TODO setTitle()");
 
         final Context _ctx = this;
         final Activity _activity = this;
@@ -227,6 +191,9 @@ public class WebViewUi extends HybridUi {
         mWebView.loadUrl(url);
 
         setContentView(mWebView);
+
+        super.onCreate(savedInstanceState);
+
     }
 
     @Override

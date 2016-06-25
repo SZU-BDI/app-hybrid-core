@@ -1,6 +1,7 @@
 package szu.bdi.hybrid.core;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
@@ -8,8 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,59 +18,17 @@ public class HybridUi extends Activity {
 
     JSONObject _uiData;
 
-    //    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        try {
-//            ActionBar actionBar = getActionBar();
-//            //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        } catch (NullPointerException ex) {
-//        } catch (NoSuchMethodError ex) {
-//        }
-//    }
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(LOGTAG, ".onCreate()");
         super.onCreate(savedInstanceState);
-
-//        super.onCreate(savedInstanceState);
-
-        Intent iin = getIntent();
-        String s_uiData = iin.getStringExtra("uiData");
-
-        initUiData(HybridTools.s2o(s_uiData));
-
-        Log.v(LOGTAG, "whole data=" + wholeUiData());
-
-        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
-        String topbar = HybridTools.optString(getUiData("topbar"));
-
-        switch (topbar) {
-            case "F":
-                //F: full screen w- top status
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                break;
-            case "M":
-                //M: only top bar w- top status
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-                break;
-            case "N":
-                //N: FullScreen w+ top status
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                break;
-            case "Y":
-            default:
-                //Y: top bar w+ top status (default)
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-                break;
+        try {
+            ActionBar actionBar = getActionBar();
+            //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ex) {
+        } catch (NoSuchMethodError ex) {
         }
-
-        setTitle("TODO setTitle()");
     }
 
     //NOTES: when user click the left-upper button on the top bar
