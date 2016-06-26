@@ -234,10 +234,6 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-//    public void java2js(String data, ICallBackFunction responseCallback) {
-//        _java2js(null, data, responseCallback);
-//    }
-
     private void _java2js(String handlerName, String data, ICallBackFunction responseCallback) {
         Jsb1Msg m = new Jsb1Msg();
         if (!TextUtils.isEmpty(data)) {
@@ -278,6 +274,8 @@ public class JsBridgeWebView extends WebView {
 
     void flushMessageQueue() {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+
+            //take the Q from javascript and handle in java
             loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new ICallBackFunction() {
 
                 @Override

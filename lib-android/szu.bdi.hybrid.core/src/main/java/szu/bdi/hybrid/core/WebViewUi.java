@@ -100,18 +100,10 @@ public class WebViewUi extends HybridUi {
                         Log.v("_app_activity_open", data);
 
                         WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
-//                        JSONObject dataJSONObject = HybridTools.s2o(data);
-//                        try {
-//                            dataJSONObject.put("url", "file://" + HybridTools.localWebRoot + "root.htm");
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-////                        HybridTools.startUi("UiContent", dataJSONObject.toString(), _activity, WebViewUi.class);
 
-                        String root_htm_s = "root.htm";
-                        Log.v(LOGTAG, "root_htm_s=" + root_htm_s);
+                        //TMP TEST:
                         //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
-                        //if no name then name = UiContent...
+
                         String uiName = "UiContent";//default;
                         JSONObject data_o = HybridTools.s2o(data);
                         if (data_o != null) {
@@ -120,7 +112,6 @@ public class WebViewUi extends HybridUi {
                                 uiName = t;
                             }
                         }
-
                         HybridTools.startUi(uiName, data, _activity);
                     }
 
