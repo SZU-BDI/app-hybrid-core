@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -27,69 +25,11 @@ public class WebViewUi extends HybridUi {
 
     final private static String LOGTAG = "WebViewUi";
 
-//    protected JsBridgeWebView.ICallBackFunction _cb = null;
-//
-//    //@ref this.startActivityForResult() + (setResult() + finish())
-//    protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
-//        Log.v(LOGTAG, "resultCode=" + resultCode);
-//        if (rtIntent != null) {
-//            Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
-//            if (_cb != null && resultCode > 0) {
-//                Log.v(LOGTAG, "onCallBack OK");
-////            _cb.onCallBack("{\"STS\":\"OK\"}");//OK
-////            _cb.onCallBack("{STS:\"OK\"}");//OK
-//                //_cb.onCallBack("What the hell");//KO, proves the result need the JSON format
-//                _cb.onCallBack(rtIntent.getStringExtra("rt"));
-////            _cb.onCallBack("{STS:\"TODO\"}");//TODO return the param of current Ui?
-//            }
-//        }
-//    }
-
-//    boolean bClose;
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        bClose = intent.getExtras().getBoolean("bClose");
-//        if (bClose == false) {
-//            //finish();
-//            onBackPressed();
-//        }
-//    }
-
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOGTAG, ".onCreate()");
-        Intent iin = getIntent();
-        String s_uiData = iin.getStringExtra("uiData");
-
-        initUiData(HybridTools.s2o(s_uiData));
-
-        Log.v(LOGTAG, "whole data=" + wholeUiData());
-        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
-        String topbar = HybridTools.optString(getUiData("topbar"));
-
-        switch (topbar) {
-            case "F":
-                //F: full screen w- top status
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                break;
-            case "M":
-                //M: only top bar w- top status
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                break;
-            case "N":
-                //N: FullScreen w+ top status
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                break;
-            case "Y":
-            default:
-                //Y: top bar w+ top status (default)
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
-                break;
-        }
+        super.onCreate(savedInstanceState);
 
         setTitle("TODO setTitle()");
 
@@ -191,8 +131,6 @@ public class WebViewUi extends HybridUi {
         mWebView.loadUrl(url);
 
         setContentView(mWebView);
-
-        super.onCreate(savedInstanceState);
 
     }
 

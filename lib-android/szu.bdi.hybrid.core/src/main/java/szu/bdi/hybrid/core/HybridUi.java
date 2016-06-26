@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +24,34 @@ public class HybridUi extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent iin = getIntent();
+        String s_uiData = iin.getStringExtra("uiData");
+        initUiData(HybridTools.s2o(s_uiData));
+        //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
+        String topbar = HybridTools.optString(getUiData("topbar"));
+
+        switch (topbar) {
+            case "F":
+                //F: full screen w- top status
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                break;
+            case "M":
+                //M: only top bar w- top status
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                break;
+            case "N":
+                //N: FullScreen w+ top status
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                break;
+            case "Y":
+            default:
+                //Y: top bar w+ top status (default)
+                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                break;
+        }
+
         try {
             ActionBar actionBar = getActionBar();
             //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
@@ -104,4 +134,17 @@ public class HybridUi extends Activity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.v(LOGTAG, "onResume ");
+
+    }
 }
