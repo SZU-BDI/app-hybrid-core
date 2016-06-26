@@ -122,6 +122,10 @@ public class HybridUi extends Activity {
 
     protected ICallBackFunction _cb = null;
 
+    public void setCallBackFunction(ICallBackFunction cb) {
+        _cb = cb;
+    }
+
     //@ref this.startActivityForResult() + (setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
         Log.v(LOGTAG, "resultCode=" + resultCode);

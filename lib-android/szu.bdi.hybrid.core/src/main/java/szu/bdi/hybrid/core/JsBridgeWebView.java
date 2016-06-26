@@ -54,20 +54,12 @@ public class JsBridgeWebView extends WebView {
 
     final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
     final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
-    final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._java2js('%s');";
+    final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._java2js";
     final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
-    //NOTES:  TODO memory cleanup?
     Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
     Map<String, ICallBackHandler> messageHandlers = new HashMap<String, ICallBackHandler>();
-    ICallBackHandler defaultHandler = new ICallBackHandler() {
-        @Override
-        public void handler(String data, ICallBackFunction function) {
-            if (function != null) {
-                function.onCallBack("Default handler response data");
-            }
-        }
-    };
+
     private List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
 
     public static String parseFunctionName(String jsUrl) {
@@ -102,11 +94,11 @@ public class JsBridgeWebView extends WebView {
     }
 
     public static void webViewLoadLocalJs(WebView view, String path) {
-        String jsContent = assetFile2Str(view.getContext(), path);
+        String jsContent = readJs(view.getContext(), path);
         view.loadUrl("javascript:" + jsContent);
     }
 
-    public static String assetFile2Str(Context c, String urlStr) {
+    public static String readJs(Context c, String urlStr) {
         InputStream in = null;
         try {
             in = c.getAssets().open(urlStr);
@@ -115,6 +107,7 @@ public class JsBridgeWebView extends WebView {
             StringBuilder sb = new StringBuilder();
             do {
                 line = bufferedReader.readLine();
+                //NOTES:  skip comments //....
                 if (line != null && !line.matches("^\\s*\\/\\/.*")) {
                     sb.append(line);
                 }
@@ -162,10 +155,6 @@ public class JsBridgeWebView extends WebView {
         init();
     }
 
-//    public void setDefaultHandler(ICallBackHandler handler) {
-//        this.defaultHandler = handler;
-//    }
-
     private void init() {
         this.setVerticalScrollBarEnabled(false);
         this.setHorizontalScrollBarEnabled(false);
@@ -184,9 +173,11 @@ public class JsBridgeWebView extends WebView {
                 JsBridgeWebView webView = JsBridgeWebView.this;
 
                 if (url.startsWith(JSB1_RETURN_DATA)) {
+                    // java2js callback
                     webView.handlerReturnData(url);
                     return true;
                 } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
+                    // js2java call
                     //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
                     webView.flushMessageQueue();
                     return true;
@@ -215,11 +206,6 @@ public class JsBridgeWebView extends WebView {
                     webView.setStartupJsb1Msg(null);
                 }
             }
-            //
-            //    @Override
-            //    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            //        super.onReceivedError(view, errorCode, description, failingUrl);
-            //    }
         });
     }
 
@@ -261,14 +247,9 @@ public class JsBridgeWebView extends WebView {
     void dispatchMessage(Jsb1Msg m) {
         String s = m.toJson();
 
-        //TODO for v2, this kind of design should be upgraded.
-        //escape special characters for json string
-        s = s.replaceAll("(\\\\)([^utrn])", "\\\\\\\\$1$2")
-                .replaceAll("(?<=[^\\\\])(\")", "\\\\\"");
-
         //NOTES: run the js in the main thread of browser:
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            this.loadUrl(String.format(JS_HANDLE_MESSAGE_FROM_JAVA, s));
+            this.loadUrl(JAVA_TO_JS + "(" + s + ");");
         }
     }
 
@@ -321,11 +302,9 @@ public class JsBridgeWebView extends WebView {
                                     }
                                 };
                             }
-                            ICallBackHandler handler;
+                            ICallBackHandler handler = null;
                             if (!TextUtils.isEmpty(m.getHandlerName())) {
                                 handler = messageHandlers.get(m.getHandlerName());
-                            } else {
-                                handler = defaultHandler;
                             }
                             if (handler != null) {
                                 handler.handler(m.getData(), responseFunction);
@@ -349,12 +328,11 @@ public class JsBridgeWebView extends WebView {
     }
 
     //    from java call js
-    public void callHandler(String handlerName, String data, ICallBackFunction callBack) {
-        _java2js(handlerName, data, callBack);
+    public void callHandler(String handlerName, String data, ICallBackFunction cb) {
+        _java2js(handlerName, data, cb);
     }
 
-    //JsBridge V1 Protocol
-    //TODO updrade to V2 soon
+    //prototol(java,js)
     public static class Jsb1Msg {
 
         private String callbackId; //callbackId
@@ -423,22 +401,6 @@ public class JsBridgeWebView extends WebView {
             }
             return null;
         }
-
-        //    public static Jsb1Msg toObject(String jsonStr) {
-        //        Jsb1Msg m = new Jsb1Msg();
-        //        try {
-        //            JSONObject jsonObject = new JSONObject(jsonStr);
-        //            m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR) : null);
-        //            m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
-        //            m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
-        //            m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
-        //            m.setData(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
-        //            return m;
-        //        } catch (JSONException e) {
-        //            e.printStackTrace();
-        //        }
-        //        return m;
-        //    }
 
         public static List<Jsb1Msg> toArrayList(String jsonStr) {
             List<Jsb1Msg> list = new ArrayList<Jsb1Msg>();

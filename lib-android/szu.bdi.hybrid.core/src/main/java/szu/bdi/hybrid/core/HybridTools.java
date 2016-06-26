@@ -404,6 +404,67 @@ public class HybridTools {
         }
     }
 
+    public static void bindWebViewApi(JsBridgeWebView wv, final HybridUi callerAct) {
+        wv.registerHandler("_app_activity_close", new ICallBackHandler() {
+            @Override
+            public void handler(String data, ICallBackFunction cb) {
+                Log.v(LOGTAG, "handler = _app_activity_close");
+                callerAct.onBackPressed();
+            }
+        });
+
+        //TODO get the binding info from config
+
+//        Object uia = getAppConfig(UI_MAPPING);
+//        if (uia == null) {
+//            HybridTools.quickShowMsgMain("config.json error!!!");
+//            return;
+//        }
+//        JSONObject defaultParam = ((JSONObject) uia).optJSONObject(name);
+//        if (defaultParam == null) {
+//            HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
+//            return;
+//        }
+//
+//        JSONObject overrideParam = s2o(overrideParam_s);
+//        JSONObject callParam = basicMerge(defaultParam, overrideParam);
+//        Log.v(LOGTAG, "param after merge=" + callParam);
+//
+//        String clsName = callParam.optString("class");
+//        if (isEmptyString(clsName)) {
+//            HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
+//            return;
+//        }
+//        Class targetClass = null;
+//        try {
+//            //reflection:
+//            targetClass = Class.forName(clsName);
+//            Log.v(LOGTAG, "class " + clsName + " found for name " + name);
+//        } catch (ClassNotFoundException e) {
+//            HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
+//            return;
+//        }
+//
+//        Intent intent = new Intent(caller, targetClass);
+//
+//        try {
+//            if (!isEmptyString(name)) {
+//                callParam.put("name", name);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String uiData_s = o2s(callParam);
+//
+//        intent.putExtra("uiData", uiData_s);
+//        try {
+//            caller.startActivityForResult(intent, 1);//onActivityResult()
+//        } catch (Throwable t) {
+//            quickShowMsgMain("Error:" + t.getMessage());
+//        }
+    }
+
     public static boolean copyAssetFolder(AssetManager assetManager,
                                           String fromAssetPath, String toPath) {
         try {

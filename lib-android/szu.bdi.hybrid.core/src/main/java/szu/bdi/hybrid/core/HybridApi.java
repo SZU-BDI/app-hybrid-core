@@ -1,5 +1,9 @@
 package szu.bdi.hybrid.core;
 
-//TODO
 public class HybridApi {
+    protected HybridUi _callerUi = null;
+
+    public void setCallerUi(HybridUi callerUi) {
+        _callerUi = callerUi;
+    }
 }

@@ -17,8 +17,6 @@ import android.webkit.WebView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//TODO rewrite the jsbridge...
-
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class WebViewUi extends HybridUi {
@@ -36,12 +34,10 @@ public class WebViewUi extends HybridUi {
         final Context _ctx = this;
         final Activity _activity = this;
 
-        JsBridgeWebView mWebView;
-
-        mWebView = HybridTools.BuildJsBridge(_ctx);
+        JsBridgeWebView _wv = HybridTools.BuildJsBridge(_ctx);
 
         //NOTES: if not set, the js alert won't effect...(maybe the default return is true)
-        mWebView.setWebChromeClient(new WebChromeClient() {
+        _wv.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
                 HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
@@ -84,22 +80,24 @@ public class WebViewUi extends HybridUi {
             }
         }
 
-        mWebView.registerHandler("_app_activity_close", new ICallBackHandler() {
+        //HybridTools.bindWebViewApi(_wv, this);
+
+        _wv.registerHandler("_app_activity_close", new ICallBackHandler() {
 
             @Override
             public void handler(String data, ICallBackFunction cb) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
-                //WebViewUi.this._cb = cb;
+                setCallBackFunction(cb);
                 WebViewUi.this.onBackPressed();
             }
         });
-        mWebView.registerHandler("_app_activity_open", new ICallBackHandler() {
+        _wv.registerHandler("_app_activity_open", new ICallBackHandler() {
 
                     @Override
                     public void handler(String data, ICallBackFunction cb) {
                         Log.v("_app_activity_open", data);
 
-                        WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
+                        setCallBackFunction(cb);
 
                         //TMP TEST:
                         //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
@@ -119,9 +117,9 @@ public class WebViewUi extends HybridUi {
         );
 
         Log.v(LOGTAG, "load url=" + url);
-        mWebView.loadUrl(url);
+        _wv.loadUrl(url);
 
-        setContentView(mWebView);
+        setContentView(_wv);
 
     }
 

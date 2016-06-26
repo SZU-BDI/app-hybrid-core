@@ -76,10 +76,10 @@
 		messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
 	}
 
-	function _java2js(messageJSON) {
+	function _java2js(message) {
 		setTimeout(function(){
+		console.log("_java2js", message);
 			//            var message = JSON.parse(messageJSON);
-			var message = s2o(messageJSON);
 			var responseCallback;
 			//java call finished, now need to call js callback function
 			if (message.responseId) {
