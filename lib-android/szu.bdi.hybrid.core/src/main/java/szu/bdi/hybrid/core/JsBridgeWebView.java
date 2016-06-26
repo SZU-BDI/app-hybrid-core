@@ -241,6 +241,8 @@ public class JsBridgeWebView extends WebView {
     void dispatchMessage(Jsb1Msg m) {
         String s = m.toJson();
 
+        if ("".equals(s)) s = "null";//TMP HACK.
+
         //NOTES: run the js in the main thread of browser:
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             this.loadUrl(JAVA_TO_JS + "(" + s + ");");

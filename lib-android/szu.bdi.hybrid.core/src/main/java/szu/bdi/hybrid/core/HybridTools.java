@@ -20,6 +20,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +34,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
@@ -40,6 +43,8 @@ public class HybridTools {
     private static Context _appContext = null;
     public static String localWebRoot;
     final static String UI_MAPPING = "ui_mapping";
+    final static String API_AUTH = "api_auth";
+    final static String API_MAPPING = "api_mapping";
 
     //IMPORTANT !!!: remember in the app entry, set HybridTools.setAppContext(getApplicationContext());
     public static void setAppContext(Context appContext) {
@@ -397,89 +402,85 @@ public class HybridTools {
         }
     }
 
-    public static void bindWebViewApi(JsBridgeWebView wv, final HybridUi callerAct) {
-        wv.registerHandler("_app_activity_close", new ICallBackHandler() {
-            @Override
-            public void handler(String data, ICallBackFunction cb) {
-                Log.v(LOGTAG, "handler = _app_activity_close");
-                callerAct.setCallBackFunction(cb);
-                callerAct.onBackPressed();
-            }
-        });
-        wv.registerHandler("_app_activity_open", new ICallBackHandler() {
-                    @Override
-                    public void handler(String data, ICallBackFunction cb) {
-                        Log.v("_app_activity_open", data);
-
-                        callerAct.setCallBackFunction(cb);
-
-                        //TMP TEST:
-                        //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
-
-                        String uiName = "UiContent";//default
-                        JSONObject data_o = HybridTools.s2o(data);
-                        //try override by the callParam.name
-                        if (data_o != null) {
-                            String t = data_o.optString("name");
-                            if (!HybridTools.isEmptyString(t)) {
-                                uiName = t;
-                            }
-                        }
-                        HybridTools.startUi(uiName, data, callerAct);
-                    }
-
+    protected static JSONArray findSubAuth(JSONObject obj, String nameOf) {
+        JSONArray _found = null;
+        Iterator it = obj.keys();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            try {
+                if (Pattern.matches(key, nameOf)) {
+                    _found = obj.optJSONArray(key);
+                    break;
                 }
-        );
-        //TODO get the binding info from config
+            } catch (PatternSyntaxException ex) {
+                Log.v(LOGTAG, "wrong regexp=" + key);
+                ex.printStackTrace();
+            }
+        }
+        return _found;
+    }
 
-//        Object uia = getAppConfig(UI_MAPPING);
-//        if (uia == null) {
-//            HybridTools.quickShowMsgMain("config.json error!!!");
-//            return;
-//        }
-//        JSONObject defaultParam = ((JSONObject) uia).optJSONObject(name);
-//        if (defaultParam == null) {
-//            HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
-//            return;
-//        }
-//
-//        JSONObject overrideParam = s2o(overrideParam_s);
-//        JSONObject callParam = basicMerge(defaultParam, overrideParam);
-//        Log.v(LOGTAG, "param after merge=" + callParam);
-//
-//        String clsName = callParam.optString("class");
-//        if (isEmptyString(clsName)) {
-//            HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
-//            return;
-//        }
-//        Class targetClass = null;
-//        try {
-//            //reflection:
-//            targetClass = Class.forName(clsName);
-//            Log.v(LOGTAG, "class " + clsName + " found for name " + name);
-//        } catch (ClassNotFoundException e) {
-//            HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
-//            return;
-//        }
-//
-//        Intent intent = new Intent(caller, targetClass);
-//
-//        try {
-//            if (!isEmptyString(name)) {
-//                callParam.put("name", name);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        String uiData_s = o2s(callParam);
-//
-//        intent.putExtra("uiData", uiData_s);
-//        try {
-//            caller.startActivityForResult(intent, 1);//onActivityResult()
-//        } catch (Throwable t) {
-//            quickShowMsgMain("Error:" + t.getMessage());
-//        }
+    public static void bindWebViewApi(JsBridgeWebView wv, final HybridUi callerAct) {
+        String name = optString(callerAct.getUiData("name"));
+        if (isEmptyString(name)) {
+            quickShowMsgMain("ConfigError: caller act name empty?");
+            return;
+        }
+        JSONObject uia = (JSONObject) getAppConfig(API_AUTH);
+        if (uia == null) {
+            HybridTools.quickShowMsgMain("ConfigError: empty " + API_AUTH);
+            return;
+        }
+        JSONObject apia = (JSONObject) getAppConfig(API_MAPPING);
+        if (apia == null) {
+            HybridTools.quickShowMsgMain("ConfigError: empty " + API_MAPPING);
+            return;
+        }
+
+        JSONObject authObj = uia.optJSONObject(name);
+        if (authObj == null) {
+            HybridTools.quickShowMsgMain("ConfigError: not found auth for " + name + " !!!");
+            return;
+        }
+        Log.v(LOGTAG, " authObj=" + authObj);
+
+        String address = optString(callerAct.getUiData("address"));
+        JSONArray foundAuth = findSubAuth(authObj, address);
+        if (foundAuth == null) {
+            HybridTools.quickShowMsgMain("ConfigError: not found match auth for address\n " + address + " !!!");
+            return;
+        }
+        Log.v(LOGTAG, " foundAuth=" + foundAuth);
+        for (int i = 0; i < foundAuth.length(); i++) {
+            String v = foundAuth.optString(i);
+            if (!isEmptyString(v)) {
+                String clsName = apia.optString(v);
+                Log.v(LOGTAG, "binding api " + v + " => " + clsName);
+                if (isEmptyString(clsName)) {
+                    HybridTools.quickShowMsgMain("ConfigError: config not found for api=" + v);
+                    continue;
+                }
+                Class targetClass = null;
+                try {
+                    //reflection:
+                    targetClass = Class.forName(clsName);
+                    Log.v(LOGTAG, "class " + clsName + " found for name " + name);
+                } catch (ClassNotFoundException e) {
+                    HybridTools.quickShowMsgMain("ConfigError: class not found " + clsName);
+                    continue;
+                }
+                try {
+                    HybridApi api = (HybridApi) targetClass.newInstance();
+                    api.setCallerUi(callerAct);
+                    wv.registerHandler(v, api.getHandler());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);
+                    continue;
+                }
+            }
+        }
+
     }
 
     public static boolean copyAssetFolder(AssetManager assetManager,
