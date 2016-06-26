@@ -49,91 +49,91 @@
 	}
 
 	//function send(data, responseCallback) {
-	//	_js2java({
-	//		data: data
-	//	}, responseCallback);
-	//}
+		//	_js2java({
+			//		data: data
+//	}, responseCallback);
+			//}
 
-	function _js2java(message, responseCallback) {
-		if (responseCallback) {
-			var callbackId = 'cb_' + (uniqueId++) + '_' + new Date().getTime();
-			responseCallbacks[callbackId] = responseCallback;
-			message.callbackId = callbackId;
-		}
-
-		sendMessageQueue.push(message);
-
-		//just a notification to the java that "hey, you got message, come get them"
-		messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://__QUEUE_MESSAGE__/';
-		//so the __QUEUE_MESSAGE__ is just a what-ever word, @ref to shouldOverrideUrlLoading
-	}
-
-	function _fetchQueue() {
-		//        var messageQueueString = JSON.stringify(sendMessageQueue);
-		var messageQueueString = o2s(sendMessageQueue);
-		sendMessageQueue = [];
-		//reload iframe src to communicate with java
-		messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
-	}
-
-	function _java2js(message) {
-		setTimeout(function(){
-		console.log("_java2js", message);
-			//            var message = JSON.parse(messageJSON);
-			var responseCallback;
-			//java call finished, now need to call js callback function
-			if (message.responseId) {
-				responseCallback = responseCallbacks[message.responseId];
-				if (!responseCallback) {
-					return;
-				}
-				responseCallback(message.responseData);
-				delete responseCallbacks[message.responseId];
-			} else {
-				if (message.callbackId) {
-					var callbackResponseId = message.callbackId;
-					responseCallback = function(responseData) {
-						_js2java({
-							responseId: callbackResponseId,
-							responseData: responseData
-						});
-					};
+			function _js2java(message, responseCallback) {
+				if (responseCallback) {
+					var callbackId = 'cb_' + (uniqueId++) + '_' + new Date().getTime();
+					responseCallbacks[callbackId] = responseCallback;
+					message.callbackId = callbackId;
 				}
 
-				var handler = null;
-				if (message.handlerName) {
-					handler = messageHandlers[message.handlerName];
-				}
-				try {
-					if(handler!=null)
-						handler(message.data, responseCallback);
-				} catch (exception) {
-					console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
-				}
+				sendMessageQueue.push(message);
+
+				//just a notification to the java that "hey, you got message, come get them"
+				messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://__QUEUE_MESSAGE__/';
+				//so the __QUEUE_MESSAGE__ is just a what-ever word, @ref to shouldOverrideUrlLoading
 			}
-		});
-	}
 
-	function registerHandler(handlerName, handler) {
-		messageHandlers[handlerName] = handler;
-	}
+			function _fetchQueue() {
+				//        var messageQueueString = JSON.stringify(sendMessageQueue);
+				var messageQueueString = o2s(sendMessageQueue);
+				sendMessageQueue = [];
+				//reload iframe src to communicate with java
+				messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
+			}
 
-	function callHandler(handlerName, data, responseCallback) {
-		_js2java({
-			handlerName: handlerName,
-			data: data
-		}, responseCallback);
-	}
+			function _java2js(message) {
+				setTimeout(function(){
+					console.log("_java2js", message);
+					//            var message = JSON.parse(messageJSON);
+					var responseCallback;
+					//java call finished, now need to call js callback function
+					if (message.responseId) {
+						responseCallback = responseCallbacks[message.responseId];
+						if (!responseCallback) {
+							return;
+						}
+						responseCallback(message.responseData);
+						delete responseCallbacks[message.responseId];
+					} else {
+						if (message.callbackId) {
+							var callbackResponseId = message.callbackId;
+							responseCallback = function(responseData) {
+								_js2java({
+									responseId: callbackResponseId,
+									responseData: responseData
+								});
+							};
+						}
 
-	var WebViewJavascriptBridge = window.WebViewJavascriptBridge = {
-		init: init,
-		registerHandler: registerHandler,
-		callHandler: callHandler,
-		_fetchQueue: _fetchQueue,
-		_js2java: _js2java,
-		_java2js: _java2js
-	};
+						var handler = null;
+						if (message.handlerName) {
+							handler = messageHandlers[message.handlerName];
+						}
+						try {
+							if(handler!=null)
+								handler(message.data, responseCallback);
+						} catch (exception) {
+							console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
+						}
+					}
+				});
+			}
 
-	_createQueueReadyIframe(document);
+			function registerHandler(handlerName, handler) {
+				messageHandlers[handlerName] = handler;
+			}
+
+			function callHandler(handlerName, data, responseCallback) {
+				_js2java({
+					handlerName: handlerName,
+					data: data
+				}, responseCallback);
+			}
+
+			var WebViewJavascriptBridge = window.WebViewJavascriptBridge = {
+				init: init,
+				registerHandler: registerHandler,
+				callHandler: callHandler,
+				_fetchQueue: _fetchQueue,
+				_js2java: _js2java,
+				_java2js: _java2js
+			};
+
+			_createQueueReadyIframe(document);
 
 })();
