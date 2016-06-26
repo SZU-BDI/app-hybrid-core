@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -470,6 +471,16 @@ public class HybridTools {
         }
     }
 
+    protected static Application _app = null;
+
+    public static void setApplication(Application app) {
+        if (app != null)
+            _app = app;
+    }
+
+    public static Application getApplication() {
+        return _app;
+    }
 }
 
 

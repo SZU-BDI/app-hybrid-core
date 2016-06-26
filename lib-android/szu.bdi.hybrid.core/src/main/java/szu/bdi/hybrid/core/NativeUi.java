@@ -56,8 +56,8 @@ public class NativeUi extends HybridUi {
     @Override
     public void onBackPressed() {
         Log.v(LOGTAG, "onBackPressed set Result 1");
-        //{name: $name, address: adress}
 
+        //{name: $name, address: adress}
         JSONObject o = new JSONObject();
         try {
             o.put("name", getUiData("name"));

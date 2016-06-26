@@ -144,19 +144,19 @@ public class WebViewUi extends HybridUi {
             }
         }
 
-        mWebView.registerHandler("_app_activity_close", new JsBridgeWebView.IBridgeHandler() {
+        mWebView.registerHandler("_app_activity_close", new ICallBackHandler() {
 
             @Override
-            public void handler(String data, JsBridgeWebView.ICallBackFunction cb) {
+            public void handler(String data, ICallBackFunction cb) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
                 //WebViewUi.this._cb = cb;
                 WebViewUi.this.onBackPressed();
             }
         });
-        mWebView.registerHandler("_app_activity_open", new JsBridgeWebView.IBridgeHandler() {
+        mWebView.registerHandler("_app_activity_open", new ICallBackHandler() {
 
                     @Override
-                    public void handler(String data, JsBridgeWebView.ICallBackFunction cb) {
+                    public void handler(String data, ICallBackFunction cb) {
                         Log.v("_app_activity_open", data);
 
                         WebViewUi.this._cb = cb;//store the cb for later callback, TODO any better way?
@@ -199,8 +199,8 @@ public class WebViewUi extends HybridUi {
     @Override
     public void onBackPressed() {
         Log.v(LOGTAG, "onBackPressed set Result 1");
-        //{name: $name, address: adress}
 
+        //{name: $name, address: adress}
         JSONObject o = new JSONObject();
         try {
             o.put("name", getUiData("name"));

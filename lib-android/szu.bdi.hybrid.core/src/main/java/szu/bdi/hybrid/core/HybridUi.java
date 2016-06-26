@@ -49,8 +49,17 @@ public class HybridUi extends Activity {
         Log.v(LOGTAG, "onKeyDown " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Log.v(LOGTAG, "onKeyDown KeyEvent.KEYCODE_BACK " + KeyEvent.KEYCODE_BACK);
-            onBackPressed();
-            return true;
+
+            Boolean reallyClose = true;
+
+//TODO not yet think up good solution to make a global decision.... TODO !!!
+//            reallyClose = HybridTools.ifLastActPromptUser(this);
+//            Application me = HybridTools.getApplication();
+            //me.callFunction(...)
+
+            if (reallyClose)
+                onBackPressed();
+            return reallyClose;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -81,7 +90,7 @@ public class HybridUi extends Activity {
         return _uiData.opt(k);
     }
 
-    protected JsBridgeWebView.ICallBackFunction _cb = null;
+    protected ICallBackFunction _cb = null;
 
     //@ref this.startActivityForResult() + (setResult() + finish())
     protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
@@ -90,12 +99,9 @@ public class HybridUi extends Activity {
             Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
             if (_cb != null && resultCode > 0) {
                 Log.v(LOGTAG, "onCallBack OK");
-//            _cb.onCallBack("{\"STS\":\"OK\"}");//OK
-//            _cb.onCallBack("{STS:\"OK\"}");//OK
-                //_cb.onCallBack("What the hell");//KO, proves the result need the JSON format
                 _cb.onCallBack(rtIntent.getStringExtra("rt"));
-//            _cb.onCallBack("{STS:\"TODO\"}");//TODO return the param of current Ui?
             }
         }
     }
+
 }

@@ -59,8 +59,8 @@ public class JsBridgeWebView extends WebView {
 
     //NOTES:  TODO memory cleanup?
     Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
-    Map<String, IBridgeHandler> messageHandlers = new HashMap<String, IBridgeHandler>();
-    IBridgeHandler defaultHandler = new IBridgeHandler() {
+    Map<String, ICallBackHandler> messageHandlers = new HashMap<String, ICallBackHandler>();
+    ICallBackHandler defaultHandler = new ICallBackHandler() {
         @Override
         public void handler(String data, ICallBackFunction function) {
             if (function != null) {
@@ -162,7 +162,7 @@ public class JsBridgeWebView extends WebView {
         init();
     }
 
-//    public void setDefaultHandler(IBridgeHandler handler) {
+//    public void setDefaultHandler(ICallBackHandler handler) {
 //        this.defaultHandler = handler;
 //    }
 
@@ -323,7 +323,7 @@ public class JsBridgeWebView extends WebView {
                                     }
                                 };
                             }
-                            IBridgeHandler handler;
+                            ICallBackHandler handler;
                             if (!TextUtils.isEmpty(m.getHandlerName())) {
                                 handler = messageHandlers.get(m.getHandlerName());
                             } else {
@@ -344,7 +344,7 @@ public class JsBridgeWebView extends WebView {
         this.loadUrl(jsUrl);
     }
 
-    public void registerHandler(String handlerName, IBridgeHandler handler) {
+    public void registerHandler(String handlerName, ICallBackHandler handler) {
         if (handler != null) {
             messageHandlers.put(handlerName, handler);
         }
@@ -353,14 +353,6 @@ public class JsBridgeWebView extends WebView {
     //    from java call js
     public void callHandler(String handlerName, String data, ICallBackFunction callBack) {
         _java2js(handlerName, data, callBack);
-    }
-
-    public interface IBridgeHandler {
-        void handler(String data, ICallBackFunction function);
-    }
-
-    public interface ICallBackFunction {
-        void onCallBack(String data);
     }
 
     //JsBridge V1 Protocol
