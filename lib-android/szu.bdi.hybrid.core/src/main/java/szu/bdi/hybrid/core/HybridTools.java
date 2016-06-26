@@ -289,13 +289,6 @@ public class HybridTools {
         return rt;
     }
 
-    //TODO might be override by child?
-    public static JsBridgeWebView BuildJsBridge(Context _ctx) {
-        JsBridgeWebView wv;
-        wv = new JsBridgeWebView(_ctx);
-        return wv;
-    }
-
     public static void appAlert(Context ctx, String msg, AlertDialog.OnClickListener clickListener) {
         AlertDialog.Builder b2;
         b2 = new AlertDialog.Builder(ctx);
@@ -409,10 +402,34 @@ public class HybridTools {
             @Override
             public void handler(String data, ICallBackFunction cb) {
                 Log.v(LOGTAG, "handler = _app_activity_close");
+                callerAct.setCallBackFunction(cb);
                 callerAct.onBackPressed();
             }
         });
+        wv.registerHandler("_app_activity_open", new ICallBackHandler() {
+                    @Override
+                    public void handler(String data, ICallBackFunction cb) {
+                        Log.v("_app_activity_open", data);
 
+                        callerAct.setCallBackFunction(cb);
+
+                        //TMP TEST:
+                        //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
+
+                        String uiName = "UiContent";//default
+                        JSONObject data_o = HybridTools.s2o(data);
+                        //try override by the callParam.name
+                        if (data_o != null) {
+                            String t = data_o.optString("name");
+                            if (!HybridTools.isEmptyString(t)) {
+                                uiName = t;
+                            }
+                        }
+                        HybridTools.startUi(uiName, data, callerAct);
+                    }
+
+                }
+        );
         //TODO get the binding info from config
 
 //        Object uia = getAppConfig(UI_MAPPING);

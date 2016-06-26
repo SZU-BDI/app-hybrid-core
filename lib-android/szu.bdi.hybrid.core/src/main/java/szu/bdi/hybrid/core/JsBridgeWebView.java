@@ -35,18 +35,12 @@ import java.util.Map;
  * NOTES:
  * <p/>
  * 1, using Queue and make sure runing in a same ui-thread.
- * 2, registerHandler and callHandler is the only protocol
+ * 2, registerHandler and callHandler is the only protocol (default handler is removed)
  */
 
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
     private final String TAG = "JsBridgeWebView";
-    //    final private static String LOGTAG = "" + (new Object() {
-//        public String getClassName() {
-//            String clazzName = this.getClass().getName();
-//            return clazzName.substring(0, clazzName.lastIndexOf('$'));
-//        }
-//    }.getClassName());
 
     final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
     final static String JSB1_RETURN_DATA = JSB1_OVERRIDE_SCHEMA + "return/";

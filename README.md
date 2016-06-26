@@ -31,6 +31,11 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 
 https://szu-bdi.gitbooks.io/app-hybrid/content/
 
+# Design Pattern
+
+* Async Call/CallBack
+* Configuration Driven Dynamic Binding
+
 # TODO
 
 ...

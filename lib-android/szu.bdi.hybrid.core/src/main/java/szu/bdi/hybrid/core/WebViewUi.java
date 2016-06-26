@@ -34,7 +34,7 @@ public class WebViewUi extends HybridUi {
         final Context _ctx = this;
         final Activity _activity = this;
 
-        JsBridgeWebView _wv = HybridTools.BuildJsBridge(_ctx);
+        JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
 
         //NOTES: if not set, the js alert won't effect...(maybe the default return is true)
         _wv.setWebChromeClient(new WebChromeClient() {
@@ -80,47 +80,21 @@ public class WebViewUi extends HybridUi {
             }
         }
 
-        //HybridTools.bindWebViewApi(_wv, this);
+        //IMPORTANT:
+        HybridTools.bindWebViewApi(_wv, this);
 
-        _wv.registerHandler("_app_activity_close", new ICallBackHandler() {
-
-            @Override
-            public void handler(String data, ICallBackFunction cb) {
-                Log.v(LOGTAG, "handler = _app_activity_close");
-                setCallBackFunction(cb);
-                WebViewUi.this.onBackPressed();
-            }
-        });
-        _wv.registerHandler("_app_activity_open", new ICallBackHandler() {
-
-                    @Override
-                    public void handler(String data, ICallBackFunction cb) {
-                        Log.v("_app_activity_open", data);
-
-                        setCallBackFunction(cb);
-
-                        //TMP TEST:
-                        //HybridTools.startUi("UiRoot", "{topbar:'N',address:'" + root_htm_s + "'}", _activity);
-
-                        String uiName = "UiContent";//default;
-                        JSONObject data_o = HybridTools.s2o(data);
-                        if (data_o != null) {
-                            String t = data_o.optString("name");
-                            if (!HybridTools.isEmptyString(t)) {
-                                uiName = t;
-                            }
-                        }
-                        HybridTools.startUi(uiName, data, _activity);
-                    }
-
-                }
-        );
+        setContentView(_wv);
 
         Log.v(LOGTAG, "load url=" + url);
         _wv.loadUrl(url);
 
-        setContentView(_wv);
-
+//        final JsBridgeWebView wv = _wv;
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setContentView(wv);
+//            }
+//        }, 111);
     }
 
     @Override
