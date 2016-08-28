@@ -23,7 +23,8 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 * lib-android/szu.bdi.hybrid.core/
 
 * testproj-android-core/<br/>
- the test project for android core
+ the test project for android core [REMOVED, please refer to github/szu-bdi/app-hybrid-demo/]
+
 * testproj-ios-core/<br/>
  the test project for ios core
 
