@@ -4,47 +4,46 @@
 
 + (id)s2id:(NSString *)s
 {
-	NSData *data = [s dataUsingEncoding:NSUTF8StringEncoding];
-	NSError *error = nil;
-
-	//$idid =NSJSONSerialization::JSONObjectWithData($data, $optinos=NSJSONReadingAllowFragments, &$error);
-	id idid = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-	if (!idid) {
-		NSLog(@"%@", error.description);
-	}
-
-	return idid;
+    NSData *data = [s dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error = nil;
+    
+    //$idid =NSJSONSerialization::JSONObjectWithData($data, $optinos=NSJSONReadingAllowFragments, &$error);
+    id idid = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+    if (!idid) {
+        NSLog(@"%@", error.description);
+    }
+    
+    return idid;
 }
 
 //TODO 增加一个可选参数 flagThrowEx【是否抛出异常， 默认值是 false】
 + (NSString *)id2s:(id)idid
 {
-	NSError *error;
-
-	if (idid==nil) return @"null";
-	if( [idid isKindOfClass:[NSString class]]){
-		return (NSString *)idid;
-	}
-	@try
-	{
-		//$result = NSJSONSerialization::dataWithJSONObject( $idid, $options=0, &$error);//don't use NSJSONWritingPrettyPrinted
-		NSData *result = [NSJSONSerialization dataWithJSONObject:idid options:0 error:&error];
-		if (!result) {
-			NSLog(@"%@", error.description);
-			//TODO if (flagThrowEx) { 抛出异常 }
-		}
-
-		//$rt= (new String())->initWithData($result, NSUTF8StringEncoding);
-		NSString *rt= [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-		return rt;
-	}
-	@catch (NSException *theException)
-	{
-		//TODO 判断如果是 字符串就直接返回，如果不是再看看怎么处理，下面强制转换是临时占位的，应该不够正确。。。
-		NSLog(@"Exception: %@", theException);
-		return (NSString *)idid;
-	}
-
+    NSError *error;
+    
+    if (idid==nil) return @"null";
+    if( [idid isKindOfClass:[NSString class]]){
+        return (NSString *)idid;
+    }
+    @try
+    {
+        //$result = NSJSONSerialization::dataWithJSONObject( $idid, $options=0, &$error);//don't use NSJSONWritingPrettyPrinted
+        NSData *result = [NSJSONSerialization dataWithJSONObject:idid options:0 error:&error];
+        if (!result) {
+            NSLog(@"%@", error.description);
+            //TODO if (flagThrowEx) { 抛出异常 }
+        }
+        
+        //$rt= (new String())->initWithData($result, NSUTF8StringEncoding);
+        NSString *rt= [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+        return rt;
+    }
+    @catch (NSException *theException)
+    {
+        NSLog(@"Exception: %@", theException);
+        //return (NSString *)idid;
+        return [idid toString];
+    }
 }
 
 + (JSO *)s2o:(NSString *)s{
@@ -104,7 +103,21 @@
 
 //TODO
 - (void)setChild:(JSO *)jso forKey:(NSString *)key{
-	//TODO
 }
 
+-(JSO *)getChildByPath:(NSString *)path{
+    id idid=[self valueForKey:@"innerid"];
+    id subid=[idid valueForKeyPath:path];
+    
+    if(subid!=nil){
+        //$o=new JSO;
+        JSO *o=[[JSO alloc] init];
+        
+        //$o->setValue("innerid",$idid);
+        [o setValue:subid forKey:@"innerid"];
+        return o;
+    }else{
+        return nil;
+    }
+}
 @end
