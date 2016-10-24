@@ -1,7 +1,7 @@
+gvim.ignore.bat
 .DS_Store
 *.iml
 build
-
+backup/
 *.apk
-
 */.DS_Store

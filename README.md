@@ -2,13 +2,44 @@
 
 SZU-BDI hybrid-app core layer library, mostly a js-bridge packer.
 
-Please refer to github/SZU-BDI/app-hybrid-demo
+For example projects, please refer to github/SZU-BDI/app-hybrid-demo
+
+【CHS】这是由**深大大数据学院**联合**明舸科技**启动的面向 android/ios 的hybrid（混编）-app库。
+
+# Why?
+
+We just want to do some small app to make things work.  
+
+【CHS】简单事情简单办，开发点小APP，即能教学又能实践。
+
+# Design & Documentation
+
+Briefly, We use a inserted object named "WebViewJavascriptBridge" in to the WebView's Context for deal with the api call.
+
+【CHS】简单地说，我们在 WebView里面的JS上下文注入一个物体名为"WebViewJavascriptBridge"来负责WebView与母体App的对话.
+
+And then all other behavior can be configurated by the config.json including the ui-mapping, api-mapping, authority-binding. which is quite free-form.
+
+【CHS】然后其它的相关行为都基本在 config.json 上定义。包括 页面UI映射、api映射、权限绑定等，非常的自由。
+
+[Doc] https://szu-bdi.gitbooks.io/app-hybrid/content/
+
+a mini example of config.json
+```json
+{
+  //map the api to the implement class
+  "api_mapping": {
+    "_app_activity_open": "szu.bdi.hybrid.core.ApiUiOpen",
+    "_app_activity_close": "szu.bdi.hybrid.core.ApiUiClose"
+  },
+}
+```
 
 # Target
 
-**WRITE YOUR OWN MOBILE APP**
-
 Combine with app-hybrid-demo, we need to complete these tasks:
+
+### Learn from Cordova/PhoneGap/Crosswalk/etc..
 
 1. auto check update and sync app-hybrid-core and copy to $my_project/../build/
 2. build and pack target apk/ipa with console cmd base on $my_project/config.json
@@ -22,15 +53,7 @@ Combine with app-hybrid-demo, we need to complete these tasks:
 * lib-android/
 * lib-android/szu.bdi.hybrid.core/
 
-* testproj-android-core/<br/>
- the test project for android core [REMOVED, please refer to github/szu-bdi/app-hybrid-demo/]
-
-* testproj-ios-core/<br/>
- the test project for ios core
-
-# Documentation
-
-https://szu-bdi.gitbooks.io/app-hybrid/content/
+* example project moved to github/szu-bdi/app-hybrid-demo
 
 # Design Pattern
 
