@@ -170,18 +170,11 @@ static int logMaxLength = 500;
 }
 
 - (void)_dispatchMessage:(WVJBMessage*)message {
-    NSString *messageJSON = [self _serializeMessage:message pretty:NO];
-    [self _log:@"SEND" json:messageJSON];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\'" withString:@"\\\'"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\r" withString:@"\\r"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\f" withString:@"\\f"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\u2028" withString:@"\\u2028"];
-    messageJSON = [messageJSON stringByReplacingOccurrencesOfString:@"\u2029" withString:@"\\u2029"];
-    
-    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._handleMessageFromObjC('%@');", messageJSON];
+    NSString *json_string = [self _serializeMessage:message pretty:NO];
+
+		//TODO if "" or null change to "null"...
+
+    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2c(%@);", json_string];
     if ([[NSThread currentThread] isMainThread]) {
         [self _evaluateJavascript:javascriptCommand];
 

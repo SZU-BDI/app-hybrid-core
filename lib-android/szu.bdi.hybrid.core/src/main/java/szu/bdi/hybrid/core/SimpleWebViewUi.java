@@ -1,5 +1,7 @@
 package szu.bdi.hybrid.core;
 
+//SimpleWebViewUi is a HybridUi with a full size "JBridgeWebView"
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -19,9 +21,9 @@ import org.json.JSONObject;
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
-public class WebViewUi extends HybridUi {
+public class SimpleWebViewUi extends HybridUi {
 
-    final private static String LOGTAG = "WebViewUi";
+    final private static String LOGTAG = "SimpleWebViewUi";
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -29,10 +31,9 @@ public class WebViewUi extends HybridUi {
         Log.v(LOGTAG, ".onCreate()");
         super.onCreate(savedInstanceState);
 
-        setTitle("TODO setTitle()");
+        //setTitle("setTitle()");
 
         final Context _ctx = this;
-        final Activity _activity = this;
 
         JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
 
@@ -66,7 +67,7 @@ public class WebViewUi extends HybridUi {
             }
         });
 
-        String address = HybridTools.optString(getUiData("address"));
+        String address = HybridTools.optString(this.getUiData("address"));
         String url = "";
         if (address == null || "".equals(address)) {
             url = "file://" + HybridTools.localWebRoot + "error.htm";
@@ -80,7 +81,6 @@ public class WebViewUi extends HybridUi {
             }
         }
 
-        //IMPORTANT:
         HybridTools.bindWebViewApi(_wv, this);
 
         setContentView(_wv);
@@ -112,7 +112,9 @@ public class WebViewUi extends HybridUi {
 
         Intent rtIntent = new Intent();
         rtIntent.putExtra("rt", o.toString());
-        setResult(1, rtIntent);//@ref onActivityResult()
+
+        //@ref onActivityResult()
+        setResult(1, rtIntent);
         finish();
     }
 

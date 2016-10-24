@@ -30,12 +30,13 @@ import java.util.Map;
  * This just the v1 implementation,
  * soon will have a v2 version for a better protocol
  * <p/>
- * design : Q + Bi-direction-call + Protocol(enc/dec)
+ * design : Q + Bi-direction-call + Protocol
  * <p/>
  * NOTES:
  * <p/>
- * 1, using Queue and make sure runing in a same ui-thread.
- * 2, registerHandler and callHandler is the only protocol (default handler is removed)
+ * 1, using Q to make sure runing in a same ui-thread.
+ * 2, registerHandler() and callHandler() are the public protocol (default handler is removed)
+ * 3, the _app2js(), _js2app(), _fetchQueue() are the hidden protocol
  */
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -48,7 +49,7 @@ public class JsBridgeWebView extends WebView {
 
     final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
     final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
-    final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._java2js";
+    final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._app2js";
     final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
     Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
@@ -167,7 +168,7 @@ public class JsBridgeWebView extends WebView {
                 JsBridgeWebView webView = JsBridgeWebView.this;
 
                 if (url.startsWith(JSB1_RETURN_DATA)) {
-                    // java2js callback
+                    // app2js callback
                     webView.handlerReturnData(url);
                     return true;
                 } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
@@ -194,9 +195,11 @@ public class JsBridgeWebView extends WebView {
                 JsBridgeWebView webView = JsBridgeWebView.this;
 
                 if (webView.getStartupJsb1Msg() != null) {
+                    //if something is called before the page is loaded, do them now...
                     for (Jsb1Msg m : webView.getStartupJsb1Msg()) {
                         webView.dispatchMessage(m);
                     }
+                    //clear it
                     webView.setStartupJsb1Msg(null);
                 }
             }
@@ -214,7 +217,7 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    private void _java2js(String handlerName, String data, ICallBackFunction responseCallback) {
+    private void _app2js(String handlerName, String data, ICallBackFunction responseCallback) {
         Jsb1Msg m = new Jsb1Msg();
         if (!TextUtils.isEmpty(data)) {
             m.setData(data);
@@ -241,7 +244,7 @@ public class JsBridgeWebView extends WebView {
     void dispatchMessage(Jsb1Msg m) {
         String s = m.toJson();
 
-        if ("".equals(s)) s = "null";//TMP HACK.
+        if ("".equals(s) || s == null) s = "null";
 
         //NOTES: run the js in the main thread of browser:
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
@@ -290,20 +293,26 @@ public class JsBridgeWebView extends WebView {
                                         queueMessage(responseMsg);
                                     }
                                 };
-                            } else {
-                                responseFunction = new ICallBackFunction() {
-                                    @Override
-                                    public void onCallBack(String data) {
-                                        // do nothing
-                                    }
-                                };
                             }
+                            //else {
+                            //    responseFunction = new ICallBackFunction() {
+                            //        @Override
+                            //        public void onCallBack(String data) {
+                            //            // do nothing
+                            //        }
+                            //    };
+                            //}
                             ICallBackHandler handler = null;
                             if (!TextUtils.isEmpty(m.getHandlerName())) {
                                 handler = messageHandlers.get(m.getHandlerName());
-                            }
-                            if (handler != null) {
-                                handler.handler(m.getData(), responseFunction);
+                                if (handler != null) {
+                                    //TODO 这里要有个 auth-mapping check！！
+                                    handler.handler(m.getData(), responseFunction);
+                                } else {
+                                    //TODO debug下什么鬼
+                                }
+                            } else {
+                                //TODO debug下又什么鬼，连名字都没有，要干嘛?
                             }
                         }
                     }
@@ -323,9 +332,9 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    //    from java call js
+    //from java call js
     public void callHandler(String handlerName, String data, ICallBackFunction cb) {
-        _java2js(handlerName, data, cb);
+        _app2js(handlerName, data, cb);
     }
 
     //prototol(java,js)

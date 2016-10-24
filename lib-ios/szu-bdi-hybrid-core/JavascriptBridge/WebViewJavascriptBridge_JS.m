@@ -13,6 +13,7 @@
 NSString * WebViewJavascriptBridge_js() {
 	#define __wvjb_js_func__(x) #x
 	
+	//TODO  不要这样写在oc里面，又不灵活又不好改，要从 assets 读进来..
 	// BEGIN preprocessorJSCode
 	static NSString * preprocessorJSCode = @__wvjb_js_func__(
 ;(function() {
@@ -23,7 +24,7 @@ NSString * WebViewJavascriptBridge_js() {
 		registerHandler: registerHandler,
 		callHandler: callHandler,
 		_fetchQueue: _fetchQueue,
-		_handleMessageFromObjC: _handleMessageFromObjC
+		_app2js: _app2js
 	};
 
 	var messagingIframe;
@@ -45,10 +46,10 @@ NSString * WebViewJavascriptBridge_js() {
 			responseCallback = data;
 			data = null;
 		}
-		_doSend({ handlerName:handlerName, data:data }, responseCallback);
+		_js2app({ handlerName:handlerName, data:data }, responseCallback);
 	}
 	
-	function _doSend(message, responseCallback) {
+	function _js2app(message, responseCallback) {
 		if (responseCallback) {
 			var callbackId = 'cb_'+(uniqueId++)+'_'+new Date().getTime();
 			responseCallbacks[callbackId] = responseCallback;
@@ -64,9 +65,8 @@ NSString * WebViewJavascriptBridge_js() {
 		return messageQueueString;
 	}
 
-	function _dispatchMessageFromObjC(messageJSON) {
+	function _app2js(message) {
 		setTimeout(function _timeoutDispatchMessageFromObjC() {
-			var message = JSON.parse(messageJSON);
 			var messageHandler;
 			var responseCallback;
 
@@ -81,7 +81,7 @@ NSString * WebViewJavascriptBridge_js() {
 				if (message.callbackId) {
 					var callbackResponseId = message.callbackId;
 					responseCallback = function(responseData) {
-						_doSend({ responseId:callbackResponseId, responseData:responseData });
+						_js2app({ responseId:callbackResponseId, responseData:responseData });
 					};
 				}
 				
@@ -98,16 +98,12 @@ NSString * WebViewJavascriptBridge_js() {
 		});
 	}
 	
-	function _handleMessageFromObjC(messageJSON) {
-        _dispatchMessageFromObjC(messageJSON);
-	}
-
 	messagingIframe = document.createElement('iframe');
 	messagingIframe.style.display = 'none';
 	messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
 	document.documentElement.appendChild(messagingIframe);
 
-	setTimeout(_callWVJBCallbacks, 0);
+	setTimeout(_callWVJBCallbacks, 1);
 	function _callWVJBCallbacks() {
 		var callbacks = window.WVJBCallbacks;
 		delete window.WVJBCallbacks;

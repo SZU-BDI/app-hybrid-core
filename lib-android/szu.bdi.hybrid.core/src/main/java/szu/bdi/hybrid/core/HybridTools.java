@@ -447,7 +447,8 @@ public class HybridTools {
         String address = optString(callerAct.getUiData("address"));
         JSONArray foundAuth = findSubAuth(authObj, address);
         if (foundAuth == null) {
-            HybridTools.quickShowMsgMain("ConfigError: not found match auth for address\n " + address + " !!!");
+            //TODO
+            HybridTools.quickShowMsgMain("ConfigError: not found match auth for address (" + address + ") !!!");
             return;
         }
         Log.v(LOGTAG, " foundAuth=" + foundAuth);
