@@ -13,9 +13,6 @@
 @interface HybridApi : NSObject
 
 - (WVJBHandler) getHandler;
-
-@property (nonatomic, strong) WVJBHandler handler;
-
-@property (nonatomic, strong) UIViewController *hybridUi;
+@property (nonatomic, strong) UIViewController *currentUi;
 
 @end
