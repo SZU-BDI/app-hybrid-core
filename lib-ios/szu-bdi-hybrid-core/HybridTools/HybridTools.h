@@ -7,19 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "HybridUi.h"
-#import "HybridApi.h"
+@class HybridUi;
+@class HybridApi;
 
 @interface HybridTools : NSObject
 
-//- (HybridUiBase *) getHybridUiBase:(NSString *)name;
-//
-//- (HybridApi *) getHybridApi:(NSString *)name;
-
-+ (HybridUi *) buildHybridUiBase:(NSString *)name;
++ (HybridUi *) buildHybridUi:(NSString *)name;
 
 + (HybridApi *) buildHybridApi:(NSString *)name;
 
-+ (NSDictionary *) getAppConfig:(NSString *)name;
++ (NSDictionary *) fromAppConfigGetApi;
 
 @end
