@@ -18,8 +18,10 @@
 			case 'string':return '"'+o.replace(/(\\|\")/g,"\\$1").replace(/\n/g,"\\n").replace(/\r/g,"\\r")+'"';break;
 			case 'object':var r=[];try{for(var p in o){v=f(o[p]);if(v!==undefined)r.push('"'+p+'":'+v);}}catch(e){};
 				return '{'+r.join(',')+'}';break;
-			case 'array':var r=[];
-				if(o.length>=0){
+			case 'array':
+				if(o.length===0) return '[]';
+				var r=[];
+				if(o.length>0){
 					for(var i=0;i<o.length;i++){var v=f(o[i]);if (v!==undefined)r.push(v);};return '['+r.join(',')+']';
 				}
 				else{
