@@ -19,18 +19,20 @@
 
 @implementation ApiActivityOpen
 
+//TODO startUI要搬去 Tools类
 // 覆盖父类的getHandler方法，并实现.
 - (WVJBHandler) getHandler{
     return ^(id data, WVJBResponseCallback responseCallback) {
-        NSLog(@"ApiActivityOpen -->  (_app_actibity_open)");
+        NSLog(@"ApiActivityOpen()");
         
         _js_param = [[NSDictionary alloc] initWithDictionary:(NSDictionary *)data];
         _js_model = _js_param[@"mode"];
         _js_address = _js_param[@"address"];
         _js_topbar = _js_param[@"topbar"];
+ 
+        NSLog(@" _js_param %@",_js_param);
         
-        if ([_js_model isEqualToString:@"WebView"]) {
-            
+//        if ([_js_model isEqualToString:@"WebView"]) {
             // 读取配置，获取UiContent
             NSDictionary *appConfig = [[NSUserDefaults standardUserDefaults] objectForKey:@"config"];
             HybridUi *ui = [HybridTools buildHybridUi:(NSString *)(appConfig[@"ui_mapping"][@"UiContent"][@"class"])];
@@ -44,7 +46,7 @@
             NSLog(@"open %@", self.currentUi);
             [self.currentUi.navigationController pushViewController:ui animated:YES];
 
-        }
+//        }
     };
 }
 
