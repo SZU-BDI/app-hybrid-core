@@ -13,14 +13,16 @@ public class ApiTestTODO extends HybridApi {
             public void handler(String dataStr, ICallBackFunction cb) {
                 //HybridUi callerAct = getCallerUi();
 
-                Log.v("_app_web", dataStr);
+                Log.v("_app_test_todo", dataStr);
 
                 JSONObject data_o = HybridTools.s2o(dataStr);
 
                 if (data_o != null) {
                     String url = data_o.optString("url");
                     if (!HybridTools.isEmptyString(url)) {
-                        cb.onCallBack("{\"STS\":\"URL\"}");
+                        String rt_s = HybridTools.webPost(url, "");
+                        Log.v("_app_test_todo", url + " => " + rt_s);
+                        cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
                         return;
                     }
                 }

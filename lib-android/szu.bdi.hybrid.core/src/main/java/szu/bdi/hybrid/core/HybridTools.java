@@ -108,23 +108,31 @@ public class HybridTools {
              urlConnection.disconnect();
              }
              */
-            URL url = new URL("http://www.android.com/");
+            URL url = new URL(uu);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(true);
-                conn.setChunkedStreamingMode(0);
+                //conn.setChunkedStreamingMode(0);
                 conn.setRequestMethod("POST");
                 OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+
+                //write to the stream
                 out.write(post_s.getBytes("UTF-8"));
+
+//                InputStream in = new BufferedInputStream(conn.getInputStream());
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+//                String s;
+//                while ((s = reader.readLine()) != null) {
+//                    return_s += s;
+//                }
+//                reader.close();
                 InputStream in = new BufferedInputStream(conn.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                String s;
-                while ((s = reader.readLine()) != null) {
-                    return_s += s;
-                }
-                reader.close();
+                return_s = HybridTools.stream2string(in);
             } finally {
-                conn.disconnect();
+                try {
+                    conn.disconnect();
+                } catch (Throwable t) {
+                }
             }
             /**
              HttpClient httpClient = new DefaultHttpClient();
@@ -150,6 +158,7 @@ public class HybridTools {
              return_s = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
              */
         } catch (Throwable ex) {
+            //TODO 如果是 filenotfound的exception，多数是因为远程错误400之类的，待处理
             ex.printStackTrace();
             return_s = ex.getMessage();
             if (isEmptyString(return_s)) {
@@ -535,6 +544,32 @@ public class HybridTools {
         }
     }
 
+    //@ref http://stackoverflow.com/questions/10500775/parse-json-from-httpurlconnection-object
+    public static String stream2string(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
+    public static int getStrLen(String rt_s) {
+        if (rt_s == null) return -1;
+        return rt_s.length();
+    }
 }
 
 
