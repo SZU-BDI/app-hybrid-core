@@ -6,8 +6,9 @@
 //  Copyright © 2016年 szu.bdi. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import "HybridUi.h"
 
-@interface NativeUi : HybridUi
+@interface NativeUi : UIViewController<HybridUi>
 
 @end

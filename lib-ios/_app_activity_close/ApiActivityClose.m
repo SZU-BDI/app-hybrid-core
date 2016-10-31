@@ -7,31 +7,32 @@
 //
 
 #import "ApiActivityClose.h"
-#import "HybridTools.h"
 #import "HybridUi.h"
 
 @interface ApiActivityClose ()
-@property (nonatomic, copy) NSDictionary *callbackData;
 @end
 
 @implementation ApiActivityClose
 
 - (WVJBHandler) getHandler{
     return ^(id data, WVJBResponseCallback responseCallback) {
-        NSLog(@"ApiActivityClose -->  (_app_actibity_close)");
+        NSLog(@"ApiActivityClose()");
         
-        HybridUi *ui = (HybridUi *)self.currentUi;
+        HybridUi *ui = [[HybridUi alloc] init];
+        ui.delegate = self.currentUi;
+        [ui activityClose];
         
-        if (ui.address) {
-            _callbackData = [[NSDictionary alloc] initWithObjects:@[ui.address] forKeys:@[@"address"]];
-        }
-        if (ui.jsCallback) {
-            ui.jsCallback(_callbackData);
-        }
-        if (self.currentUi.navigationController.viewControllers.count > 1){
-            NSLog(@"colse %@", self.currentUi);
-            [self.currentUi.navigationController popViewControllerAnimated:YES];
-        }
+//        HybridUi *ui = (HybridUi *)self.currentUi;
+//        if (ui.address) {
+//            _callbackData = [[NSDictionary alloc] initWithObjects:@[ui.address] forKeys:@[@"address"]];
+//        }
+//        if (ui.jsCallback) {
+//            ui.jsCallback(_callbackData);
+//        }
+//        if (self.currentUi.navigationController.viewControllers.count > 1){
+//            NSLog(@"colse %@", self.currentUi);
+//            [self.currentUi.navigationController popViewControllerAnimated:YES];
+//        }
     };
 }
 

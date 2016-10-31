@@ -8,29 +8,57 @@
 
 #import "HybridUi.h"
 
-@interface HybridUi ()
-
-@end
-
 @implementation HybridUi
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil
-                         bundle:(NSBundle *)nibBundleOrNil{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        self.topBar  = [[UINavigationController alloc] initWithRootViewController:self];
-    }
-    return self;
+- (void)setHaveTopBar:(BOOL)haveTopBar{
+    
+    [self.delegate getHaveTopBar:haveTopBar];
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
+- (void)setTopBarTitle:(NSString *)title{
+    
+    [self.delegate getTopBarTitle:title];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)setWebViewUiUrl:(NSString *)url{
+    
+    [self.delegate getWebViewUiUrl:url];
+}
+
+- (void)setCallback:(WVJBResponseCallback)callback{
+    
+    [self.delegate getCallback:callback];
+}
+
+- (void)activityClose{
+    [self.delegate closeActivity];
 }
 
 @end
+
+//@interface HybridUi ()
+//
+//@end
+//
+//@implementation HybridUi
+//
+//- (instancetype)initWithNibName:(NSString *)nibNameOrNil
+//                         bundle:(NSBundle *)nibBundleOrNil{
+//    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+//    if (self) {
+//        self.topBar  = [[UINavigationController alloc] initWithRootViewController:self];
+//    }
+//    return self;
+//}
+//
+//- (void)viewDidLoad {
+//    [super viewDidLoad];
+//    // Do any additional setup after loading the view.
+//}
+//
+//- (void)didReceiveMemoryWarning {
+//    [super didReceiveMemoryWarning];
+//    // Dispose of any resources that can be recreated.
+//}
+//
+//@end

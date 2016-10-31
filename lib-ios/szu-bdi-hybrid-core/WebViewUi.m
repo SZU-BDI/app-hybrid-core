@@ -9,11 +9,16 @@
 #import "WebViewUi.h"
 #import "HybridApi.h"
 #import "HybridTools.h"
+#import "WebViewJavascriptBridge.h"
 
 @interface WebViewUi ()<UIWebViewDelegate>
 
 @property (nonatomic, strong) UIWebView *webView;
-@property (nonatomic, copy) NSDictionary *callbackData;
+//@property (nonatomic, copy) NSDictionary *callbackData;
+@property (nonatomic) BOOL haveTopBar;
+@property (nonatomic, copy) NSString *accessAddress; // 接口链接
+@property (nonatomic, strong) WebViewJavascriptBridge *bridge;
+@property (nonatomic, strong) WVJBResponseCallback jsCallback;
 
 @end
 
@@ -24,20 +29,37 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [self CustomLeftBarButtonItem];
-        NSLog(@"WebViewUi 初始化");
     }
     return self;
+}
+
+- (void)loadView{
+    
+    // initial the webView and add webview in window：
+    CGRect rect = [UIScreen mainScreen].bounds;
+    self.webView = [[UIWebView alloc]initWithFrame:rect];
+    self.webView.backgroundColor = [UIColor whiteColor];
+    self.webView.delegate = self;
+    
+    // The page automatically zoom to fit the screen, default NO.
+    self.webView.scalesPageToFit = YES;
+    
+    // Edges prohibit sliding, default YES.
+    self.webView.scrollView.bounces = NO;
+    self.view = self.webView;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    [self loadAccessAddress];
+
     if (_bridge) {
         return;
     }
     // initial the webView and add webview in window：
-    [self configWebview];
+    // [self configWebview];
     
     // Enable logging：
     [WebViewJavascriptBridge enableLogging];
@@ -53,44 +75,76 @@
 }
 
 // Custom topBar left back buttonItem
--(void)CustomLeftBarButtonItem
-{
+- (void)CustomLeftBarButtonItem{
+    
     UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"] style:UIBarButtonItemStylePlain target:self action:@selector(leftBarItemAction)];
     leftBar.tintColor = [UIColor blackColor];
     self.navigationItem.leftBarButtonItem = leftBar;
 }
--(void)leftBarItemAction{
+
+- (void)leftBarItemAction{
     
-    if (self.address) {
-        _callbackData = [[NSDictionary alloc] initWithObjects:@[self.address] forKeys:@[@"address"]];
+    // 判断是被push还是被modal出来的;
+    NSArray *viewcontrollers = self.navigationController.viewControllers;
+    
+    if (viewcontrollers.count > 1) {
+        
+        if ([viewcontrollers objectAtIndex:viewcontrollers.count-1] == self){
+            
+            //push方式
+            [self.navigationController popViewControllerAnimated:YES];
+        }
     }
+    else{
+        
+        // present方式
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    
     if (self.jsCallback) {
-        self.jsCallback(_callbackData);
+        self.jsCallback(self.accessAddress);
     }
-    if (self.navigationController.viewControllers.count > 1){
-        [self.navigationController popViewControllerAnimated:YES];
-    }
+//    if (self.address) {
+//        _callbackData = [[NSDictionary alloc] initWithObjects:@[self.address] forKeys:@[@"address"]];
+//    }
+//    if (self.jsCallback) {
+//        self.jsCallback(_callbackData);
+//    }
+//    if (self.navigationController.viewControllers.count > 1){
+//        [self.navigationController popViewControllerAnimated:YES];
+//    }
 }
 
-- (void)configWebview{
+- (void)loadAccessAddress{
     
-    CGRect bounds = [[UIScreen mainScreen] bounds];
-    self.webView = [[UIWebView alloc]initWithFrame:bounds];
-    self.webView.backgroundColor = [UIColor whiteColor];
-    self.webView.delegate = self;
-    // The page automatically zoom to fit the screen, default NO.
-    self.webView.scalesPageToFit = YES;
-    // Edges prohibit sliding, default YES.
-    self.webView.scrollView.bounces = NO;
-    [self.view addSubview:self.webView];
-    
-    if (self.address) {
-        [self LoadTheUrl:self.address];
-    }else{
+    if ([self.accessAddress isEqualToString:@"root.htm"])  {
+        NSLog(@"加载root.htm");
         [self LoadLocalhtmlName:@"root"];
     }
-
+    else if (self.accessAddress != nil){
+        [self LoadTheUrl:self.accessAddress];
+    }
 }
+
+//- (void)configWebview{
+//    
+//    CGRect bounds = [[UIScreen mainScreen] bounds];
+//    self.webView = [[UIWebView alloc]initWithFrame:bounds];
+//    self.webView.backgroundColor = [UIColor whiteColor];
+//    self.webView.delegate = self;
+//    // The page automatically zoom to fit the screen, default NO.
+//    self.webView.scalesPageToFit = YES;
+//    // Edges prohibit sliding, default YES.
+//    self.webView.scrollView.bounces = NO;
+//    [self.view addSubview:self.webView];
+//    
+//    if (self.address) {
+//        [self LoadTheUrl:self.address];
+//    }else{
+//        [self LoadLocalhtmlName:@"root"];
+//    }
+//
+//}
 
 - (void)LoadLocalhtmlName:(NSString *)loadLocalhtml{
     NSString* htmlPath = [[NSBundle mainBundle] pathForResource:loadLocalhtml ofType:@"htm"];
@@ -110,59 +164,102 @@
     // Dispose of any resources that can be recreated.
 }
 
-
 - (void)registerHandlerApi{
     
     // get the appConfig:
-    NSDictionary *appConfig = [HybridTools fromAppConfigGetApi];
+    NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[HybridTools wholeAppConfig]];
     
-    // get the appConfig all keys:
-    NSArray *appConfigkeys = [appConfig allKeys];
+    // 获取 Api 映射数据
+    NSDictionary *apiMapping = [NSDictionary dictionaryWithDictionary:(NSDictionary *)(appConfig[@"api_mapping"])];
+    
+    // get the apiMapping all keys:
+    NSArray *appConfigkeys = [apiMapping allKeys];
     
     // Iterate through all the value(The values in the appConfigkeys is key):
     for (NSString *key in appConfigkeys) {
         
         // Get the value through the key:
-        HybridApi *api = [HybridTools buildHybridApi:appConfig[key]];
+        HybridApi *api = [HybridTools getHybridApi:apiMapping[key]];
         
         // 把当前控制器（ui）赋值给 api的成员变量
         api.currentUi = self;
         
         // Registered name of key handler:
         [self.bridge registerHandler:key handler:[api getHandler]];
-        NSLog(@"注册方法 %@" , key);
+        
+        // NSLog(@"注册方法 %@" , key);
     }
 }
 
+//- (void)registerHandlerApi{
+//    
+//    // get the appConfig:
+//    NSDictionary *appConfig = [HybridTools fromAppConfigGetApi];
+//    
+//    // get the appConfig all keys:
+//    NSArray *appConfigkeys = [appConfig allKeys];
+//    
+//    // Iterate through all the value(The values in the appConfigkeys is key):
+//    for (NSString *key in appConfigkeys) {
+//        
+//        // Get the value through the key:
+//        HybridApi *api = [HybridTools buildHybridApi:appConfig[key]];
+//        
+//        // 把当前控制器（ui）赋值给 api的成员变量
+//        api.currentUi = self;
+//        
+//        // Registered name of key handler:
+//        [self.bridge registerHandler:key handler:[api getHandler]];
+//        NSLog(@"注册方法 %@" , key);
+//    }
+//}
+
 #pragma mark - UIWebViewDelegate
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
-{
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    
     return YES;
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView;
-{
+- (void)webViewDidFinishLoad:(UIWebView *)webView;{
+    
     NSLog(@"Root - Load the success");
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
+    
     NSLog(@"Root - Load the fail");
 }
 
--(void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:NO];
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     
-    //  if (self.isTopBar = NO) activity hidden topbar
-    if (self.isTopBar == YES) {
-        [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    }else{
-        [[self navigationController] setNavigationBarHidden:YES animated:YES];
-    }
+    if (self.haveTopBar)  [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    if (!self.haveTopBar) [[self navigationController] setNavigationBarHidden:YES animated:YES];
+}
+
+#pragma mark - HybridUiDelegate
+- (void)getHaveTopBar:(BOOL)haveTopBar{
+    _haveTopBar = haveTopBar;
+}
+
+- (void)getTopBarTitle:(NSString *)title{
+    self.title = title;
+}
+
+- (void)getWebViewUiUrl:(NSString *)url{
+    _accessAddress = url;
+}
+
+- (void)getCallback:(WVJBResponseCallback)callback{
+    _jsCallback = callback;
+}
+
+- (void)closeActivity{
+    [self leftBarItemAction];
 }
 
 - (void)dealloc{
-    NSLog(@"HybridUi dealloc");
+    NSLog(@"WebViewUi dealloc");
 }
 
 @end

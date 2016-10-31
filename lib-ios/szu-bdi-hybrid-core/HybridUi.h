@@ -6,17 +6,52 @@
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import "WebViewJavascriptBridge.h"
+//#import <UIKit/UIKit.h>
+//#import "WebViewJavascriptBridge.h"
+#import "WebViewJavascriptBridgeBase.h"
 
-@interface HybridUi : UIViewController
+// 协议定义
+@protocol HybridUi <NSObject>
 
-@property (nonatomic, strong) UINavigationController *topBar;
+@optional
 
-@property (nonatomic, copy) NSString *address;
+- (void)getHaveTopBar:(BOOL)haveTopBar;
 
-@property (nonatomic, strong) WVJBResponseCallback jsCallback;
+- (void)getTopBarTitle:(NSString *)title;
 
-@property (nonatomic) BOOL isTopBar;
+- (void)getWebViewUiUrl:(NSString *)url;
+
+- (void)getCallback:(WVJBResponseCallback)callback;
+
+- (void)closeActivity;
 
 @end
+
+@interface HybridUi : NSObject
+
+// 遵循协议的一个代理变量定义
+@property (nonatomic, weak) id<HybridUi> delegate;
+
+- (void)setHaveTopBar:(BOOL)haveTopBar;
+
+- (void)setTopBarTitle:(NSString *)title;
+
+- (void)setWebViewUiUrl:(NSString *)url;
+
+- (void)setCallback:(WVJBResponseCallback)callback;
+
+- (void)activityClose;
+
+@end
+
+//@interface HybridUi : UIViewController
+//
+//@property (nonatomic, strong) UINavigationController *topBar;
+//
+//@property (nonatomic, copy) NSString *address;
+//
+//@property (nonatomic, strong) WVJBResponseCallback jsCallback;
+//
+//@property (nonatomic) BOOL isTopBar;
+//
+//@end

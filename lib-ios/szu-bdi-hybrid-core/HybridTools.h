@@ -7,15 +7,35 @@
 //
 
 #import <Foundation/Foundation.h>
-@class HybridUi;
-@class HybridApi;
+#import "HybridUi.h"
+#import "HybridApi.h"
 
 @interface HybridTools : NSObject
 
-+ (HybridUi *) buildHybridUi:(NSString *)name;
+/**
+ *  初始化缓存 AppConfig -> s2o()
+ */
++ (void)initAppConfig;
 
-+ (HybridApi *) buildHybridApi:(NSString *)name;
+/**
+ *  启动或打开UI
+ */
++ (void)startUi:(NSString *)strUiName strInitParam:(NSDictionary *)strInitParam objCaller:(id<HybridUi>)objCaller;
 
-+ (NSDictionary *) fromAppConfigGetApi;
+/**
+ *  通过api映射出api对应的类
+ */
++ (HybridApi *)getHybridApi:(NSString *)name;
+
+/**
+ *  取到整个AppConfig
+ */
++ (id)wholeAppConfig;
+
+//+ (HybridUi *) buildHybridUi:(NSString *)name;
+//
+//+ (HybridApi *) buildHybridApi:(NSString *)name;
+//
+//+ (NSDictionary *) fromAppConfigGetApi;
 
 @end

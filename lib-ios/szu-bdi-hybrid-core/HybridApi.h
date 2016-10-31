@@ -6,13 +6,23 @@
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+//#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "WebViewJavascriptBridgeBase.h"
+#import "HybridUi.h"
+//#import "WebViewJavascriptBridgeBase.h"
 
 @interface HybridApi : NSObject
 
+/**
+ *   获取js注册方法的回调
+ */
 - (WVJBHandler) getHandler;
-@property (nonatomic, strong) UIViewController *currentUi;
+
+/**
+ *   当前显示的Ui
+ */
+@property (nonatomic, weak) id<HybridUi> currentUi;
+
+//@property (nonatomic, strong) UIViewController *currentUi;
 
 @end
