@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HybridUi extends Activity {
+
     private static String LOGTAG = "HybridUi";
 
     JSONObject _uiData;
@@ -24,8 +25,10 @@ public class HybridUi extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Intent iin = getIntent();
         String s_uiData = iin.getStringExtra("uiData");
+
         initUiData(HybridTools.s2o(s_uiData));
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
         String topbar = HybridTools.optString(getUiData("topbar"));
@@ -53,6 +56,7 @@ public class HybridUi extends Activity {
         }
 
         try {
+            //for some model of android
             ActionBar actionBar = getActionBar();
             //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -61,13 +65,32 @@ public class HybridUi extends Activity {
         }
     }
 
+    public void close() {
+        //{name: $name, address: adress}
+        JSONObject o = new JSONObject();
+        try {
+            o.put("name", getUiData("name"));
+            o.put("address", getUiData("address"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Intent rtIntent = new Intent();
+        rtIntent.putExtra("rt", o.toString());
+
+        //@ref onActivityResult()
+        setResult(1, rtIntent);
+
+        finish();
+    }
+
     //NOTES: when user click the left-upper button on the top bar
     //@ref setDisplayHomeAsUpEnabled()
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                this.close();
                 break;
         }
         return true;
@@ -76,19 +99,14 @@ public class HybridUi extends Activity {
     //in case old androids dont have onBackPress(), need onKeyDown() to do it
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.v(LOGTAG, "onKeyDown " + keyCode);
+//        Log.v(LOGTAG, "onKeyDown " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Log.v(LOGTAG, "onKeyDown KeyEvent.KEYCODE_BACK " + KeyEvent.KEYCODE_BACK);
-
             Boolean reallyClose = true;
-
-//TODO not yet think up good solution to make a global decision.... TODO !!!
-//            reallyClose = HybridTools.ifLastActPromptUser(this);
-//            Application me = HybridTools.getApplication();
-            //me.callFunction(...)
+//TODO
+//            reallyClose = HybridTools.ifLastActThenPromptUser(this);
 
             if (reallyClose)
-                onBackPressed();
+                this.close();
             return reallyClose;
         }
         return super.onKeyDown(keyCode, event);
@@ -97,11 +115,10 @@ public class HybridUi extends Activity {
     public void initUiData(JSONObject o) {
         if (o == null) return;
         _uiData = o;
-//        Log.v(LOGTAG, "initUiData _uiData=" + _uiData);
+        this.setUiData("_init_time_", HybridTools.isoDateTime());
     }
 
     public JSONObject wholeUiData() {
-//        Log.v(LOGTAG, "wholeUiData _uiData=" + _uiData);
         return _uiData;
     }
 
@@ -139,16 +156,8 @@ public class HybridUi extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
+    public void onBackPressed() {
+        this.close();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Log.v(LOGTAG, "onResume ");
-
-    }
 }
