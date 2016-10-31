@@ -2,28 +2,20 @@ package szu.bdi.hybrid.core;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.Handler;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -53,9 +47,6 @@ public class HybridTools {
     }
 
     public static Context getAppContext() {
-//        if (_appContext == null) {
-//            throw new Exception("_appContext is null");
-//        }
         return _appContext;
     }
 
@@ -90,31 +81,74 @@ public class HybridTools {
         sp.edit().putString(field, value).commit();
     }
 
-    public static String webPost(String url, String post_s) {
+    public static String webPost(String uu, String post_s) {
         String return_s = null;
 
         try {
-            HttpClient httpClient = new DefaultHttpClient();
-            //it's said that in future is:
-            // HttpClient httpClient = HttpClientBuilder.create().build();
-//            CloseableHttpClient httpClient;
-//            httpClient = HttpClientBuilder.create()
-//                    .setDefaultConnectionConfig(config)
-//                    .build();
+            /**
+             * URL url = new URL("http://www.android.com/");
+             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+             try {
+             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+             readStream(in);
+             } finally {
+             urlConnection.disconnect();
+             }
+             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+             try {
+             urlConnection.setDoOutput(true);
+             urlConnection.setChunkedStreamingMode(0);
 
-            //NOTES:  to improve this timeout better maybe...
-            // Connect Timeout
-            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 12000);
-            // Socket Timeout
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
+             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
+             writeStream(out);
 
-            HttpPost httpPost = new HttpPost(url);
-            Log.v(LOGTAG, "To Post : " + url + "\n" + post_s);
+             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+             readStream(in);
+             } finally {
+             urlConnection.disconnect();
+             }
+             */
+            URL url = new URL("http://www.android.com/");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            try {
+                conn.setDoOutput(true);
+                conn.setChunkedStreamingMode(0);
+                conn.setRequestMethod("POST");
+                OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+                out.write(post_s.getBytes("UTF-8"));
+                InputStream in = new BufferedInputStream(conn.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                String s;
+                while ((s = reader.readLine()) != null) {
+                    return_s += s;
+                }
+                reader.close();
+            } finally {
+                conn.disconnect();
+            }
+            /**
+             HttpClient httpClient = new DefaultHttpClient();
+             //it's said that in future is:
+             // HttpClient httpClient = HttpClientBuilder.create().build();
+             //            CloseableHttpClient httpClient;
+             //            httpClient = HttpClientBuilder.create()
+             //                    .setDefaultConnectionConfig(config)
+             //                    .build();
 
-            StringEntity se = new StringEntity(post_s);
-            httpPost.setEntity(se);
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            return_s = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+             //NOTES:  to improve this timeout better maybe...
+             // Connect Timeout
+             httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 12000);
+             // Socket Timeout
+             httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
+
+             HttpPost httpPost = new HttpPost(uu);
+             Log.v(LOGTAG, "To Post : " + uu + "\n" + post_s);
+
+             StringEntity se = new StringEntity(post_s);
+             httpPost.setEntity(se);
+             HttpResponse httpResponse = httpClient.execute(httpPost);
+             return_s = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+             */
         } catch (Throwable ex) {
             ex.printStackTrace();
             return_s = ex.getMessage();
@@ -141,7 +175,7 @@ public class HybridTools {
         return o.toString();
     }
 
-    //Wrap the raw webPost for our cmp api call
+    //Wrap the raw webPost for cmp api call
     public static JSONObject apiPost(String url, JSONObject jo) {
         String return_s = null;
         try {
@@ -169,41 +203,6 @@ public class HybridTools {
         return rt;
     }
 
-    public static void quit(boolean playMedia) {
-        flagAppWorking = false;//wlll affect the bg service
-
-        quickShowMsgMain("Quiting...");
-        Log.d(LOGTAG, "quit " + playMedia);
-
-//        if (playMedia) {
-//            try {
-//                mp.reset();
-//                Uri uu = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-////                    Log.d(LOGTAG, "Uri=" + uu.toString());
-//                mp.setDataSource(_appContext, uu);
-//                mp.setOnPreparedListener(preparedListener);
-//                //mp.prepareAsync();
-//                mp.prepare();
-//            } catch (IllegalStateException | IOException e) {
-//                playMedia = false;
-//                e.printStackTrace();
-//            }
-//        }
-
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                KillAppSelf();
-            }
-        }, (playMedia) ? 5000 : 2500);
-    }
-
-    public static void KillAppSelf() {
-        int pid = android.os.Process.myPid();
-        Log.d(LOGTAG, "kill and quit pid=" + pid);
-
-        android.os.Process.killProcess(pid);
-        System.exit(0);
-    }
 
     public static String isoDateTime() {
         String time_s = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
@@ -536,31 +535,6 @@ public class HybridTools {
         }
     }
 
-    //@ref http://stackoverflow.com/questions/8258725/strict-mode-in-android-2-2
-    //StrictMode.ThreadPolicy was introduced since API Level 9 and the default thread policy had been changed since API Level 11, which in short, does not allow network operation (eg: HttpClient and HttpUrlConnection) get executed on UI thread. If you do this, you get NetworkOnMainThreadException.
-    public static void uiNeedNetworkPolicyHack() {
-        int _sdk_int = android.os.Build.VERSION.SDK_INT;
-        if (_sdk_int > 8) {
-            try {
-                Log.d(LOGTAG, "setThreadPolicy for api level " + _sdk_int);
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
-
-    protected static Application _app = null;
-
-    public static void setApplication(Application app) {
-        if (app != null)
-            _app = app;
-    }
-
-    public static Application getApplication() {
-        return _app;
-    }
 }
 
 

@@ -7,9 +7,7 @@ public class ApiUiClose extends HybridApi {
         return new ICallBackHandler() {
             @Override
             public void handler(String data, ICallBackFunction cb) {
-                HybridUi __callerUi = getCallerUi();
-                //__callerUi.setCallBackFunction(cb);
-                __callerUi.onBackPressed();
+                getCallerUi().close();
             }
         };
     }

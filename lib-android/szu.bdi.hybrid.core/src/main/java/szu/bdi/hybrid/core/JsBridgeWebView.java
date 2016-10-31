@@ -220,7 +220,7 @@ public class JsBridgeWebView extends WebView {
     private void _app2js(String handlerName, String data, ICallBackFunction responseCallback) {
         Jsb1Msg m = new Jsb1Msg();
         if (!TextUtils.isEmpty(data)) {
-            m.setData(data);
+            m.setDataStr(data);
         }
         if (responseCallback != null) {
             String callbackStr = String.format(CALLBACK_ID_FORMAT, ++uniqueId + ("_" + SystemClock.currentThreadTimeMillis()));
@@ -297,7 +297,7 @@ public class JsBridgeWebView extends WebView {
                             //else {
                             //    responseFunction = new ICallBackFunction() {
                             //        @Override
-                            //        public void onCallBack(String data) {
+                            //        public void onCallBack(String dataStr) {
                             //            // do nothing
                             //        }
                             //    };
@@ -307,7 +307,7 @@ public class JsBridgeWebView extends WebView {
                                 handler = messageHandlers.get(m.getHandlerName());
                                 if (handler != null) {
                                     //TODO 这里要有个 auth-mapping check！！
-                                    handler.handler(m.getData(), responseFunction);
+                                    handler.handler(m.getDataStr(), responseFunction);
                                 } else {
                                     //TODO debug下什么鬼
                                 }
@@ -343,7 +343,7 @@ public class JsBridgeWebView extends WebView {
         private String callbackId; //callbackId
         private String responseId; //responseId
         private String responseData; //responseData
-        private String data; //data of message
+        private String dataStr; //dataStr of message
         private String handlerName; //name of handler
 
         private final static String CALLBACK_ID_STR = "callbackId";
@@ -376,12 +376,12 @@ public class JsBridgeWebView extends WebView {
             this.callbackId = callbackId;
         }
 
-        public String getData() {
-            return data;
+        public String getDataStr() {
+            return dataStr;
         }
 
-        public void setData(String data) {
-            this.data = data;
+        public void setDataStr(String data) {
+            this.dataStr = data;
         }
 
         public String getHandlerName() {
@@ -396,7 +396,7 @@ public class JsBridgeWebView extends WebView {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put(CALLBACK_ID_STR, getCallbackId());
-                jsonObject.put(DATA_STR, getData());
+                jsonObject.put(DATA_STR, getDataStr());
                 jsonObject.put(HANDLER_NAME_STR, getHandlerName());
                 jsonObject.put(RESPONSE_DATA_STR, getResponseData());
                 jsonObject.put(RESPONSE_ID_STR, getResponseId());
@@ -418,7 +418,7 @@ public class JsBridgeWebView extends WebView {
                     m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
                     m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
                     m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
-                    m.setData(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
+                    m.setDataStr(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
                     list.add(m);
                 }
             } catch (JSONException e) {

@@ -4,20 +4,15 @@ package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
@@ -37,7 +32,6 @@ public class SimpleWebViewUi extends HybridUi {
 
         JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
 
-        //NOTES: if not set, the js alert won't effect...(maybe the default return is true)
         _wv.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
@@ -87,35 +81,5 @@ public class SimpleWebViewUi extends HybridUi {
 
         Log.v(LOGTAG, "load url=" + url);
         _wv.loadUrl(url);
-
-//        final JsBridgeWebView wv = _wv;
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                setContentView(wv);
-//            }
-//        }, 111);
     }
-
-    @Override
-    public void onBackPressed() {
-        Log.v(LOGTAG, "onBackPressed set Result 1");
-
-        //{name: $name, address: adress}
-        JSONObject o = new JSONObject();
-        try {
-            o.put("name", getUiData("name"));
-            o.put("address", getUiData("address"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Intent rtIntent = new Intent();
-        rtIntent.putExtra("rt", o.toString());
-
-        //@ref onActivityResult()
-        setResult(1, rtIntent);
-        finish();
-    }
-
 }
