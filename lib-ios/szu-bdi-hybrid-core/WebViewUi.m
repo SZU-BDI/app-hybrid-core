@@ -10,6 +10,7 @@
 #import "HybridApi.h"
 #import "HybridTools.h"
 #import "WebViewJavascriptBridge.h"
+#import "JSO.h"
 
 @interface WebViewUi ()<UIWebViewDelegate>
 
@@ -102,7 +103,8 @@
     }
     
     if (self.jsCallback) {
-        self.jsCallback(self.accessAddress);
+        
+        self.jsCallback(@{@"address":@"test url"});
     }
 //    if (self.address) {
 //        _callbackData = [[NSDictionary alloc] initWithObjects:@[self.address] forKeys:@[@"address"]];
@@ -167,28 +169,45 @@
 - (void)registerHandlerApi{
     
     // get the appConfig:
-    NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[HybridTools wholeAppConfig]];
+    // NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[HybridTools wholeAppConfig]];
+    NSString *jso_string = [HybridTools wholeAppConfig];
     
     // 获取 Api 映射数据
-    NSDictionary *apiMapping = [NSDictionary dictionaryWithDictionary:(NSDictionary *)(appConfig[@"api_mapping"])];
+    // NSDictionary *apiMapping = [NSDictionary dictionaryWithDictionary:(NSDictionary *)(appConfig[@"api_mapping"])];
+    JSO *jso = [JSO s2o:jso_string];
+    JSO *jso_api_mapping = [jso getChild:@"api_mapping"];
+    NSString *jso_string_value = [JSO o2s:jso_api_mapping];
     
-    // get the apiMapping all keys:
-    NSArray *appConfigkeys = [apiMapping allKeys];
     
-    // Iterate through all the value(The values in the appConfigkeys is key):
-    for (NSString *key in appConfigkeys) {
+    NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    
+    if (!err) {
         
-        // Get the value through the key:
-        HybridApi *api = [HybridTools getHybridApi:apiMapping[key]];
+        // get the apiMapping all keys:
+        NSArray *appConfigkeys = [dic allKeys];
         
-        // 把当前控制器（ui）赋值给 api的成员变量
-        api.currentUi = self;
-        
-        // Registered name of key handler:
-        [self.bridge registerHandler:key handler:[api getHandler]];
-        
-        // NSLog(@"注册方法 %@" , key);
+        // Iterate through all the value(The values in the appConfigkeys is key):
+        for (NSString *key in appConfigkeys) {
+            
+            // Get the value through the key:
+            HybridApi *api = [HybridTools getHybridApi:dic[key]];
+            
+            // 把当前控制器（ui）赋值给 api的成员变量
+            api.currentUi = self;
+            
+            // Registered name of key handler:
+            [self.bridge registerHandler:key handler:[api getHandler]];
+            
+            // NSLog(@"注册方法 %@" , key);
+        }
     }
+    
+//    NSLog(@"88 == %@", jso_string_value);
+//    JSO *apiMapping = [JSO s2o:jso_string_value];
 }
 
 //- (void)registerHandlerApi{

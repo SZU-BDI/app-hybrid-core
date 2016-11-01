@@ -8,46 +8,46 @@
 
 #import "HybridTools.h"
 #import "AppDelegate.h"
+#import "JSO.h"
 
 @implementation HybridTools
 
 + (void)initAppConfig{
+#warning 现在是每次启动都重新缓存
     
-    //    NSDictionary *appConfig = [SHUserDefault objectForKey:@"config"];
-    //    if (appConfig) {
-    //
-    //        NSLog(@"配置文件已经有缓存了");
-    //        return;
-    //    }
-    //    else{
-    
-#warning 缓存配置文件 -> 测试阶段暂每次都重新缓存
     // 获取文件(config.json)的路径
-    NSString *config_filePath = [[NSBundle mainBundle]pathForResource:@"config"ofType:@"json"];
-    NSData *jsonData = [[NSData alloc]initWithContentsOfFile:config_filePath];
-    
-    // 把json数据转换成oc
-    NSError *error;
-    NSDictionary *jsonContent = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"config"ofType:@"json"];
+    NSData *jsonData = [[NSData alloc] initWithContentsOfFile:configFilePath];
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
     // 持久化获取的配置，以config为key
-    [[NSUserDefaults standardUserDefaults] setObject:jsonContent forKey:@"config"];
+    [[NSUserDefaults standardUserDefaults] setObject:jsonString forKey:@"config"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    //     }
+//    // 把json数据转换成oc
+//    NSError *error;
+//    NSDictionary *jsonContent = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
+//    // 持久化获取的配置，以config为key
+//    [[NSUserDefaults standardUserDefaults] setObject:jsonContent forKey:@"config"];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 + (void)startUi:(NSString *)strUiName strInitParam:(NSDictionary *)strInitParam objCaller:(id<HybridUi>)objCaller{
     
     // 获取 UI 映射数据
-    NSDictionary *uiMapping = [self getAppConfig:@"ui_mapping"];
+    // NSDictionary *uiMapping = [self getAppConfig:@"ui_mapping"];
+    JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
     // 获取 UI 的配置文件
-    NSDictionary *uiConfig = uiMapping[strUiName];
-    
+    // NSDictionary *uiConfig = uiMapping[strUiName];
+    JSO *jso_uiConfig = [jso_uiMapping getChild:strUiName];
+
     // 动态获取 UI 类:
-    Class uiClass = NSClassFromString((NSString *)uiConfig[@"class"]);
-    
+    // Class uiClass = NSClassFromString((NSString *)uiConfig[@"class"]);
+    JSO *jso_className = [jso_uiConfig getChild:@"class"];
+    NSString *className = [JSO o2s:jso_className];
+    Class uiClass = NSClassFromString(className);
+
     // 实例化动态获取的 UI 类:
     id <HybridUi> initUiClass = [[uiClass alloc] init];
     
@@ -63,31 +63,40 @@
     hyBridUi.delegate = initUiClass;
     
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
-    NSString *uiMode = (NSString *)uiConfig[@"type"];
+    // NSString *uiMode = (NSString *)uiConfig[@"type"];
+    JSO *jso_uiMode = [jso_uiConfig getChild:@"type"];
+    NSString *uiMode = [JSO o2s:jso_uiMode];
     if (strInitParam[@"type"] != nil) {
         uiMode = (NSString *)strInitParam[@"type"];
     }
     
     // 3、获取 UI 的url  *覆盖参数有url* 则覆盖附带的url
-    NSString *webUrl = (NSString *)uiConfig[@"url"];
+    // NSString *webUrl = (NSString *)uiConfig[@"url"];
+    JSO *jso_webUrl = [jso_uiConfig getChild:@"url"];
+    NSString *webUrl = [JSO o2s:jso_webUrl];
     if (strInitParam[@"url"] != nil) {
         webUrl = (NSString *)strInitParam[@"url"];
     }
     
     // 4、获取 UI 有无topBar *覆盖参数有topBar* 则覆盖附带的topBar
-    BOOL haveTopBar = ([uiConfig[@"topbar"] isEqualToString:@"Y"])? YES : NO;
+    // BOOL haveTopBar = ([uiConfig[@"topbar"] isEqualToString:@"Y"])? YES : NO;
+    JSO *jso_haveTopBar = [jso_uiConfig getChild:@"topbar"];
+    BOOL haveTopBar = ([[JSO o2s:jso_haveTopBar] isEqualToString:@"Y"])? YES : NO;
     if (strInitParam[@"topbar"] != nil) {
         haveTopBar = ([strInitParam[@"topbar"] isEqualToString:@"Y"])? YES : NO;
     }
     
     // 5、获取 UI topBar 的标题  *覆盖参数有title* 则覆盖附带的title
-    NSString *title = (NSString *)uiConfig[@"title"];
+    // NSString *title = (NSString *)uiConfig[@"title"];
+    JSO *jso_title = [jso_uiConfig getChild:@"title"];
+    NSString *title = [JSO o2s:jso_title];
     if (strInitParam[@"title"] != nil) {
         title = (NSString *)strInitParam[@"title"];
     }
     
     // 6、获取覆盖参数中的回调函数
     if (strInitParam[@"callback"] != nil) {
+        NSLog(@"设置回调函数");
         // 7、设置回调
         [hyBridUi setCallback:(WVJBResponseCallback)strInitParam[@"callback"]];
     }
@@ -151,23 +160,44 @@
     return nil;
 }
 
-+ (id)wholeAppConfig{
++ (NSString *)wholeAppConfig{
     
-    NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:@"config"]];
-    if (!appConfig){
+//    NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:@"config"]];
+    
+    NSString *jso_string = (NSString *)[[NSUserDefaults standardUserDefaults] objectForKey:@"config"];
+    
+    if (!jso_string){
         NSLog(@"appConfig not found");
         return nil;
     }
-    return appConfig;
+    return jso_string;
 }
 
-+ (id)getAppConfig:(NSString *)key{
++ (JSO *)getAppConfig:(NSString *)key{
     
-    if (![self wholeAppConfig][key]){
-        NSLog(@"appConfig (%@) not found", [self wholeAppConfig][key]);
-        return nil;
+    NSString *jso_string = [self wholeAppConfig];
+    
+    JSO *jso_value;
+    if (jso_string) {
+       
+        JSO *jso = [JSO s2o:jso_string];
+        JSO *jso_key = [jso getChild:key];
+        NSString *jso_string_value = [JSO o2s:jso_key];
+        
+        jso_value = [JSO s2o:jso_string_value];
     }
-    return [self wholeAppConfig][key];
+    else{
+        NSLog(@"appConfig (%@) not found", key);
+        jso_value = nil;
+    }
+    
+    return jso_value;
+    
+//    if (![self wholeAppConfig][key]){
+//        NSLog(@"appConfig (%@) not found", [self wholeAppConfig][key]);
+//        return nil;
+//    }
+//    return [self wholeAppConfig][key];
 }
 
 //+ (HybridUi *) buildHybridUi:(NSString *)name{
