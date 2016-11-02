@@ -186,7 +186,7 @@ static int logMaxLength = 500;
 
 		//TODO if "" or null change to "null"...
 
-    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2c(%@);", json_string];
+    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", json_string];
     if ([[NSThread currentThread] isMainThread]) {
         [self _evaluateJavascript:javascriptCommand];
 

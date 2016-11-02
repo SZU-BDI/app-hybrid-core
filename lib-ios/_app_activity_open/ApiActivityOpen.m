@@ -74,8 +74,9 @@
 - (void)setParam:(id)param forKey:(NSString *)key{
 
 #warning 这里抓取不到param为空，不知道为什么，打印出来的日志显示是 null ， 但是以下的判断都抓取不到。
+#warning TODO Tools要增加 isEmpty() 等函数！
     
-    if (param == nil || [param isEqual:[NSNull class]] || param == NULL || [param isKindOfClass:[NSNull class]]) {
+    if ( param == nil || [param isEqual:[NSNull class]] || param == NULL || [param isKindOfClass:[NSNull class]] || [@"null" isEqualToString:param] ) {
         return;
     }
     
