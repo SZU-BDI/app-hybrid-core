@@ -124,6 +124,8 @@
 	win.WebViewJavascriptBridge = {
 		_fetchQueue: _fetchQueue,
 		_js2app: _js2app,
+
+		//for app call js:
 		_app2js: _app2js,
 
 		init: init,

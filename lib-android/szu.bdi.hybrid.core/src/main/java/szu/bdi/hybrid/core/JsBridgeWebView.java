@@ -1,13 +1,24 @@
 package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -41,6 +52,7 @@ import java.util.Map;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
+
     private final String TAG = "JsBridgeWebView";
 
     final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
@@ -52,12 +64,149 @@ public class JsBridgeWebView extends WebView {
     final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._app2js";
     final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
+    //NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
     Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
     Map<String, ICallBackHandler> messageHandlers = new HashMap<String, ICallBackHandler>();
 
-    private List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
+    class MyWebChromeClient extends WebChromeClient {
+        Context _ctx = null;
 
+        public MyWebChromeClient(Context context) {
+            this._ctx = context;
+        }
+
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+            HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    result.confirm();
+                }
+            });
+            return true;
+        }
+
+        @Override
+        public boolean onJsConfirm(WebView view, String url, String message, final JsResult jsrst) {
+            HybridTools.appConfirm(_ctx, message, new AlertDialog.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    jsrst.confirm();
+                }
+            }, new AlertDialog.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    jsrst.cancel();
+                }
+            });
+            return true;
+        }
+    }
+
+    class MyWebViewClient extends WebViewClient {
+        Context _ctx = null;
+
+        public MyWebViewClient(Context context) {
+            this._ctx = context;
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            try {
+                url = URLDecoder.decode(url, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            JsBridgeWebView webView = JsBridgeWebView.this;
+
+            if (url.startsWith(JSB1_RETURN_DATA)) {
+                // app2js callback
+                webView.handlerReturnData(url);
+                return true;
+            } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
+                // js2java call
+                //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
+                webView.flushMessageQueue();
+                return true;
+            } else {
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            webViewLoadLocalJs(view, "WebViewJavascriptBridge.js");
+
+            JsBridgeWebView webView = JsBridgeWebView.this;
+
+            if (webView.startupJsb1Msg != null) {
+                //if something is called before the page is loaded, do them now...
+                for (Jsb1Msg m : startupJsb1Msg) {
+                    webView.dispatchMessage(m);
+                }
+                //clear it
+                webView.startupJsb1Msg = null;
+            }
+            super.onPageFinished(view, url);
+        }
+
+
+        // <input type=file> support:
+        // openFileChooser() is for pre KitKat and in KitKat mr1 (it's known broken in KitKat).
+        // For Lollipop, we use onShowFileChooser().
+        public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+            this.openFileChooser(uploadMsg, "*/*");
+        }
+
+        public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
+            this.openFileChooser(uploadMsg, acceptType, null);
+        }
+
+        public void openFileChooser(final ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+//                parentEngine.cordova.startActivityForResult(new CordovaPlugin() {
+//                    @Override
+//                    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+//                        Uri result = intent == null || resultCode != Activity.RESULT_OK ? null : intent.getData();
+//                        Log.d(LOG_TAG, "Receive file chooser URL: " + result);
+//                        uploadMsg.onReceiveValue(result);
+//                    }
+//                }, intent, FILECHOOSER_RESULTCODE);
+        }
+
+        //@Override //??
+        //TODO
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        public boolean onShowFileChooser(WebView webView, final ValueCallback<Uri[]> filePathsCallback, final WebChromeClient.FileChooserParams fileChooserParams) {
+            Intent intent = fileChooserParams.createIntent();
+//                try {
+//                    parentEngine.cordova.startActivityForResult(new CordovaPlugin() {
+//                        @Override
+//                        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+//                            Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, intent);
+//                            Log.d(LOG_TAG, "Receive file chooser URL: " + result);
+//                            filePathsCallback.onReceiveValue(result);
+//                        }
+//                    }, intent, FILECHOOSER_RESULTCODE);
+//                } catch (ActivityNotFoundException e) {
+//                    Log.w("No activity found to handle file chooser intent.", e);
+//                    filePathsCallback.onReceiveValue(null);
+//                }
+            return true;
+        }
+
+    }
+
+    //msg Q before page loaded.
+    public List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
+
+    //get the target function name.
     public static String parseFunctionName(String jsUrl) {
+        //example
+        //javascript:jsb1://WebViewJavascriptBridge._fetchQueue(...);
+        // => _fetchQueue
         return jsUrl.replace("javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + ".", "").replaceAll("\\(.*\\);", "");
     }
 
@@ -124,86 +273,41 @@ public class JsBridgeWebView extends WebView {
         }
         return null;
     }
+//
+//    public List<Jsb1Msg> getStartupJsb1Msg() {
+//        return startupJsb1Msg;
+//    }
 
-    public List<Jsb1Msg> getStartupJsb1Msg() {
-        return startupJsb1Msg;
-    }
-
-    public void setStartupJsb1Msg(List<Jsb1Msg> startupJsb1Msg) {
-        this.startupJsb1Msg = startupJsb1Msg;
-    }
+//    public void setStartupJsb1Msg(List<Jsb1Msg> startupJsb1Msg) {
+//        this.startupJsb1Msg = startupJsb1Msg;
+//    }
 
     private long uniqueId = 0;
 
     public JsBridgeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public JsBridgeWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
+        init(context);
     }
 
     public JsBridgeWebView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         this.setVerticalScrollBarEnabled(false);
         this.setHorizontalScrollBarEnabled(false);
         this.getSettings().setJavaScriptEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
-        this.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                try {
-                    url = URLDecoder.decode(url, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                JsBridgeWebView webView = JsBridgeWebView.this;
-
-                if (url.startsWith(JSB1_RETURN_DATA)) {
-                    // app2js callback
-                    webView.handlerReturnData(url);
-                    return true;
-                } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
-                    // js2java call
-                    //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
-                    webView.flushMessageQueue();
-                    return true;
-                } else {
-                    return super.shouldOverrideUrlLoading(view, url);
-                }
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-                webViewLoadLocalJs(view, "WebViewJavascriptBridge.js");
-
-                JsBridgeWebView webView = JsBridgeWebView.this;
-
-                if (webView.getStartupJsb1Msg() != null) {
-                    //if something is called before the page is loaded, do them now...
-                    for (Jsb1Msg m : webView.getStartupJsb1Msg()) {
-                        webView.dispatchMessage(m);
-                    }
-                    //clear it
-                    webView.setStartupJsb1Msg(null);
-                }
-            }
-        });
+        this.setWebViewClient(new MyWebViewClient(context));
+        this.setWebChromeClient(new MyWebChromeClient(context));
     }
 
     void handlerReturnData(String url) {
@@ -244,6 +348,7 @@ public class JsBridgeWebView extends WebView {
     void dispatchMessage(Jsb1Msg m) {
         String s = m.toJson();
 
+        //quick hack
         if ("".equals(s) || s == null) s = "null";
 
         //NOTES: run the js in the main thread of browser:
@@ -255,7 +360,7 @@ public class JsBridgeWebView extends WebView {
     void flushMessageQueue() {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 
-            //take the Q from javascript and handle in java
+            //call the _fetchQueue()
             loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new ICallBackFunction() {
 
                 @Override
@@ -273,46 +378,44 @@ public class JsBridgeWebView extends WebView {
                     }
                     for (int i = 0; i < list.size(); i++) {
                         Jsb1Msg m = list.get(i);
+                        if (m == null) {
+                            Log.w(TAG, "??? m==null ???");
+                            continue;
+                        }
                         String responseId = m.getResponseId();
 
                         if (!TextUtils.isEmpty(responseId)) {
+                            //if has reponseId, find the callback
                             ICallBackFunction function = responseCallbacks.get(responseId);
                             String responseData = m.getResponseData();
                             function.onCallBack(responseData);
+                            //after call, clean it up
                             responseCallbacks.remove(responseId);
                         } else {
+                            //new call or a callback from js
                             ICallBackFunction responseFunction = null;
                             final String callbackId = m.getCallbackId();
                             if (!TextUtils.isEmpty(callbackId)) {
+                                //it is a callback from js
                                 responseFunction = new ICallBackFunction() {
                                     @Override
-                                    public void onCallBack(String data) {
+                                    public void onCallBack(String data_s) {
                                         Jsb1Msg responseMsg = new Jsb1Msg();
                                         responseMsg.setResponseId(callbackId);
-                                        responseMsg.setResponseData(data);
+                                        responseMsg.setResponseData(data_s);
                                         queueMessage(responseMsg);
                                     }
                                 };
                             }
-                            //else {
-                            //    responseFunction = new ICallBackFunction() {
-                            //        @Override
-                            //        public void onCallBack(String dataStr) {
-                            //            // do nothing
-                            //        }
-                            //    };
-                            //}
                             ICallBackHandler handler = null;
                             if (!TextUtils.isEmpty(m.getHandlerName())) {
                                 handler = messageHandlers.get(m.getHandlerName());
+                                //TODO 这里要有个 auth-mapping (whitelist) check?
                                 if (handler != null) {
-                                    //TODO 这里要有个 auth-mapping check！！
                                     handler.handler(m.getDataStr(), responseFunction);
-                                } else {
-                                    //TODO debug下什么鬼
                                 }
                             } else {
-                                //TODO debug下又什么鬼，连名字都没有，要干嘛?
+                                Log.w(TAG, "??? what the hell m= " + m.toString());
                             }
                         }
                     }
@@ -332,12 +435,12 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    //from java call js
-    public void callHandler(String handlerName, String data, ICallBackFunction cb) {
-        _app2js(handlerName, data, cb);
+    //from java call js...
+    public void callHandler(String handlerName, String data_s, ICallBackFunction cb) {
+        _app2js(handlerName, data_s, cb);
     }
 
-    //prototol(java,js)
+    //prototol(java<=>js)
     public static class Jsb1Msg {
 
         private String callbackId; //callbackId
