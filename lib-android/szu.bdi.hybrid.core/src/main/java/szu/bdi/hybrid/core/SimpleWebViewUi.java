@@ -32,35 +32,6 @@ public class SimpleWebViewUi extends HybridUi {
 
         JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
 
-        _wv.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-                HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        result.confirm();
-                    }
-                });
-                return true;
-            }
-
-            @Override
-            public boolean onJsConfirm(WebView view, String url, String message, final JsResult jsrst) {
-                HybridTools.appConfirm(_ctx, message, new AlertDialog.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        jsrst.confirm();
-                    }
-                }, new AlertDialog.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        jsrst.cancel();
-                    }
-                });
-                return true;
-            }
-        });
-
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";
         if (address == null || "".equals(address)) {
