@@ -118,9 +118,8 @@
 }
 
 - (void)loadAccessAddress{
-    
+    NSLog(@"WebViewUi.loadAccessAddress() %@",self.accessAddress);
     if ([self.accessAddress isEqualToString:@"root.htm"])  {
-        NSLog(@"加载root.htm");
         [self LoadLocalhtmlName:@"root"];
     }
     else if (self.accessAddress != nil){
@@ -241,12 +240,12 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView;{
     
-    NSLog(@"Root - Load the success");
+    NSLog(@"webViewDidFinishLoad ?");
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
     
-    NSLog(@"Root - Load the fail");
+    NSLog(@"WebViewUi %@",error);
 }
 
 - (void)viewWillAppear:(BOOL)animated{

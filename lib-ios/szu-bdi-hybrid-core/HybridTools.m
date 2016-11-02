@@ -14,13 +14,22 @@
 
 + (void)initAppConfig{
 #warning 现在是每次启动都重新缓存
+
+#warning TODO 参考 android ，增加 readFileFromAsset()
     
-    // 获取文件(config.json)的路径
+    //get path of asset (config.json)
     NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"config"ofType:@"json"];
+    
+    //get the content of the config.json
     NSData *jsonData = [[NSData alloc] initWithContentsOfFile:configFilePath];
+    
+    //decoded as string of utf-8
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    // 持久化获取的配置，以config为key
+    
+    
+    //push the ? into user user-default
+#warning wholeAppConfig 奇怪，为什么不是s2o后的，而是放str???
     [[NSUserDefaults standardUserDefaults] setObject:jsonString forKey:@"config"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -53,6 +62,7 @@
     
     // 判断是否存在
     if (!initUiClass) {
+#warning TODO  改为调用 HybridTools::quickAlertMsg(str)
         NSLog(@"%@ is not found", strUiName);
         return;
     }
@@ -61,6 +71,7 @@
     // 1、设置获取的 UI 类， 遵循 HybridUi 协议。
     HybridUi *hyBridUi = [[HybridUi alloc] init];
     hyBridUi.delegate = initUiClass;
+#warning 上面这个 delegate 有歧义，为什么要这样弄？
     
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
     // NSString *uiMode = (NSString *)uiConfig[@"type"];
@@ -173,6 +184,8 @@
     return jso_string;
 }
 
+
+
 + (JSO *)getAppConfig:(NSString *)key{
     
     NSString *jso_string = [self wholeAppConfig];
@@ -199,6 +212,10 @@
 //    }
 //    return [self wholeAppConfig][key];
 }
+
+
+
+
 
 //+ (HybridUi *) buildHybridUi:(NSString *)name{
 //

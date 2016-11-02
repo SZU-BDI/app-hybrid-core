@@ -100,6 +100,7 @@
     NSURL *url = [request URL];
     if ([_base isCorrectProcotocolScheme:url]) {
         if ([_base isBridgeLoadedURL:url]) {
+					NSLog(@" (OSX) injecting js ");
             [_base injectJavascriptFile];
         } else if ([_base isQueueMessageURL:url]) {
             NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
@@ -133,16 +134,26 @@
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    if (webView != _webView) { return; }
-    
-    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
-    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
-        [strongDelegate webViewDidFinishLoad:webView];
-    }
+	NSLog(@" WebViewJavascriptBridge.webViewDidFinishLoad() ");
+	if (webView != _webView) {
+		NSLog(@" skip: not the same webview?? ");
+		return;
+	}
+
+	__strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+	if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
+											[strongDelegate webViewDidFinishLoad:webView];
+	}
+	NSLog(@" try injecting js ?");
+	[_base injectJavascriptFile];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    if (webView != _webView) { return; }
+	NSLog(@" didFailLoadWithError() %@",error);
+    if (webView != _webView) {
+			return;
+		NSLog(@" skip: not the same webview?? ");
+		}
     
     __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
     if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:didFailLoadWithError:)]) {
@@ -151,24 +162,27 @@
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    if (webView != _webView) { return YES; }
-    NSURL *url = [request URL];
-    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
-    if ([_base isCorrectProcotocolScheme:url]) {
-        if ([_base isBridgeLoadedURL:url]) {
-            [_base injectJavascriptFile];
-        } else if ([_base isQueueMessageURL:url]) {
-            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
-            [_base flushMessageQueue:messageQueueString];
-        } else {
-            [_base logUnkownMessage:url];
-        }
-        return NO;
-    } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
-        return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
-    } else {
-        return YES;
-    }
+	if (webView != _webView) { return YES; }
+	NSURL *url = [request URL];
+	NSLog(@" shouldStartLoadWithRequest= %@ ",url);
+	__strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+	if ([_base isCorrectProcotocolScheme:url]) {
+					if ([_base isBridgeLoadedURL:url]) {
+						NSLog(@" skip injecting js ");
+						//[_base injectJavascriptFile];
+					} else if ([_base isQueueMessageURL:url]) {
+						NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+						[_base flushMessageQueue:messageQueueString];
+					} else {
+						//NSLog(@" logUnkownMessage %@ ",url);
+						[_base logUnkownMessage:url];
+					}
+					return NO;
+	} else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+																	 return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+	} else {
+		return YES;
+	}
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "WebViewJavascriptBridgeBase.h"
-#import "WebViewJavascriptBridge_JS.h"
+//#import "WebViewJavascriptBridge_JS.h"
 
 @implementation WebViewJavascriptBridgeBase {
     id _webViewDelegate;
@@ -111,15 +111,27 @@ static int logMaxLength = 500;
 }
 
 - (void)injectJavascriptFile {
-    NSString *js = WebViewJavascriptBridge_js();
-    [self _evaluateJavascript:js];
-    if (self.startupMessageQueue) {
-        NSArray* queue = self.startupMessageQueue;
-        self.startupMessageQueue = nil;
-        for (id queuedMessage in queue) {
-            [self _dispatchMessage:queuedMessage];
-        }
-    }
+	//TODO 要优化缓存（等下OK再弄)
+
+	//get path of asset (config.json)
+	NSString *filepath = [[NSBundle mainBundle] pathForResource:@"WebViewJavascriptBridge"ofType:@"js"];
+
+	//get the content of the config.json
+	NSData *filedata = [[NSData alloc] initWithContentsOfFile:filepath];
+
+	//decoded as string of utf-8
+	NSString *js = [[NSString alloc] initWithData:filedata encoding:NSUTF8StringEncoding];
+
+	//NSString *js = WebViewJavascriptBridge_js();
+
+	[self _evaluateJavascript:js];
+	if (self.startupMessageQueue) {
+		NSArray* queue = self.startupMessageQueue;
+		self.startupMessageQueue = nil;
+		for (id queuedMessage in queue) {
+			[self _dispatchMessage:queuedMessage];
+		}
+	}
 }
 
 -(BOOL)isCorrectProcotocolScheme:(NSURL*)url {

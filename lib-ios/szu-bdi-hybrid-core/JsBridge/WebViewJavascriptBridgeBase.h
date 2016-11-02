@@ -1,15 +1,12 @@
-//
 //  WebViewJavascriptBridgeBase.h
-//  testproj-ios-core
-//
-//  Created by @LokiMeyburg on 10/15/14.
-//  Copyright (c) 2014 @LokiMeyburg. All rights reserved.
-//
 
 #import <Foundation/Foundation.h>
 
-#define kCustomProtocolScheme @"wvjbscheme"
-#define kQueueHasMessage      @"__WVJB_QUEUE_MESSAGE__"
+//NOTES: should be same as the one in WebViewJavascriptBridge.js
+#define kCustomProtocolScheme @"jsb1"
+#define kQueueHasMessage      @"__QUEUE_MESSAGE__"
+
+//NOTES:  where is the kBridgeLoaded or __BRIDGE_LOADED__ is trigger?
 #define kBridgeLoaded         @"__BRIDGE_LOADED__"
 
 typedef void (^WVJBResponseCallback)(id responseData);

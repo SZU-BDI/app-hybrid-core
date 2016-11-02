@@ -1,5 +1,8 @@
 //NOTES: the comments will be removed
 (function(win,doc,PROTOCOL_SCHEME){
+//var _h=(win.location.href);
+//if(_h=="about:blank")return;
+ 
 	if (win.WebViewJavascriptBridge) {
 		//in case of already init-ed.
 		return;
@@ -63,6 +66,9 @@
 		//TODO to improve the mechanism
 		//reload iframe src to communicate with java
 		msgIfrm.src = PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
+
+                                                 //TMP for IOS patch:
+                                                 return messageQueueString;
 	}
 
 	function _app2js(msg) {
@@ -116,10 +122,6 @@
 			data: data
 		}, cb);
 	}
-	//init msg iframe:
-	msgIfrm = doc.createElement('iframe');
-	msgIfrm.style.display = 'none';
-	doc.documentElement.appendChild(msgIfrm);
 
 	win.WebViewJavascriptBridge = {
 		_fetchQueue: _fetchQueue,
@@ -133,4 +135,9 @@
 		registerHandler: registerHandler,
 		callHandler: callHandler
 	};
+                                                 //init msg iframe:
+                                                 msgIfrm = doc.createElement('iframe');
+                                                 msgIfrm.style.display = 'none';
+                                                 doc.documentElement.appendChild(msgIfrm);
+                                                
 })(window,document,'jsb1');

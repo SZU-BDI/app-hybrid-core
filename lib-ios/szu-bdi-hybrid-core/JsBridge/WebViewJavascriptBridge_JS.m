@@ -17,13 +17,14 @@ NSString * WebViewJavascriptBridge_js() {
 	// BEGIN preprocessorJSCode
 	static NSString * preprocessorJSCode = @__wvjb_js_func__(
 ;(function() {
-	if (window.WebViewJavascriptBridge) {
+    if (window.WebViewJavascriptBridge) {
 		return;
 	}
 	window.WebViewJavascriptBridge = {
 		registerHandler: registerHandler,
 		callHandler: callHandler,
 		_fetchQueue: _fetchQueue,
+        _js2app:_js2app,
 		_app2js: _app2js
 	};
 
@@ -31,8 +32,8 @@ NSString * WebViewJavascriptBridge_js() {
 	var sendMessageQueue = [];
 	var messageHandlers = {};
 	
-	var CUSTOM_PROTOCOL_SCHEME = 'wvjbscheme';
-	var QUEUE_HAS_MESSAGE = '__WVJB_QUEUE_MESSAGE__';
+	var CUSTOM_PROTOCOL_SCHEME = 'jsb1';
+	var QUEUE_HAS_MESSAGE = '__QUEUE_MESSAGE__';
 	
 	var responseCallbacks = {};
 	var uniqueId = 1;
@@ -100,17 +101,20 @@ NSString * WebViewJavascriptBridge_js() {
 	
 	messagingIframe = document.createElement('iframe');
 	messagingIframe.style.display = 'none';
-	messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
+	//messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
 	document.documentElement.appendChild(messagingIframe);
-
-	setTimeout(_callWVJBCallbacks, 1);
-	function _callWVJBCallbacks() {
-		var callbacks = window.WVJBCallbacks;
-		delete window.WVJBCallbacks;
-		for (var i=0; i<callbacks.length; i++) {
-			callbacks[i](WebViewJavascriptBridge);
-		}
-	}
+	
+    //console.log("inside js debug ",window.WVJBCallbacks);
+    //alert("inside js debug "+window.WVJBCallbacks)
+        
+	//setTimeout(_callWVJBCallbacks, 1);
+	//function _callWVJBCallbacks() {
+	//	var callbacks = window.WVJBCallbacks;
+	//	delete window.WVJBCallbacks;
+	//	for (var i=0; i<callbacks.length; i++) {
+	//		callbacks[i](WebViewJavascriptBridge);
+	//	}
+	//}
 })();
 	); // END preprocessorJSCode
 
