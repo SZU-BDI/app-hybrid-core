@@ -6,11 +6,12 @@
 #define kCustomProtocolScheme @"jsb1"
 #define kQueueHasMessage      @"__QUEUE_MESSAGE__"
 
-//NOTES:  where is the kBridgeLoaded or __BRIDGE_LOADED__ is trigger?
-#define kBridgeLoaded         @"__BRIDGE_LOADED__"
+
 
 typedef void (^WVJBResponseCallback)(id responseData);
 typedef void (^WVJBHandler)(id data, WVJBResponseCallback responseCallback);
+
+//TODO change as JSO
 typedef NSDictionary WVJBMessage;
 
 @protocol WebViewJavascriptBridgeBaseDelegate <NSObject>
@@ -18,7 +19,6 @@ typedef NSDictionary WVJBMessage;
 @end
 
 @interface WebViewJavascriptBridgeBase : NSObject
-
 
 @property (assign) id <WebViewJavascriptBridgeBaseDelegate> delegate;
 @property (strong, nonatomic) NSMutableArray* startupMessageQueue;

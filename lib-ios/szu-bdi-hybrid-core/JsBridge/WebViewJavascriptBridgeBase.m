@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "WebViewJavascriptBridgeBase.h"
-//#import "WebViewJavascriptBridge_JS.h"
 
 @implementation WebViewJavascriptBridgeBase {
     id _webViewDelegate;
@@ -122,8 +121,6 @@ static int logMaxLength = 500;
 	//decoded as string of utf-8
 	NSString *js = [[NSString alloc] initWithData:filedata encoding:NSUTF8StringEncoding];
 
-	//NSString *js = WebViewJavascriptBridge_js();
-
 	[self _evaluateJavascript:js];
 	if (self.startupMessageQueue) {
 		NSArray* queue = self.startupMessageQueue;
@@ -151,11 +148,11 @@ static int logMaxLength = 500;
 }
 
 -(BOOL)isBridgeLoadedURL:(NSURL*)url {
-    return ([[url scheme] isEqualToString:kCustomProtocolScheme] && [[url host] isEqualToString:kBridgeLoaded]);
+    return ([[url scheme] isEqualToString:kCustomProtocolScheme]);
 }
 
 -(void)logUnkownMessage:(NSURL*)url {
-    NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command %@://%@", kCustomProtocolScheme, [url path]);
+    NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
 }
 
 -(NSString *)webViewJavascriptCheckCommand {
