@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+
 #import "WebViewJavascriptBridgeBase.h"
 
 @implementation WebViewJavascriptBridgeBase {
@@ -132,7 +133,7 @@ static int logMaxLength = 500;
 }
 
 -(BOOL)isCorrectProcotocolScheme:(NSURL*)url {
-    if([[url scheme] isEqualToString:kCustomProtocolScheme]){
+    if([[url scheme] isEqualToString:S_JSB_PROTOCOL]){
         return YES;
     } else {
         return NO;
@@ -140,7 +141,7 @@ static int logMaxLength = 500;
 }
 
 -(BOOL)isQueueMessageURL:(NSURL*)url {
-    if([[url host] isEqualToString:kQueueHasMessage]){
+    if([[url host] isEqualToString:S_JSB_Q_MSG]){
         return YES;
     } else {
         return NO;
@@ -148,19 +149,19 @@ static int logMaxLength = 500;
 }
 
 -(BOOL)isBridgeLoadedURL:(NSURL*)url {
-    return ([[url scheme] isEqualToString:kCustomProtocolScheme]);
+    return ([[url scheme] isEqualToString:S_JSB_PROTOCOL]);
 }
 
--(void)logUnkownMessage:(NSURL*)url {
-    NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
-}
+//-(void)logUnkownMessage:(NSURL*)url {
+//    NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
+//}
 
 -(NSString *)webViewJavascriptCheckCommand {
     return @"typeof WebViewJavascriptBridge == \'object\';";
 }
 
 -(NSString *)webViewJavascriptFetchQueyCommand {
-    return @"WebViewJavascriptBridge._fetchQueue();";
+    return @"WebViewJavascriptBridge._fetchQueue(true);";
 }
 
 // Private
@@ -184,6 +185,8 @@ static int logMaxLength = 500;
 		//TODO if "" or null change to "null"...
 
     NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", json_string];
+    
+    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
     if ([[NSThread currentThread] isMainThread]) {
         [self _evaluateJavascript:javascriptCommand];
 

@@ -1,10 +1,8 @@
-//NOTES: the comments will be removed
+//NOTES: the comments will be removed when eval()
+//and this file share with iOS/Android JSB
+//and this function is called by the "app" to inject a WebViewJavascriptBridge
 (function(win,doc,PROTOCOL_SCHEME){
-//var _h=(win.location.href);
-//if(_h=="about:blank")return;
- 
 	if (win.WebViewJavascriptBridge) {
-		//in case of already init-ed.
 		return;
 	}
 	//o2s/s2o
@@ -41,12 +39,12 @@
 	var responseCallbacks = {};
 	var msgId = 1;
 
-	//NOTES: can't remove yet, old bridge codes might use it... will remove in future...
+	//NOTES: can't remove yet, old bridge codes might use it... will remove in further future...
 	function init() {
 		console.log('deprecated WebViewJavascriptBridge.init() is called.');
 	}
 
-	function _js2app(msg, cb) {
+	function _js2app(msg, cb){
 		if (cb) {
 			msgId=(msgId + 1) % 1000000;
 			var callbackId = 'cb_' + msgId + '_' + new Date().getTime();
@@ -60,15 +58,17 @@
 		//the __QUEUE_MESSAGE__ is just a what-ever word, @ref to shouldOverrideUrlLoading
 	}
 
-	function _fetchQueue() {
+	function _fetchQueue(directreturn) {
 		var messageQueueString = o2s(send_Q);
 		send_Q = [];
-		//TODO to improve the mechanism
-		//reload iframe src to communicate with java
-		msgIfrm.src = PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
 
-                                                 //TMP for IOS patch:
-                                                 return messageQueueString;
+		if(directreturn){
+            return messageQueueString;
+		}else{
+            //for android...
+            //TODO to improve the mechanism, try using hacking prompt() as phonegap/cordova
+            msgIfrm.src = PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
+		}
 	}
 
 	function _app2js(msg) {
@@ -135,9 +135,9 @@
 		registerHandler: registerHandler,
 		callHandler: callHandler
 	};
-                                                 //init msg iframe:
-                                                 msgIfrm = doc.createElement('iframe');
-                                                 msgIfrm.style.display = 'none';
-                                                 doc.documentElement.appendChild(msgIfrm);
-                                                
+	//init msg iframe:
+	msgIfrm = doc.createElement('iframe');
+	msgIfrm.style.display = 'none';
+	doc.documentElement.appendChild(msgIfrm);
+
 })(window,document,'jsb1');

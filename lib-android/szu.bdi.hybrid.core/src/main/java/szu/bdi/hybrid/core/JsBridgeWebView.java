@@ -16,6 +16,7 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -101,6 +102,27 @@ public class JsBridgeWebView extends WebView {
             });
             return true;
         }
+        //TODO hacking prompt.
+//        @Override
+//        public boolean onJsPrompt(WebView view, String origin, String message, String defaultValue, final JsPromptResult result) {
+//            // Unlike the @JavascriptInterface bridge, this method is always called on the UI thread.
+//            String handledRet = parentEngine.bridge.promptOnJsPrompt(origin, message, defaultValue);
+//            if (handledRet != null) {
+//                result.confirm(handledRet);
+//            } else {
+//                dialogsHelper.showPrompt(message, defaultValue, new CordovaDialogsHelper.Result() {
+//                    @Override
+//                    public void gotResult(boolean success, String value) {
+//                        if (success) {
+//                            result.confirm(value);
+//                        } else {
+//                            result.cancel();
+//                        }
+//                    }
+//                });
+//            }
+//            return true;
+//        }
     }
 
     class MyWebViewClient extends WebViewClient {

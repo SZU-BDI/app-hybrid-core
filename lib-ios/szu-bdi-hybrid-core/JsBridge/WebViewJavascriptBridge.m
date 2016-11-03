@@ -71,42 +71,42 @@
  **********************************/
 #if defined WVJB_PLATFORM_OSX
 
-- (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
-    _webView = webView;
-    
-    _webView.policyDelegate = self;
-    
-    _base = [[WebViewJavascriptBridgeBase alloc] init];
-    _base.delegate = self;
-}
-
-- (void) _platformSpecificDealloc {
-    _webView.policyDelegate = nil;
-}
-
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener
-{
-    if (webView != _webView) { return; }
-    
-    NSURL *url = [request URL];
-    if ([_base isCorrectProcotocolScheme:url]) {
-        if ([_base isBridgeLoadedURL:url]) {
-            NSLog(@" (OSX) injecting js ");
-            [_base injectJavascriptFile];
-        } else if ([_base isQueueMessageURL:url]) {
-            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
-            [_base flushMessageQueue:messageQueueString];
-        } else {
-            [_base logUnkownMessage:url];
-        }
-        [listener ignore];
-    } else if (_webViewDelegate && [_webViewDelegate respondsToSelector:@selector(webView:decidePolicyForNavigationAction:request:frame:decisionListener:)]) {
-        [_webViewDelegate webView:webView decidePolicyForNavigationAction:actionInformation request:request frame:frame decisionListener:listener];
-    } else {
-        [listener use];
-    }
-}
-
+//- (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
+//    _webView = webView;
+//    
+//    _webView.policyDelegate = self;
+//    
+//    _base = [[WebViewJavascriptBridgeBase alloc] init];
+//    _base.delegate = self;
+//}
+//
+//- (void) _platformSpecificDealloc {
+//    _webView.policyDelegate = nil;
+//}
+//
+//- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener
+//{
+//    if (webView != _webView) { return; }
+//    
+//    NSURL *url = [request URL];
+//    if ([_base isCorrectProcotocolScheme:url]) {
+//        if ([_base isBridgeLoadedURL:url]) {
+//            NSLog(@" (OSX) injecting js ");
+//            [_base injectJavascriptFile];
+//        } else if ([_base isQueueMessageURL:url]) {
+//            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+//            [_base flushMessageQueue:messageQueueString];
+//        } else {
+//            [_base logUnkownMessage:url];
+//        }
+//        [listener ignore];
+//    } else if (_webViewDelegate && [_webViewDelegate respondsToSelector:@selector(webView:decidePolicyForNavigationAction:request:frame:decisionListener:)]) {
+//        [_webViewDelegate webView:webView decidePolicyForNavigationAction:actionInformation request:request frame:frame decisionListener:listener];
+//    } else {
+//        [listener use];
+//    }
+//}
+//
 
 
 /* Platform specific internals: iOS
@@ -167,7 +167,8 @@
             [_base flushMessageQueue:messageQueueString];
         } else {
             //NSLog(@" logUnkownMessage %@ ",url);
-            [_base logUnkownMessage:url];
+//            [_base logUnkownMessage:url];
+            NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
         }
         return NO;
     } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {

@@ -2,11 +2,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import "JSO.h"
+
 //NOTES: should be same as the one in WebViewJavascriptBridge.js
-#define kCustomProtocolScheme @"jsb1"
-#define kQueueHasMessage      @"__QUEUE_MESSAGE__"
-
-
+#define S_JSB_PROTOCOL @"jsb1"
+#define S_JSB_Q_MSG      @"__QUEUE_MESSAGE__"
 
 typedef void (^WVJBResponseCallback)(id responseData);
 typedef void (^WVJBHandler)(id data, WVJBResponseCallback responseCallback);
@@ -21,6 +21,7 @@ typedef NSDictionary WVJBMessage;
 @interface WebViewJavascriptBridgeBase : NSObject
 
 @property (assign) id <WebViewJavascriptBridgeBaseDelegate> delegate;
+
 @property (strong, nonatomic) NSMutableArray* startupMessageQueue;
 @property (strong, nonatomic) NSMutableDictionary* responseCallbacks;
 @property (strong, nonatomic) NSMutableDictionary* messageHandlers;
