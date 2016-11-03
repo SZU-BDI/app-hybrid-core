@@ -1,33 +1,45 @@
-//
-//  WebViewJavascriptBridge.h
-//  testproj-ios-core
-//
-//  Created by Marcus Westin on 6/14/13.
-//  Copyright (c) 2013 Marcus Westin. All rights reserved.
-//
+//@ref https://developer.apple.com/reference/webkit/wkwebview?language=objc
+//Starting in iOS 8.0 and OS X 10.10, use WKWebView to add web content to your app. Do not use UIWebView or WebView.
 
 #import <Foundation/Foundation.h>
+
 #import "WebViewJavascriptBridgeBase.h"
 
-//#if defined __MAC_OS_X_VERSION_MAX_ALLOWED
+//#if (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0 || __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_10)
+//
+////move on to the new MKWebView
+//	#import <WebKit/WebKit.h>
+//	#define WVJB_WEBVIEW_TYPE WKWebView
+//	#define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<WKUIDelegate,WKNavigationDelegate>
+//	#define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<WKUIDelegate, WebViewJavascriptBridgeBaseDelegate>
+//#define WEBVIEWUIINTERFACE ()<WKUIDelegate>
+//
+//#elif defined __MAC_OS_X_VERSION_MAX_ALLOWED
+//
+////WARNING OSX not tested, just put here for place holding...
+////for osx...
 //    #import <WebKit/WebKit.h>
-//    #define WVJB_PLATFORM_OSX
 //    #define WVJB_WEBVIEW_TYPE WebView
 //    #define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<WebViewJavascriptBridgeBaseDelegate>
 //    #define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<WebViewJavascriptBridgeBaseDelegate, WebPolicyDelegate>
+//#define WEBVIEWUIINTERFACE ()<WKUIDelegate>
+//
 //#elif defined __IPHONE_OS_VERSION_MAX_ALLOWED
-//    #import <UIKit/UIWebView.h>
-//    #define WVJB_PLATFORM_IOS
-//    #define WVJB_WEBVIEW_TYPE UIWebView
-//    #define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<UIWebViewDelegate>
-//    #define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<UIWebViewDelegate, WebViewJavascriptBridgeBaseDelegate>
+//
+////for older ios
+//	#import <UIKit/UIWebView.h>
+//	#define WVJB_WEBVIEW_TYPE UIWebView
+//	#define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<UIWebViewDelegate>
+//	#define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<UIWebViewDelegate, WebViewJavascriptBridgeBaseDelegate>
+//#define WEBVIEWUIINTERFACE ()<UIWebViewDelegate>
+//
 //#endif
 
-    #import <UIKit/UIWebView.h>
-    #define WVJB_PLATFORM_IOS
-    #define WVJB_WEBVIEW_TYPE UIWebView
-    #define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<UIWebViewDelegate>
-    #define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<UIWebViewDelegate, WebViewJavascriptBridgeBaseDelegate>
+#import <UIKit/UIWebView.h>
+#define WVJB_WEBVIEW_TYPE UIWebView
+#define WVJB_WEBVIEW_DELEGATE_TYPE NSObject<UIWebViewDelegate>
+#define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject<UIWebViewDelegate, WebViewJavascriptBridgeBaseDelegate>
+#define WEBVIEWUIINTERFACE ()<UIWebViewDelegate>
 
 @interface WebViewJavascriptBridge : WVJB_WEBVIEW_DELEGATE_INTERFACE
 
@@ -41,3 +53,5 @@
 - (void)callHandler:(NSString*)handlerName data:(id)data responseCallback:(WVJBResponseCallback)responseCallback;
 - (void)setWebViewDelegate:(WVJB_WEBVIEW_DELEGATE_TYPE*)webViewDelegate;
 @end
+
+

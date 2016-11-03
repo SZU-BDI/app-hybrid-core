@@ -1,10 +1,4 @@
-//
-//  WebViewUi.m
-//  testproj-ios-core
-//
-//  Created by 大数据 on 16/6/13.
-//  Copyright © 2016年 szu.bdi. All rights reserved.
-//
+
 
 #import "WebViewUi.h"
 #import "HybridApi.h"
@@ -12,10 +6,14 @@
 #import "WebViewJavascriptBridge.h"
 #import "JSO.h"
 
-@interface WebViewUi ()<UIWebViewDelegate>
 
-@property (nonatomic, strong) UIWebView *webView;
+@interface WebViewUi WEBVIEWUIINTERFACE
+
+
+@property (nonatomic, strong) WVJB_WEBVIEW_TYPE *webView;
+
 //@property (nonatomic, copy) NSDictionary *callbackData;
+
 @property (nonatomic) BOOL haveTopBar;
 @property (nonatomic, copy) NSString *accessAddress; // 接口链接
 @property (nonatomic, strong) WebViewJavascriptBridge *bridge;
@@ -38,7 +36,7 @@
     
     // initial the webView and add webview in window：
     CGRect rect = [UIScreen mainScreen].bounds;
-    self.webView = [[UIWebView alloc]initWithFrame:rect];
+    self.webView = [[WVJB_WEBVIEW_TYPE alloc]initWithFrame:rect];
     self.webView.backgroundColor = [UIColor whiteColor];
     self.webView.delegate = self;
     
@@ -130,7 +128,7 @@
 //- (void)configWebview{
 //    
 //    CGRect bounds = [[UIScreen mainScreen] bounds];
-//    self.webView = [[UIWebView alloc]initWithFrame:bounds];
+//    self.webView = [[WVJB_WEBVIEW_TYPE alloc]initWithFrame:bounds];
 //    self.webView.backgroundColor = [UIColor whiteColor];
 //    self.webView.delegate = self;
 //    // The page automatically zoom to fit the screen, default NO.
@@ -232,18 +230,19 @@
 //    }
 //}
 
-#pragma mark - UIWebViewDelegate
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
-    
-    return YES;
-}
+#pragma mark - WVJB_WEBVIEW_DELEGATE_TYPE
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView;{
+//- (BOOL)webView:(WVJB_WEBVIEW_TYPE *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+//    
+//    return YES;
+//}
+
+- (void)webViewDidFinishLoad:(WVJB_WEBVIEW_TYPE *)webView;{
     
     NSLog(@"webViewDidFinishLoad ?");
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
+- (void)webView:(WVJB_WEBVIEW_TYPE *)webView didFailLoadWithError:(NSError *)error{
     
     NSLog(@"WebViewUi %@",error);
 }

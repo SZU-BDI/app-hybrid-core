@@ -62,15 +62,77 @@
     _webViewDelegate = nil;
 }
 
-- (NSString*) _evaluateJavascript:(NSString*)javascriptCommand
-{
-    return [_webView stringByEvaluatingJavaScriptFromString:javascriptCommand];
-}
 
-/* Platform specific internals: OSX
- **********************************/
-#if defined WVJB_PLATFORM_OSX
-
+//#if (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0 || __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_10)
+//
+//- (NSString *) _evaluateJavascript: (NSString *) javaScriptString {
+//    //completionHandler: (void (^)(id, NSError *)) completionHandler
+////    [_webView evaluateJavaScript:javaScriptString completionHandler:completionHandler];
+//     [_webView evaluateJavaScript:javaScriptString completionHandler:nil];
+//    return @"";
+//}
+//
+//- (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
+//    _webView = webView;
+//    //    _webView.delegate = self;
+//    _webView.UIDelegate=self;
+//    _base = [[WebViewJavascriptBridgeBase alloc] init];
+//    _base.delegate = self;
+//}
+//
+//- (void) _platformSpecificDealloc {
+//    //    _webView.delegate = nil;
+//    _webView.UIDelegate = nil;
+//}
+//
+//- (void)webViewDidFinishLoad:(WKWebView *)webView {
+//    NSLog(@" WebViewJavascriptBridge.webViewDidFinishLoad() ");
+//    if (webView != _webView) {
+//        NSLog(@" skip: not the same webview?? ");
+//        return;
+//    }
+//    
+//    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
+//        //        [strongDelegate webViewDidFinishLoad:webView];
+//        //[strongDelegate webviewDidf];
+//    }
+//    NSLog(@" injecting js");
+//    [_base injectJavascriptFile];
+//}
+//
+//- (void)webView:(WKWebView *)webView didFailLoadWithError:(NSError *)error {
+//    NSLog(@" didFailLoadWithError() %@",error);
+//    if (webView != _webView) {
+//        NSLog(@" skip: not the same webview?? ");
+//        return;
+//    }
+//    
+//    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:didFailLoadWithError:)]) {
+//        //[strongDelegate webView:webView didFailLoadWithError:error];
+//        [strongDelegate webView:webView didFailNavigation:nil withError:error];
+//    }
+//}
+//
+//- (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation{
+//    //navigationAction.request.URL.host
+//    NSLog(@"WKwebView ... didCommitNavigation ..");
+//}
+//
+//
+//- (void)webViewDidStartLoad:(WKWebView *)webView {
+//    if (webView != _webView) { return; }
+//    
+//    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidStartLoad:)]) {
+//        NSLog(@"WKwebView ... webViewDidStartLoad ..");
+//        //[strongDelegate webViewDidStartLoad:webView];
+//    }
+//}
+//
+//#elif defined __MAC_OS_X_VERSION_MAX_ALLOWED
+//
 //- (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
 //    _webView = webView;
 //    
@@ -107,12 +169,42 @@
 //    }
 //}
 //
+//
+//- (BOOL)webView:(WKWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+//    if (webView != _webView) { return YES; }
+//    NSURL *url = [request URL];
+//    NSLog(@" shouldStartLoadWithRequest= %@ ",url);
+//    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+//    if ([_base isCorrectProcotocolScheme:url]) {
+//        //        if ([_base isBridgeLoadedURL:url]) {
+//        //            NSLog(@" skip injecting js %@ ",url);
+//        //            //[_base injectJavascriptFile];
+//        //        } else
+//        if ([_base isQueueMessageURL:url]) {
+//            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+//            [_base flushMessageQueue:messageQueueString];
+//        } else {
+//            //NSLog(@" logUnkownMessage %@ ",url);
+//            //            [_base logUnkownMessage:url];
+//            NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
+//        }
+//        return NO;
+//    } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+////        return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+////        return [strongDelegate webView:webView didCommitNavigation:navigationType]
+//    } else {
+//        return YES;
+//    }
+//}
+//
+//
+//#elif defined __IPHONE_OS_VERSION_MAX_ALLOWED
 
-
-/* Platform specific internals: iOS
- **********************************/
-#elif defined WVJB_PLATFORM_IOS
-
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED
+- (NSString*) _evaluateJavascript:(NSString*)javascriptCommand
+{
+    return [_webView stringByEvaluatingJavaScriptFromString:javascriptCommand];
+}
 - (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
     _webView = webView;
     _webView.delegate = self;
