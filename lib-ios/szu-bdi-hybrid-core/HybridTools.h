@@ -9,18 +9,27 @@
 #import <Foundation/Foundation.h>
 #import "HybridUi.h"
 #import "HybridApi.h"
+#import "WebViewJavascriptBridgeBase.h"
+@class JSO;
 
 @interface HybridTools : NSObject
 
+@property (nonatomic, strong) JSO *jso;
+
 /**
- *  初始化缓存 AppConfig -> s2o()
+ *  单例，保证再多线程只实例化一次
+ */
++ (id)sharedManager;
+
+/**
+ *  初始化AppConfig
  */
 + (void)initAppConfig;
 
 /**
  *  启动或打开UI
  */
-+ (void)startUi:(NSString *)strUiName strInitParam:(NSDictionary *)strInitParam objCaller:(id<HybridUi>)objCaller;
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(WVJBResponseCallback)callback;
 
 /**
  *  通过api映射出api对应的类
@@ -30,12 +39,6 @@
 /**
  *  取到整个AppConfig
  */
-+ (id)wholeAppConfig;
-
-//+ (HybridUi *) buildHybridUi:(NSString *)name;
-//
-//+ (HybridApi *) buildHybridApi:(NSString *)name;
-//
-//+ (NSDictionary *) fromAppConfigGetApi;
++ (JSO *)wholeAppConfig;
 
 @end

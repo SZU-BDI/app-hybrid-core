@@ -12,108 +12,93 @@
 
 @implementation HybridTools
 
-+ (void)initAppConfig{
-#warning 现在是每次启动都重新缓存
-
-#warning TODO 参考 android ，增加 readFileFromAsset()
++ (id)sharedManager{
     
-    //get path of asset (config.json)
-    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"config"ofType:@"json"];
-    
-    //get the content of the config.json
-    NSData *jsonData = [[NSData alloc] initWithContentsOfFile:configFilePath];
-    
-    //decoded as string of utf-8
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    
-    
-    //push the ? into user user-default
-#warning wholeAppConfig 奇怪，为什么不是s2o后的，而是放str???
-    [[NSUserDefaults standardUserDefaults] setObject:jsonString forKey:@"config"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-//    // 把json数据转换成oc
-//    NSError *error;
-//    NSDictionary *jsonContent = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
-//    // 持久化获取的配置，以config为key
-//    [[NSUserDefaults standardUserDefaults] setObject:jsonContent forKey:@"config"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
+    static HybridTools *sharedHybridTools = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedHybridTools = [[self alloc] init];
+    });
+    return sharedHybridTools;
 }
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(NSDictionary *)strInitParam objCaller:(id<HybridUi>)objCaller{
++ (void)initAppConfig{
+    
+    // readFileFromAsset()
+    NSString *jsonString = [self readFileFromAsset:@"config" ofType:@"json"];
+    JSO *jsonJso = [JSO s2o:jsonString];
+    
+    // 用单例保存为全局变量
+    HybridTools *hybridManager = [self sharedManager];
+    hybridManager.jso = jsonJso;
+}
+
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(WVJBResponseCallback)callback{
     
     // 获取 UI 映射数据
-    // NSDictionary *uiMapping = [self getAppConfig:@"ui_mapping"];
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
     // 获取 UI 的配置文件
-    // NSDictionary *uiConfig = uiMapping[strUiName];
     JSO *jso_uiConfig = [jso_uiMapping getChild:strUiName];
-
+    
     // 动态获取 UI 类:
-    // Class uiClass = NSClassFromString((NSString *)uiConfig[@"class"]);
     JSO *jso_className = [jso_uiConfig getChild:@"class"];
     NSString *className = [JSO o2s:jso_className];
-    Class uiClass = NSClassFromString(className);
-
+    
     // 实例化动态获取的 UI 类:
+    Class uiClass = NSClassFromString(className);
     id <HybridUi> initUiClass = [[uiClass alloc] init];
     
     // 判断是否存在
     if (!initUiClass) {
-#warning TODO  改为调用 HybridTools::quickAlertMsg(str)
-        NSLog(@"%@ is not found", strUiName);
+        [self showAlertMessage:[NSString stringWithFormat:@"%@ is not found", strUiName]];
         return;
     }
     
-    /*---- 若存在则执行以下步骤 ----*/
-    // 1、设置获取的 UI 类， 遵循 HybridUi 协议。
+    /*---- 若存在则执行以下步骤 -----------------
+     1、设置获取的 UI 类， 遵循 HybridUi 协议。*/
     HybridUi *hyBridUi = [[HybridUi alloc] init];
-    hyBridUi.delegate = initUiClass;
-#warning 上面这个 delegate 有歧义，为什么要这样弄？
+    hyBridUi.HybridUiDelegate = initUiClass;
+    //#warning 上面这个 delegate 有歧义，为什么要这样弄？
+#warning 此处的 delegate 就是让要打开的ui 去 遵循hyBridUi的协议，然后下面才能执行协议中的方法
     
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
-    // NSString *uiMode = (NSString *)uiConfig[@"type"];
-    JSO *jso_uiMode = [jso_uiConfig getChild:@"type"];
-    NSString *uiMode = [JSO o2s:jso_uiMode];
-    if (strInitParam[@"type"] != nil) {
-        uiMode = (NSString *)strInitParam[@"type"];
+    NSString *uiMode = [self fastO2S:jso_uiConfig forKey:@"type"];
+    NSString *paramUiMode = [self fastO2S:strInitParam forKey:@"type"];
+    if (![paramUiMode isEqualToString:@""]) {
+        uiMode = paramUiMode;
     }
     
     // 3、获取 UI 的url  *覆盖参数有url* 则覆盖附带的url
-    // NSString *webUrl = (NSString *)uiConfig[@"url"];
-    JSO *jso_webUrl = [jso_uiConfig getChild:@"url"];
-    NSString *webUrl = [JSO o2s:jso_webUrl];
-    if (strInitParam[@"url"] != nil) {
-        webUrl = (NSString *)strInitParam[@"url"];
+    NSString *webUrl = [self fastO2S:jso_uiConfig forKey:@"url"];
+    NSString *paramWebUrl = [self fastO2S:strInitParam forKey:@"address"];
+    if (![paramWebUrl isEqualToString:@""]) {
+        webUrl = paramWebUrl;
     }
     
     // 4、获取 UI 有无topBar *覆盖参数有topBar* 则覆盖附带的topBar
-    // BOOL haveTopBar = ([uiConfig[@"topbar"] isEqualToString:@"Y"])? YES : NO;
-    JSO *jso_haveTopBar = [jso_uiConfig getChild:@"topbar"];
-    BOOL haveTopBar = ([[JSO o2s:jso_haveTopBar] isEqualToString:@"Y"])? YES : NO;
-    if (strInitParam[@"topbar"] != nil) {
-        haveTopBar = ([strInitParam[@"topbar"] isEqualToString:@"Y"])? YES : NO;
+    NSString *topBarStatus = [self fastO2S:jso_uiConfig forKey:@"topbar"];
+    BOOL haveTopBar = ([topBarStatus isEqualToString:@"Y"])? YES : NO;
+    NSString *paramTopBarStatus = [self fastO2S:strInitParam forKey:@"topbar"];
+    if (![paramTopBarStatus isEqualToString:@""]) {
+        haveTopBar = ([paramTopBarStatus isEqualToString:@"Y"])? YES : NO;
     }
     
     // 5、获取 UI topBar 的标题  *覆盖参数有title* 则覆盖附带的title
-    // NSString *title = (NSString *)uiConfig[@"title"];
-    JSO *jso_title = [jso_uiConfig getChild:@"title"];
-    NSString *title = [JSO o2s:jso_title];
-    if (strInitParam[@"title"] != nil) {
-        title = (NSString *)strInitParam[@"title"];
+    NSString *title = [self fastO2S:jso_uiConfig forKey:@"title"];
+    NSString *paramTitle = [self fastO2S:strInitParam forKey:@"title"];
+    if (![paramTitle isEqualToString:@""]) {
+        title = paramTitle;
     }
     
-    // 6、获取覆盖参数中的回调函数
-    if (strInitParam[@"callback"] != nil) {
-        NSLog(@"设置回调函数");
+    // 6、判断是否有回调函数
+    if (callback) {
         // 7、设置回调
-        [hyBridUi setCallback:(WVJBResponseCallback)strInitParam[@"callback"]];
+        [hyBridUi setCallback:callback];
     }
     
-    /*---- 开始设置 ----*/
-    // 若为 WebView 类型，则通过HybridUi协议设置 ui 的 url
+    /*---------------- 开始设置 -----------------
+     若为 WebView 类型，则通过HybridUi协议设置 ui 的 url*/
     if ([uiMode isEqualToString:@"WebView"]) {
         [hyBridUi setWebViewUiUrl:webUrl];
     }
@@ -164,105 +149,96 @@
     if (myApiClassInstance) {
         // NSLog(@"返回api的是：(%@)", myApiClassInstance);
         return myApiClassInstance;
-    }else{
-        NSLog(@"Api: %@ not found", name);
+    }
+    else{
+        [self showAlertMessage:[NSString stringWithFormat:@"Api: %@ not found", name]];
     }
     
     return nil;
 }
 
-+ (NSString *)wholeAppConfig{
++ (JSO *)wholeAppConfig{
     
-//    NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:@"config"]];
-    
-    NSString *jso_string = (NSString *)[[NSUserDefaults standardUserDefaults] objectForKey:@"config"];
-    
-    if (!jso_string){
-        NSLog(@"appConfig not found");
-        return nil;
-    }
-    return jso_string;
+    HybridTools *hybridManager = [self sharedManager];
+    return hybridManager.jso;
 }
-
-
 
 + (JSO *)getAppConfig:(NSString *)key{
     
-    NSString *jso_string = [self wholeAppConfig];
-    
     JSO *jso_value;
-    if (jso_string) {
-       
-        JSO *jso = [JSO s2o:jso_string];
-        JSO *jso_key = [jso getChild:key];
-        NSString *jso_string_value = [JSO o2s:jso_key];
+    
+    JSO *jsonJso = [self wholeAppConfig];
+    if (jsonJso) {
         
-        jso_value = [JSO s2o:jso_string_value];
+        jso_value = [jsonJso getChild:key];
     }
     else{
-        NSLog(@"appConfig (%@) not found", key);
+        [self showAlertMessage:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
         jso_value = nil;
     }
     
     return jso_value;
-    
-//    if (![self wholeAppConfig][key]){
-//        NSLog(@"appConfig (%@) not found", [self wholeAppConfig][key]);
-//        return nil;
-//    }
-//    return [self wholeAppConfig][key];
 }
 
++ (NSString *)fastO2S:(JSO *)jso forKey:(NSString *)key{
+    
+    JSO *jsoValue = [jso getChild:key];
+    NSString *jsonString = [JSO o2s:jsoValue];
+    
+    if ([jsonString isEqualToString:@"null"]){
+        return @"";
+    }
+    
+    return jsonString;
+}
 
++ (NSString *)readFileFromAsset:(NSString *)asset ofType:(NSString *)type{
+    
+    // get path of asset (config.json)
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:asset ofType:type];
+    
+    // get the content of the config.json
+    NSData *jsonData = [[NSData alloc] initWithContentsOfFile:configFilePath];
+    
+    // decoded as string of utf-8
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    return jsonString == nil ? @"":jsonString;
+}
 
++ (void)showAlertMessage:(NSString *)message{
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    [alert show];
+}
 
+/******************************备用*********************************/
++ (void)saveAppConfig{
+    
+    HybridTools *hybridManager = [self sharedManager];
+    NSString *jsonString = [JSO o2s:hybridManager.jso];
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:jsonString forKey:@"appConfig"];
+    [userDefaults synchronize];
+}
 
-//+ (HybridUi *) buildHybridUi:(NSString *)name{
-//
-//    // 利用类的名字，动态获得一个类:
-//    Class myUiClass = NSClassFromString(name);
-//    
-//    // 实例化动态获取的这个类:
-//    id myUiClassInstance = [[myUiClass alloc] init];
-//
-//    // 如果实例化成功，则返回该类的实例
-//    if (myUiClassInstance) {
-//        NSLog(@"返回ui的是：：：%@", myUiClassInstance);
-//        return myUiClassInstance;
-//    }else{
-//        NSLog(@"Ui: %@ not found", name);
-//    }
-//    
-//    return nil;
-//}
-//
-//+ (HybridApi *) buildHybridApi:(NSString *)name{
-//    
-//    Class myApiClass = NSClassFromString(name);
-//    
-//    id myApiClassInstance = [[myApiClass alloc] init];
-//    
-//    if (myApiClassInstance) {
-//        NSLog(@"返回api的是：：：%@", myApiClassInstance);
-//        return myApiClassInstance;
-//    }else{
-//        NSLog(@"Api: %@ not found", name);
-//    }
-//    
-//    return nil;
-//}
-//
-//+ (NSDictionary *) fromAppConfigGetApi{
-//    // 读取配置
-//    NSDictionary *appConfig = [[NSUserDefaults standardUserDefaults] objectForKey:@"config"];
-//    
-//    if (appConfig[@"api_mapping"]) {
-//        NSLog(@"==拿到的api映射 --> %@", appConfig[@"api_mapping"]);
-//        return appConfig[@"api_mapping"];
-//    }else{
-//        NSLog(@"api not found");
-//    }
-//    return nil;
-//}
++ (JSO *)loadAppConfig{
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *jsonString =[userDefaults objectForKey:@"appConfig"];
+    JSO *jsonJso = [JSO s2o:jsonString];
+    
+    return jsonJso;
+}
+
++ (void)saveUserConfig{
+    
+}
+
++ (void)loadUserConfig{
+    
+}
+/******************************备用*********************************/
 
 @end

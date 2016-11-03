@@ -41,10 +41,6 @@
 
 - (void)leftBarItemAction{
     
-    //    if (self.address) {
-    //        _callbackData = [[NSDictionary alloc] initWithObjects:@[self.address] forKeys:@[@"address"]];
-    //    }
-    
     // 判断是被push还是被modal出来的;
     NSArray *viewcontrollers = self.navigationController.viewControllers;
     

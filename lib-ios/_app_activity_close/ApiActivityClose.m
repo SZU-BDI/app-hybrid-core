@@ -18,21 +18,9 @@
     return ^(id data, WVJBResponseCallback responseCallback) {
         NSLog(@"ApiActivityClose()");
         
-        HybridUi *ui = [[HybridUi alloc] init];
-        ui.delegate = self.currentUi;
-        [ui activityClose];
-        
-//        HybridUi *ui = (HybridUi *)self.currentUi;
-//        if (ui.address) {
-//            _callbackData = [[NSDictionary alloc] initWithObjects:@[ui.address] forKeys:@[@"address"]];
-//        }
-//        if (ui.jsCallback) {
-//            ui.jsCallback(_callbackData);
-//        }
-//        if (self.currentUi.navigationController.viewControllers.count > 1){
-//            NSLog(@"colse %@", self.currentUi);
-//            [self.currentUi.navigationController popViewControllerAnimated:YES];
-//        }
+        HybridUi *hybridUi = [[HybridUi alloc] init];
+        hybridUi.HybridUiDelegate = self.currentUi;
+        [hybridUi activityClose];
     };
 }
 

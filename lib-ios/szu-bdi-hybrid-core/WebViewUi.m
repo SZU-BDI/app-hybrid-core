@@ -12,8 +12,6 @@
 
 @property (nonatomic, strong) WVJB_WEBVIEW_TYPE *webView;
 
-//@property (nonatomic, copy) NSDictionary *callbackData;
-
 @property (nonatomic) BOOL haveTopBar;
 @property (nonatomic, copy) NSString *accessAddress; // 接口链接
 @property (nonatomic, strong) WebViewJavascriptBridge *bridge;
@@ -89,30 +87,22 @@
     if (viewcontrollers.count > 1) {
         
         if ([viewcontrollers objectAtIndex:viewcontrollers.count-1] == self){
-            
             //push方式
             [self.navigationController popViewControllerAnimated:YES];
         }
     }
     else{
-        
         // present方式
         [self dismissViewControllerAnimated:YES completion:nil];
     }
     
     if (self.jsCallback) {
         
-        self.jsCallback(@{@"address":@"test url"});
+        //        JSO *jsoValue = [JSO s2o:self.accessAddress];
+        //        [jsoValue setChild:@"address" JSO:jsoValue];
+        NSString *address = [NSString stringWithFormat:@"%@", self.accessAddress];
+        self.jsCallback(@{@"address":address});
     }
-//    if (self.address) {
-//        _callbackData = [[NSDictionary alloc] initWithObjects:@[self.address] forKeys:@[@"address"]];
-//    }
-//    if (self.jsCallback) {
-//        self.jsCallback(_callbackData);
-//    }
-//    if (self.navigationController.viewControllers.count > 1){
-//        [self.navigationController popViewControllerAnimated:YES];
-//    }
 }
 
 - (void)loadAccessAddress{
@@ -124,26 +114,6 @@
         [self LoadTheUrl:self.accessAddress];
     }
 }
-
-//- (void)configWebview{
-//    
-//    CGRect bounds = [[UIScreen mainScreen] bounds];
-//    self.webView = [[WVJB_WEBVIEW_TYPE alloc]initWithFrame:bounds];
-//    self.webView.backgroundColor = [UIColor whiteColor];
-//    self.webView.delegate = self;
-//    // The page automatically zoom to fit the screen, default NO.
-//    self.webView.scalesPageToFit = YES;
-//    // Edges prohibit sliding, default YES.
-//    self.webView.scrollView.bounces = NO;
-//    [self.view addSubview:self.webView];
-//    
-//    if (self.address) {
-//        [self LoadTheUrl:self.address];
-//    }else{
-//        [self LoadLocalhtmlName:@"root"];
-//    }
-//
-//}
 
 - (void)LoadLocalhtmlName:(NSString *)loadLocalhtml{
     NSString* htmlPath = [[NSBundle mainBundle] pathForResource:loadLocalhtml ofType:@"htm"];
@@ -166,22 +136,18 @@
 - (void)registerHandlerApi{
     
     // get the appConfig:
-    // NSDictionary *appConfig = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[HybridTools wholeAppConfig]];
-    NSString *jso_string = [HybridTools wholeAppConfig];
+    JSO *jsonO = [HybridTools wholeAppConfig];
     
     // 获取 Api 映射数据
-    // NSDictionary *apiMapping = [NSDictionary dictionaryWithDictionary:(NSDictionary *)(appConfig[@"api_mapping"])];
-    JSO *jso = [JSO s2o:jso_string];
-    JSO *jso_api_mapping = [jso getChild:@"api_mapping"];
+    JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
     NSString *jso_string_value = [JSO o2s:jso_api_mapping];
     
-    
+#warning 这里需要获取json数据中的所有key --> 把取到的json转为NSDictionary，NSDictionary有个方法是可以读取它其中的所有key
     NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err;
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
                                                         options:NSJSONReadingMutableContainers
                                                           error:&err];
-    
     if (!err) {
         
         // get the apiMapping all keys:
@@ -202,33 +168,8 @@
             // NSLog(@"注册方法 %@" , key);
         }
     }
-    
-//    NSLog(@"88 == %@", jso_string_value);
-//    JSO *apiMapping = [JSO s2o:jso_string_value];
 }
 
-//- (void)registerHandlerApi{
-//    
-//    // get the appConfig:
-//    NSDictionary *appConfig = [HybridTools fromAppConfigGetApi];
-//    
-//    // get the appConfig all keys:
-//    NSArray *appConfigkeys = [appConfig allKeys];
-//    
-//    // Iterate through all the value(The values in the appConfigkeys is key):
-//    for (NSString *key in appConfigkeys) {
-//        
-//        // Get the value through the key:
-//        HybridApi *api = [HybridTools buildHybridApi:appConfig[key]];
-//        
-//        // 把当前控制器（ui）赋值给 api的成员变量
-//        api.currentUi = self;
-//        
-//        // Registered name of key handler:
-//        [self.bridge registerHandler:key handler:[api getHandler]];
-//        NSLog(@"注册方法 %@" , key);
-//    }
-//}
 
 #pragma mark - WVJB_WEBVIEW_DELEGATE_TYPE
 

@@ -6,8 +6,6 @@
 //  Copyright © 2016年 Cmptech. All rights reserved.
 //
 
-//#import <UIKit/UIKit.h>
-//#import "WebViewJavascriptBridge.h"
 #import "WebViewJavascriptBridgeBase.h"
 
 // 协议定义
@@ -30,7 +28,7 @@
 @interface HybridUi : NSObject
 
 // 遵循协议的一个代理变量定义
-@property (nonatomic, weak) id<HybridUi> delegate;
+@property (nonatomic, weak) id<HybridUi> HybridUiDelegate;
 
 - (void)setHaveTopBar:(BOOL)haveTopBar;
 
@@ -43,15 +41,3 @@
 - (void)activityClose;
 
 @end
-
-//@interface HybridUi : UIViewController
-//
-//@property (nonatomic, strong) UINavigationController *topBar;
-//
-//@property (nonatomic, copy) NSString *address;
-//
-//@property (nonatomic, strong) WVJBResponseCallback jsCallback;
-//
-//@property (nonatomic) BOOL isTopBar;
-//
-//@end
