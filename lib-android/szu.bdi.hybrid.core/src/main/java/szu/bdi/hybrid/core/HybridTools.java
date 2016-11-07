@@ -13,6 +13,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -168,6 +169,7 @@ public class HybridTools {
         return return_s;
     }
 
+    //@deprecated, using JSO.s2o()
     public static JSONObject s2o(String s) {
         if (s == null || "".equals(s)) return null;
         try {
@@ -175,10 +177,12 @@ public class HybridTools {
         } catch (Exception ex) {
             Log.v(LOGTAG, "failed to parse json=" + s);
             ex.printStackTrace();
+            //JSONArray
         }
         return null;
     }
 
+    //@deprecated using JSO.o2s() ?
     public static String o2s(JSONObject o) {
         if (o == null) return null;
         return o.toString();

@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
@@ -63,7 +65,7 @@ public class JsBridgeWebView extends WebView {
     final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
     final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
     final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._app2js";
-    final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
+//    final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
     //NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
     Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
@@ -316,9 +318,50 @@ public class JsBridgeWebView extends WebView {
         init(context);
     }
 
-    public JsBridgeWebView(Context context) {
+    class androidjsb {
+
+        @JavascriptInterface
+        public String getVersion(String p1) {
+            return p1;
+        }
+    }
+
+    //@SuppressLint("JavascriptInterface")
+    public JsBridgeWebView(final Context context) {
         super(context);
         init(context);
+        this.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public String js2app(final String callId, String handlerName, final String data_s) {
+
+//                ICallBackFunction responseFunction = new ICallBackFunction() {
+//                    @Override
+//                    public void onCallBack(String data_s) {
+//                        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+//                            loadUrl("alert(" + data_s + ");");
+//                        }
+//                    }
+//                };
+//                ICallBackHandler handler = null;
+//                if (!TextUtils.isEmpty(handlerName)) {
+//                    handler = messageHandlers.get(handlerName);
+//                    //TODO 这里要有个 auth-mapping (whitelist) check?
+//                    if (handler != null) {
+//                        handler.handler(data_s, responseFunction);
+//                    }
+//                }
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                            loadUrl("javascript:setTimeout(function(){alert("
+                                    + JSO.s2o(data_s).toString() + ");},2000);");
+                        }
+                    }
+                });
+                return "TODO";
+            }
+        }, "androidjsb");
     }
 
     private void init(Context context) {
@@ -343,21 +386,21 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    private void _app2js(String handlerName, String data, ICallBackFunction responseCallback) {
-        Jsb1Msg m = new Jsb1Msg();
-        if (!TextUtils.isEmpty(data)) {
-            m.setDataStr(data);
-        }
-        if (responseCallback != null) {
-            String callbackStr = String.format(CALLBACK_ID_FORMAT, ++uniqueId + ("_" + SystemClock.currentThreadTimeMillis()));
-            responseCallbacks.put(callbackStr, responseCallback);
-            m.setCallbackId(callbackStr);
-        }
-        if (!TextUtils.isEmpty(handlerName)) {
-            m.setHandlerName(handlerName);
-        }
-        queueMessage(m);
-    }
+//    private void _app2js(String handlerName, String data, ICallBackFunction responseCallback) {
+//        Jsb1Msg m = new Jsb1Msg();
+//        if (!TextUtils.isEmpty(data)) {
+//            m.setDataStr(data);
+//        }
+//        if (responseCallback != null) {
+//            String callbackStr = String.format(CALLBACK_ID_FORMAT, ++uniqueId + ("_" + SystemClock.currentThreadTimeMillis()));
+//            responseCallbacks.put(callbackStr, responseCallback);
+//            m.setCallbackId(callbackStr);
+//        }
+//        if (!TextUtils.isEmpty(handlerName)) {
+//            m.setHandlerName(handlerName);
+//        }
+//        queueMessage(m);
+//    }
 
     private void queueMessage(Jsb1Msg m) {
         if (startupJsb1Msg != null) {
@@ -458,9 +501,9 @@ public class JsBridgeWebView extends WebView {
     }
 
     //from java call js...
-    public void callHandler(String handlerName, String data_s, ICallBackFunction cb) {
-        _app2js(handlerName, data_s, cb);
-    }
+//    public void callHandler(String handlerName, String data_s, ICallBackFunction cb) {
+//        _app2js(handlerName, data_s, cb);
+//    }
 
     //prototol(java<=>js)
     public static class Jsb1Msg {

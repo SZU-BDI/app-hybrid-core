@@ -15,10 +15,10 @@ public class ApiTestTODO extends HybridApi {
 
                 Log.v("_app_test_todo", dataStr);
 
-                JSONObject data_o = HybridTools.s2o(dataStr);
+                JSO data_o = JSO.s2o(dataStr);
 
                 if (data_o != null) {
-                    String url = data_o.optString("url");
+                    String url = ((JSONObject) data_o.getValue()).optString("url");
                     if (!HybridTools.isEmptyString(url)) {
                         String rt_s = HybridTools.webPost(url, "");
                         Log.v("_app_test_todo", url + " => " + rt_s);
