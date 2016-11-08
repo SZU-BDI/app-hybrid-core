@@ -326,42 +326,49 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    //@SuppressLint("JavascriptInterface")
     public JsBridgeWebView(final Context context) {
         super(context);
         init(context);
-        this.addJavascriptInterface(new Object() {
-            @JavascriptInterface
-            public String js2app(final String callId, String handlerName, final String data_s) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            this.addJavascriptInterface(new Object() {
 
-//                ICallBackFunction responseFunction = new ICallBackFunction() {
-//                    @Override
-//                    public void onCallBack(String data_s) {
-//                        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-//                            loadUrl("alert(" + data_s + ");");
-//                        }
-//                    }
-//                };
-//                ICallBackHandler handler = null;
-//                if (!TextUtils.isEmpty(handlerName)) {
-//                    handler = messageHandlers.get(handlerName);
-//                    //TODO 这里要有个 auth-mapping (whitelist) check?
-//                    if (handler != null) {
-//                        handler.handler(data_s, responseFunction);
-//                    }
-//                }
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-                            loadUrl("javascript:setTimeout(function(){alert("
-                                    + JSO.s2o(data_s).toString() + ");},2000);");
+                @JavascriptInterface
+                public String js2app(final String callId, String handlerName, final String param_s) {
+
+                    final ICallBackFunction responseFunction = new ICallBackFunction() {
+                        @Override
+                        public void onCallBack(final String data_s) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Jsb1Msg responseMsg = new Jsb1Msg();
+                                    responseMsg.setResponseId(callId);
+                                    responseMsg.setResponseData(data_s);
+                                    String s = responseMsg.toJson();
+                                    //quick hack
+                                    if ("".equals(s) || s == null) s = "null";
+                                    Log.v(TAG, "s ==> " + s);
+                                    loadUrl(JAVA_TO_JS + "(" + s + ");");
+                                    //loadUrl("javascript:console.log(o2s("+s+"));");
+                                }
+                            });
                         }
+                    };
+                    final ICallBackHandler handler = messageHandlers.get(handlerName);
+
+                    //TODO 这里要有个 auth-mapping (whitelist) check?
+                    if (handler != null) {
+                        (new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                handler.handler(param_s, responseFunction);
+                            }
+                        })).start();
                     }
-                });
-                return "TODO";
-            }
-        }, "androidjsb");
+                    return callId;
+                }
+            }, "androidjsb");
+        }
     }
 
     private void init(Context context) {
@@ -418,7 +425,7 @@ public class JsBridgeWebView extends WebView {
 
         //NOTES: run the js in the main thread of browser:
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            this.loadUrl(JAVA_TO_JS + "(" + s + ");");
+            loadUrl(JAVA_TO_JS + "(" + s + ");");
         }
     }
 

@@ -17,15 +17,15 @@ public class ApiTestTODO extends HybridApi {
 
                 JSO data_o = JSO.s2o(dataStr);
 
-                if (data_o != null) {
-                    String url = ((JSONObject) data_o.getValue()).optString("url");
-                    if (!HybridTools.isEmptyString(url)) {
-                        String rt_s = HybridTools.webPost(url, "");
-                        Log.v("_app_test_todo", url + " => " + rt_s);
-                        cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
-                        return;
-                    }
-                }
+//                if (data_o != null) {
+//                    String url = ((JSONObject) data_o.getValue()).optString("url");
+//                    if (!HybridTools.isEmptyString(url)) {
+//                        String rt_s = HybridTools.webPost(url, "");
+//                        Log.v("_app_test_todo", url + " => " + rt_s);
+//                        cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
+//                        return;
+//                    }
+//                }
                 cb.onCallBack("{\"STS\":\"TODO\"}");
             }
         };

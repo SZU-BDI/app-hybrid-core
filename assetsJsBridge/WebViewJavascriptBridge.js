@@ -6,28 +6,53 @@
 		return;
 	}
 	//o2s/s2o
-	function o2s(o){
+	//function o2s(o){
+	//	if(null==o)return "null";
+	//	var f=arguments.callee;
+	//	var t=typeof o;
+	//	if('object'==t){if(Array==o.constructor)t='array';else if(RegExp==o.constructor)t='regexp';}
+	//	switch(t){
+	//		case 'undefined':case 'unknown':return;
+	//		case 'function':return !('prototype' in o)?"function(){}":(""+o);break;
+	//		case 'boolean':case 'regexp':return o.toString(); break;
+	//		case 'number':return isFinite(o)?o.toString():'null';break;
+	//		case 'string':return '"'+o.replace(/(\\|\")/g,"\\$1").replace(/\n/g,"\\n").replace(/\r/g,"\\r")+'"';break;
+	//		case 'object':
+	//		case 'array':
+	//			if(o.length===0) return '[]';
+	//			var r=[];
+	//			if(o.length>0){
+	//				for(var i=0;i<o.length;i++){var v=f(o[i]);if (v!==undefined)r.push(v);};return '['+r.join(',')+']';
+	//			}
+	//			var r=[];try{for(var p in o){v=f(o[p]);if(v!==undefined)r.push('"'+p+'":'+v);}}catch(e){};
+	//			return '{'+r.join(',')+'}';break;
+	//	}
+	//};
+	//o2s/s2o//20161109
+	function o2s(o,l){
 		if(null==o)return "null";
-		f=arguments.callee;
-		t=typeof o;
-		if('object'==t){if(Array==o.constructor)t='array';else if(RegExp==o.constructor)t='regexp';}
+		var f=arguments.callee;
+		var t=typeof o;
+		if (!l>0) l=10;
+		if (l<=0) return;
+		if('object'==t){ if(RegExp==o.constructor)t='regexp'; }
 		switch(t){
 			case 'undefined':case 'unknown':return;
-			case 'function':return !('prototype' in o)?"function(){}":(""+o);break;
+			//case 'function':return !('prototype' in o)?"function(){}":(""+o);break;
+			case 'object':
+			case 'array':
+				var r=[];
+				if(o.constructor==Array && o.length>=0){
+					for(var i=0;i<o.length;i++){var v=f(o[i],l-1);if(v!==undefined)r.push(v);};return '['+r.join(',')+']';
+				}
+				try{for(var p in o){v=f(o[p],l-1);if(v!==undefined)r.push('"'+p+'":'+v);}}catch(ex){return ""+ex;};
+				return '{'+r.join(',')+'}';
+				break;
 			case 'boolean':case 'regexp':return o.toString(); break;
 			case 'number':return isFinite(o)?o.toString():'null';break;
-			case 'string':return '"'+o.replace(/(\\|\")/g,"\\$1").replace(/\n/g,"\\n").replace(/\r/g,"\\r")+'"';break;
-			case 'object':var r=[];try{for(var p in o){v=f(o[p]);if(v!==undefined)r.push('"'+p+'":'+v);}}catch(e){};
-				return '{'+r.join(',')+'}';break;
-			case 'array':
-				if(o.length===0) return '[]';
-				var r=[];
-				if(o.length>0){
-					for(var i=0;i<o.length;i++){var v=f(o[i]);if (v!==undefined)r.push(v);};return '['+r.join(',')+']';
-				}
-				else{
-					for(var k in o){var v=f(o[k]);if(v!==undefined)r.push('"'+k+'":'+v);};return '{'+r.join(',')+'}';
-				}
+			default:
+				var s= o.toString?o.toString():(""+o);
+				return '"'+s.replace(/(\\|\")/g,"\\$1").replace(/\n/g,"\\n").replace(/\r/g,"\\r")+'"';break;
 		}
 	};
 	function s2o(s){ try{ return (new Function('return '+s))(); }catch(ex){} };
@@ -47,15 +72,26 @@
 	function _js2app(msg, cb){
 		if (cb) {
 			msgId=(msgId + 1) % 1000000;
-			var callbackId = 'cb_' + msgId + '_' + new Date().getTime();
+			var callTime=new Date().getTime();
+			var callbackId = 'cb_' + msgId + '_' + callTime;
 			responseCallbacks[callbackId] = cb;
 			msg.callbackId = callbackId;
-		}
-		send_Q.push(msg);
 
-		//notify app a msg is Q-ed
-		msgIfrm.src = PROTOCOL_SCHEME + '://__QUEUE_MESSAGE__/';
-		//the __QUEUE_MESSAGE__ is just a what-ever word, @ref to shouldOverrideUrlLoading
+			//TODO clean up by own gc
+			msg.time=callTime;
+		}
+
+		if(androidjsb){
+			//try new way
+			androidjsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
+		}else{
+			//prev ok way
+			send_Q.push(msg);
+
+			//notify app a msg is Q-ed
+			msgIfrm.src = PROTOCOL_SCHEME + '://__QUEUE_MESSAGE__/';
+			//the __QUEUE_MESSAGE__ is just a what-ever word, @ref to shouldOverrideUrlLoading
+		}
 	}
 
 	function _fetchQueue(directreturn) {
@@ -63,21 +99,22 @@
 		send_Q = [];
 
 		if(directreturn){
-            return messageQueueString;
+			return messageQueueString;
 		}else{
-            //for android...
-            //TODO to improve the mechanism, try using hacking prompt() as phonegap/cordova
-            msgIfrm.src = PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
+			//for android...
+			//TODO to improve the mechanism, try using hacking prompt() as phonegap/cordova
+			msgIfrm.src = PROTOCOL_SCHEME + '://return/_fetchQueue/' + encodeURIComponent(messageQueueString);
 		}
 	}
 
 	function _app2js(msg) {
+		//console.log("msg.responseId="+msg.responseId);
 		setTimeout(function(){
-			//console.log("_app2js", msg);
 			var callback=null;
 			//java call finished, now need to call js callback function
 			if (msg.responseId) {
 				callback = responseCallbacks[msg.responseId];
+		        //console.log("callback="+o2s(callback));
 				if (!callback) {
 					return;
 				}
