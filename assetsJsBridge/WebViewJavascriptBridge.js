@@ -80,10 +80,10 @@
 			//TODO clean up by own gc
 			msg.time=callTime;
 		}
-
-		if(androidjsb){
+        //alert(typeof nativejsb);
+		if("undefined"!=typeof nativejsb){
 			//try new way
-			androidjsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
+			nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
 		}else{
 			//prev ok way
 			send_Q.push(msg);

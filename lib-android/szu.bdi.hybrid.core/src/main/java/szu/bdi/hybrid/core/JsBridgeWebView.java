@@ -330,10 +330,11 @@ public class JsBridgeWebView extends WebView {
         super(context);
         init(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            //try this new way
             this.addJavascriptInterface(new Object() {
 
                 @JavascriptInterface
-                public String js2app(final String callId, String handlerName, final String param_s) {
+                public String js2app(final String callBackId, String handlerName, final String param_s) {
 
                     final ICallBackFunction responseFunction = new ICallBackFunction() {
                         @Override
@@ -342,7 +343,7 @@ public class JsBridgeWebView extends WebView {
                                 @Override
                                 public void run() {
                                     Jsb1Msg responseMsg = new Jsb1Msg();
-                                    responseMsg.setResponseId(callId);
+                                    responseMsg.setResponseId(callBackId);
                                     responseMsg.setResponseData(data_s);
                                     String s = responseMsg.toJson();
                                     //quick hack
@@ -365,9 +366,9 @@ public class JsBridgeWebView extends WebView {
                             }
                         })).start();
                     }
-                    return callId;
+                    return callBackId;
                 }
-            }, "androidjsb");
+            }, "nativejsb");
         }
     }
 

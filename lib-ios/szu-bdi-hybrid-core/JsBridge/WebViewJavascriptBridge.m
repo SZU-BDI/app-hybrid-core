@@ -2,6 +2,64 @@
 
 #import "WebViewJavascriptBridge.h"
 
+@interface WebScriptObject: NSObject
+@end
+
+@interface WebView
+- (WebScriptObject *)windowScriptObject;
+@end
+
+@interface WebScriptBridge: NSObject
+//- (void)someEvent: (uint64_t)foo :(NSString *)bar;
+- (NSString *)js2app;
++ (BOOL)isKeyExcludedFromWebScript:(const char *)name;
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector;
++ (WebScriptBridge*)getWebScriptBridge;
+@end
+
+static WebScriptBridge *gWebScriptBridge = nil;
+
+@implementation WebScriptBridge
+
+-(NSString *) js2app {
+    NSLog(@"TODO js2app!!!!!");
+    return @"TODO_js2app";
+}
+
++ (BOOL)isKeyExcludedFromWebScript:(const char *)name;
+{
+    return NO;
+}
+
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector;
+{
+    return NO;
+}
+
++ (NSString *)webScriptNameForSelector:(SEL)sel
+{
+    // Naming rules can be found at: https://developer.apple.com/library/mac/documentation/Cocoa/Reference/WebKit/Protocols/WebScripting_Protocol/Reference/Reference.html
+    if (sel == @selector(js2app)) return @"js2app";
+    //if (sel == @selector(someEvent::)) return @"someEvent";
+    
+    return nil;
+}
+
+//+ (BasicAddressBook *)addressBook;
+//- (NSString *)js2app:(NSString *) callBackId handlerName:(NSString *)handlerName param_s:(NSString *)param_s;
++ (WebScriptBridge*)getWebScriptBridge {
+    if (gWebScriptBridge == nil)
+        gWebScriptBridge = [WebScriptBridge new];
+    
+    return gWebScriptBridge;
+}
+@end
+
+
+@interface UIWebDocumentView: UIView
+- (WebView *)webView;
+@end
+
 #if __has_feature(objc_arc_weak)
 #define WVJB_WEAK __weak
 #else
@@ -229,6 +287,14 @@
     }
     NSLog(@" injecting js");
     [_base injectJavascriptFile];
+
+    //NOTES: failed for the windowScriptObject is for macOS only...
+    //TODO change to wkwebview later for better performance
+//    //[webView windowScriptObject];
+//    //[win setValue:littleBlackBook forKey:@"AddressBook"];
+//    UIWebDocumentView *documentView = (UIWebDocumentView *)_webView;
+//    WebScriptObject *wso = documentView.webView.windowScriptObject;
+//    [wso setValue:[WebScriptBridge getWebScriptBridge] forKey:@"nativejsb"];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
@@ -243,6 +309,11 @@
         [strongDelegate webView:webView didFailLoadWithError:error];
     }
 }
+
+// TODO wanjo
+//https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/ObjCFromJavaScript.html
+//http://stackoverflow.com/questions/9473582/ios-javascript-bridge
+//其实 也可以暴露一个 nativejsb 到 window.nativejsb 的！  注意回调时放回 UI线程
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     if (webView != _webView) { return YES; }
