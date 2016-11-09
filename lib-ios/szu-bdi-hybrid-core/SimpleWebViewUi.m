@@ -1,11 +1,11 @@
 #import "SimpleWebViewUi.h"
 #import "HybridApi.h"
 #import "HybridTools.h"
-//#import "WebViewJavascriptBridge.h"
 #import "JSO.h"
 
-@interface SimpleWebViewUi ()<UIWebViewDelegate>
+//@interface SimpleWebViewUi() <UIWebViewDelegate>
 
+@interface SimpleWebViewUi()
 
 //@property (nonatomic, strong) UIWebView *webView;
 
@@ -247,8 +247,7 @@
     // 获取 Api 映射数据
     JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
     NSString *jso_string_value = [JSO o2s:jso_api_mapping];
-    
-#warning use JSO
+
     JSO *jso = [JSO s2o:jso_string_value];
     NSLog(@"TODO registerHandlerApi %@", [jso getChildKeys]);
     
@@ -316,8 +315,8 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
     [self.webView loadRequest:request];
 }
-- (void)dealloc{
-    NSLog(@"WebViewUi dealloc");
-}
+//- (void)dealloc{
+//    NSLog(@"WebViewUi dealloc");
+//}
 
 @end

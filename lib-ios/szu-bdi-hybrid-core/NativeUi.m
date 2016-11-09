@@ -1,14 +1,6 @@
-//
-//  NativeUi.m
-//  testproj-ios-core
-//
-//  Created by 大数据 on 16/6/13.
-//  Copyright © 2016年 szu.bdi. All rights reserved.
-//
-
 #import "NativeUi.h"
 
-@interface NativeUi ()
+@interface NativeUi()
 @property (nonatomic) BOOL haveTopBar;
 @property (nonatomic, strong) HybridCallback jsCallback;
 @end
