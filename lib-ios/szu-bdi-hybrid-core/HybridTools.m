@@ -52,7 +52,7 @@
         [self showAlertMessage:[NSString stringWithFormat:@"%@ is not found", strUiName]];
         return;
     }
-    
+
     /*---- 若存在则执行以下步骤 -----------------
      1、设置获取的 UI 类， 遵循 HybridUi 协议。*/
     HybridUi *hyBridUi = [[HybridUi alloc] init];

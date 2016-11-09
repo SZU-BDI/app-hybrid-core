@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "HybridUi.h"
 #import "HybridApi.h"
-#import "WebViewJavascriptBridgeBase.h"
+//#import "WebViewJavascriptBridgeBase.h"
 @class JSO;
 #ifndef HybridTools_h
 #define HybridTools_h

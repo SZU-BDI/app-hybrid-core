@@ -12,22 +12,22 @@
 
 - (void)setHaveTopBar:(BOOL)haveTopBar{
     
-    [self.HybridUiDelegate getHaveTopBar:haveTopBar];
+    [self.HybridUiDelegate setHaveTopBar:haveTopBar];
 }
 
 - (void)setTopBarTitle:(NSString *)title{
     
-    [self.HybridUiDelegate getTopBarTitle:title];
+    [self.HybridUiDelegate setTopBarTitle:title];
 }
 
 - (void)setWebViewUiUrl:(NSString *)url{
     
-    [self.HybridUiDelegate getWebViewUiUrl:url];
+    [self.HybridUiDelegate setWebViewUiUrl:url];
 }
 
 - (void)setCallback:(HybridCallback)callback{
     
-    [self.HybridUiDelegate getCallback:callback];
+    [self.HybridUiDelegate setCallback:callback];
 }
 
 - (void)activityClose{
