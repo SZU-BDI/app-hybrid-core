@@ -432,7 +432,7 @@ public class HybridTools {
         return _found;
     }
 
-    public static void bindWebViewApi(JsBridgeWebView wv, final HybridUi callerAct) {
+    public static void bindWebViewApi(HybridWebViewBase wv, final HybridUi callerAct) {
         String name = optString(callerAct.getUiData("name"));
         if (isEmptyString(name)) {
             quickShowMsgMain("ConfigError: caller act name empty?");
