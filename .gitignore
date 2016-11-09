@@ -5,3 +5,4 @@ build
 backup/
 *.apk
 */.DS_Store
+*.tmp/

@@ -1,39 +1,37 @@
-//
-//  HybridTools.m
-//  testproj-ios-core
-//
-//  Created by 双虎 on 16/6/2.
-//  Copyright © 2016年 Cmptech. All rights reserved.
-//
+#import <UIKit/UIKit.h>
 
 #import "HybridTools.h"
-#import "AppDelegate.h"
+
+//github/szu-bdi/lib-ios-jso
 #import "JSO.h"
 
 @implementation HybridTools
 
-+ (id)sharedManager{
++ (id)getSingleton{
     
-    static HybridTools *sharedHybridTools = nil;
+    static HybridTools *_sharedHybridTools = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedHybridTools = [[self alloc] init];
+        _sharedHybridTools = [[self alloc] init];
     });
-    return sharedHybridTools;
+    return _sharedHybridTools;
 }
 
-+ (void)initAppConfig{
++ (void)checkAppConfig{
     
-    // readFileFromAsset()
-    NSString *jsonString = [self readFileFromAsset:@"config" ofType:@"json"];
-    JSO *jsonJso = [JSO s2o:jsonString];
-    
-    // 用单例保存为全局变量
-    HybridTools *hybridManager = [self sharedManager];
-    hybridManager.jso = jsonJso;
+    HybridTools *hybridManager = [self getSingleton];
+    if(nil==hybridManager.jso){
+        
+        // readFileFromAsset()
+        NSString *jsonString = [self readFileFromAsset:@"config" ofType:@"json"];
+        
+        JSO *jsonJso = [JSO s2o:jsonString];
+        hybridManager.jso = jsonJso;
+    }
 }
 
 + (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(WVJBResponseCallback)callback{
+    [self checkAppConfig];
     
     // 获取 UI 映射数据
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
@@ -116,15 +114,16 @@
     // 调用者为nil 则表示是启动
     if (objCaller == nil) {
         
-        AppDelegate *delegate = [UIApplication sharedApplication].delegate;
+        id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
+        
         if ([initUiClass isKindOfClass:[UITabBarController class]]) {
             // 若为 UI 为 UITabBarController类型 则直接作为根视图
-            delegate.window.rootViewController = (UIViewController *)initUiClass;
+            ddd.window.rootViewController = (UIViewController *)initUiClass;
         }
         else{
             // 否则，添加导航栏后，作为根视图
             UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:(UIViewController *)initUiClass];
-            delegate.window.rootViewController = nav;
+            ddd.window.rootViewController = nav;
         }
     }
     else{
@@ -159,7 +158,7 @@
 
 + (JSO *)wholeAppConfig{
     
-    HybridTools *hybridManager = [self sharedManager];
+    HybridTools *hybridManager = [self getSingleton];
     return hybridManager.jso;
 }
 
@@ -215,7 +214,7 @@
 /******************************备用*********************************/
 + (void)saveAppConfig{
     
-    HybridTools *hybridManager = [self sharedManager];
+    HybridTools *hybridManager = [self getSingleton];
     NSString *jsonString = [JSO o2s:hybridManager.jso];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
