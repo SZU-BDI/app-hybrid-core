@@ -1,4 +1,9 @@
 //  WebViewJavascriptBridgeBase.h
+#import "Hybrid.h"
+
+#ifndef WebViewJavascriptBridgeBase_h
+
+#define WebViewJavascriptBridgeBase_h
 
 #import <Foundation/Foundation.h>
 
@@ -8,11 +13,10 @@
 #define S_JSB_PROTOCOL @"jsb1"
 #define S_JSB_Q_MSG      @"__QUEUE_MESSAGE__"
 
-typedef void (^WVJBResponseCallback)(id responseData);
-typedef void (^WVJBHandler)(id data, WVJBResponseCallback responseCallback);
-
 #warning TODO change as JSO
 typedef NSDictionary WVJBMessage;
+
+#endif
 
 
 @protocol WebViewJavascriptBridgeBaseDelegate <NSObject>
