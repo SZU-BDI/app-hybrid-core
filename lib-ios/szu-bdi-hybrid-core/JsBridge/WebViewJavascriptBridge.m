@@ -90,7 +90,7 @@ static WebScriptBridge *gWebScriptBridge = nil;
     [self send:data responseCallback:nil];
 }
 
-- (void)send:(id)data responseCallback:(WVJBResponseCallback)responseCallback {
+- (void)send:(id)data responseCallback:(HybridCallback)responseCallback {
     [_base sendData:data responseCallback:responseCallback handlerName:nil];
 }
 
@@ -102,7 +102,7 @@ static WebScriptBridge *gWebScriptBridge = nil;
     [self callHandler:handlerName data:data responseCallback:nil];
 }
 
-- (void)callHandler:(NSString *)handlerName data:(id)data responseCallback:(WVJBResponseCallback)responseCallback {
+- (void)callHandler:(NSString *)handlerName data:(id)data responseCallback:(HybridCallback)responseCallback {
     [_base sendData:data responseCallback:responseCallback handlerName:handlerName];
 }
 

@@ -30,7 +30,7 @@
     }
 }
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(WVJBResponseCallback)callback{
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(HybridCallback)callback{
     [self checkAppConfig];
     
     // 获取 UI 映射数据

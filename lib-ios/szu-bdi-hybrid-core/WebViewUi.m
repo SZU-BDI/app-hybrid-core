@@ -15,7 +15,7 @@
 @property (nonatomic) BOOL haveTopBar;
 @property (nonatomic, copy) NSString *accessAddress; // 接口链接
 @property (nonatomic, strong) WebViewJavascriptBridge *bridge;
-@property (nonatomic, strong) WVJBResponseCallback jsCallback;
+@property (nonatomic, strong) HybridCallback jsCallback;
 
 @end
 
@@ -208,7 +208,7 @@
     _accessAddress = url;
 }
 
-- (void)getCallback:(WVJBResponseCallback)callback{
+- (void)getCallback:(HybridCallback)callback{
     _jsCallback = callback;
 }
 

@@ -10,7 +10,7 @@
 
 @interface NativeUi ()
 @property (nonatomic) BOOL haveTopBar;
-@property (nonatomic, strong) WVJBResponseCallback jsCallback;
+@property (nonatomic, strong) HybridCallback jsCallback;
 @end
 
 @implementation NativeUi
@@ -79,7 +79,7 @@
     self.title = title;
 }
 
-- (void)getCallback:(WVJBResponseCallback)callback{
+- (void)getCallback:(HybridCallback)callback{
     _jsCallback = callback;
 }
 

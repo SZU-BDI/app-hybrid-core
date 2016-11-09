@@ -23,7 +23,7 @@
 
 + (HybridApi *)getHybridApi:(NSString *)name;
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id)objCaller callback:(WVJBResponseCallback)callback;
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id)objCaller callback:(HybridCallback)callback;
 
 + (JSO *)wholeAppConfig;
 

@@ -35,7 +35,7 @@ static int logMaxLength = 500;
     _uniqueId = 0;
 }
 
-- (void)sendData:(id)data responseCallback:(WVJBResponseCallback)responseCallback handlerName:(NSString*)handlerName {
+- (void)sendData:(id)data responseCallback:(HybridCallback)responseCallback handlerName:(NSString*)handlerName {
     NSMutableDictionary* message = [NSMutableDictionary dictionary];
     
     if (data) {
@@ -70,11 +70,11 @@ static int logMaxLength = 500;
         
         NSString* responseId = message[@"responseId"];
         if (responseId) {
-            WVJBResponseCallback responseCallback = _responseCallbacks[responseId];
+            HybridCallback responseCallback = _responseCallbacks[responseId];
             responseCallback(message[@"responseData"]);
             [self.responseCallbacks removeObjectForKey:responseId];
         } else {
-            WVJBResponseCallback responseCallback = NULL;
+            HybridCallback responseCallback = NULL;
             NSString* callbackId = message[@"callbackId"];
             if (callbackId) {
                 responseCallback = ^(id responseData) {

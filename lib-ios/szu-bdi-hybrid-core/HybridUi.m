@@ -25,7 +25,7 @@
     [self.HybridUiDelegate getWebViewUiUrl:url];
 }
 
-- (void)setCallback:(WVJBResponseCallback)callback{
+- (void)setCallback:(HybridCallback)callback{
     
     [self.HybridUiDelegate getCallback:callback];
 }

@@ -50,7 +50,7 @@
 - (void)registerHandler:(NSString*)handlerName handler:(WVJBHandler)handler;
 - (void)callHandler:(NSString*)handlerName;
 - (void)callHandler:(NSString*)handlerName data:(id)data;
-- (void)callHandler:(NSString*)handlerName data:(id)data responseCallback:(WVJBResponseCallback)responseCallback;
+- (void)callHandler:(NSString*)handlerName data:(id)data responseCallback:(HybridCallback)responseCallback;
 - (void)setWebViewDelegate:(WVJB_WEBVIEW_DELEGATE_TYPE*)webViewDelegate;
 @end
 

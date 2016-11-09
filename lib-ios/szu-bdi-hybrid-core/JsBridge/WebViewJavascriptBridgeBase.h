@@ -41,7 +41,7 @@ typedef NSDictionary WVJBMessage;
 
 - (void)reset;
 
-- (void)sendData:(id)data responseCallback:(WVJBResponseCallback)responseCallback handlerName:(NSString*)handlerName;
+- (void)sendData:(id)data responseCallback:(HybridCallback)responseCallback handlerName:(NSString*)handlerName;
 
 - (void)flushMessageQueue:(NSString *)messageQueueString;
 

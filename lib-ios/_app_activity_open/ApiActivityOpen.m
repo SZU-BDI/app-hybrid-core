@@ -17,7 +17,7 @@
 @implementation ApiActivityOpen
 
 - (WVJBHandler) getHandler{
-    return ^(id data, WVJBResponseCallback responseCallback) {
+    return ^(id data, HybridCallback responseCallback) {
         NSLog(@"ApiActivityOpen()");
         
         // JSON String -> JSO

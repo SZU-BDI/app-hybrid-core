@@ -15,7 +15,7 @@
 @implementation ApiActivityClose
 
 - (WVJBHandler) getHandler{
-    return ^(id data, WVJBResponseCallback responseCallback) {
+    return ^(id data, HybridCallback responseCallback) {
         NSLog(@"ApiActivityClose()");
         
         HybridUi *hybridUi = [[HybridUi alloc] init];

@@ -19,7 +19,7 @@
 
 - (void)getWebViewUiUrl:(NSString *)url;
 
-- (void)getCallback:(WVJBResponseCallback)callback;
+- (void)getCallback:(HybridCallback)callback;
 
 - (void)closeActivity;
 
@@ -36,7 +36,7 @@
 
 - (void)setWebViewUiUrl:(NSString *)url;
 
-- (void)setCallback:(WVJBResponseCallback)callback;
+- (void)setCallback:(HybridCallback)callback;
 
 - (void)activityClose;
 
