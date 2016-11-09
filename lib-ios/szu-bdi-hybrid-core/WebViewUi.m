@@ -142,7 +142,7 @@
     JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
     NSString *jso_string_value = [JSO o2s:jso_api_mapping];
     
-#warning 这里需要获取json数据中的所有key --> 把取到的json转为NSDictionary，NSDictionary有个方法是可以读取它其中的所有key
+#warning use JSO
     NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err;
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData

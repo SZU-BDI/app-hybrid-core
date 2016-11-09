@@ -47,7 +47,7 @@
 + (void)enableLogging;
 + (void)setLogMaxLength:(int)length;
 
-- (void)registerHandler:(NSString*)handlerName handler:(WVJBHandler)handler;
+- (void)registerHandler:(NSString*)handlerName handler:(HybridHandler)handler;
 - (void)callHandler:(NSString*)handlerName;
 - (void)callHandler:(NSString*)handlerName data:(id)data;
 - (void)callHandler:(NSString*)handlerName data:(id)data responseCallback:(HybridCallback)responseCallback;

@@ -14,7 +14,7 @@
 
 @implementation ApiActivityClose
 
-- (WVJBHandler) getHandler{
+- (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {
         NSLog(@"ApiActivityClose()");
         

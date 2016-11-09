@@ -91,7 +91,7 @@ static int logMaxLength = 500;
                 };
             }
             
-            WVJBHandler handler = self.messageHandlers[message[@"handlerName"]];
+            HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
             
             if (!handler) {
                 NSLog(@"WVJBNoHandlerException, No handler for message from JS: %@", message);

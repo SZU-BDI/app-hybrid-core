@@ -10,7 +10,7 @@
 
 typedef void (^HybridCallback)(id responseData);
 
-typedef void (^WVJBHandler)(id data, HybridCallback responseCallback);
+typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
 #endif /* Hybrid_h */
 

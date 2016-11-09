@@ -10,7 +10,7 @@
 
 @implementation HybridApi
 
-- (WVJBHandler) getHandler{
+- (HybridHandler) getHandler{
     // 父类的方法，不实现，由子类实现
     return nil;
 }

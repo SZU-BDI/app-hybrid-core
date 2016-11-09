@@ -57,8 +57,7 @@
      1、设置获取的 UI 类， 遵循 HybridUi 协议。*/
     HybridUi *hyBridUi = [[HybridUi alloc] init];
     hyBridUi.HybridUiDelegate = initUiClass;
-    //#warning 上面这个 delegate 有歧义，为什么要这样弄？
-#warning 此处的 delegate 就是让要打开的ui 去 遵循hyBridUi的协议，然后下面才能执行协议中的方法
+    
     
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
     NSString *uiMode = [self fastO2S:jso_uiConfig forKey:@"type"];

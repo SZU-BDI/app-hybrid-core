@@ -6,7 +6,7 @@
 @interface HybridApi : NSObject
 
 //get callback handler
-- (WVJBHandler) getHandler;
+- (HybridHandler) getHandler;
 
 @property (nonatomic, weak) id<HybridUi> currentUi;
 

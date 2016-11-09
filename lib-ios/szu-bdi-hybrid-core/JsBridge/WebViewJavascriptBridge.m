@@ -106,7 +106,7 @@ static WebScriptBridge *gWebScriptBridge = nil;
     [_base sendData:data responseCallback:responseCallback handlerName:handlerName];
 }
 
-- (void)registerHandler:(NSString *)handlerName handler:(WVJBHandler)handler {
+- (void)registerHandler:(NSString *)handlerName handler:(HybridHandler)handler {
     _base.messageHandlers[handlerName] = [handler copy];
 }
 

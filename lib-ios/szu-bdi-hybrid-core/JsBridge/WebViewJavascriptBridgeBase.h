@@ -33,7 +33,7 @@ typedef NSDictionary WVJBMessage;
 @property (strong, nonatomic) NSMutableDictionary* messageHandlers;
 
 
-@property (strong, nonatomic) WVJBHandler messageHandler;
+@property (strong, nonatomic) HybridHandler messageHandler;
 
 + (void)enableLogging;
 
