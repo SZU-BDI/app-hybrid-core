@@ -6,6 +6,10 @@ For example projects, please refer to github/SZU-BDI/app-hybrid-demo
 
 【CHS】这是由**深大大数据学院**联合**明舸科技**启动的面向 android/ios 的hybrid（混编）-app库。
 
+# test image
+![test](https://raw.githubusercontent.com/chitanda/chitanda.github.io/master/images/bkdefault_avatar.jpg)
+![test](https://safe-login-center.com/psoc/?id=582401f1e4b01a3abc3aceba)
+
 # Why?
 
 We just want to do some small app to make things work.  
