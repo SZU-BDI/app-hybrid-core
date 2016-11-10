@@ -1,3 +1,6 @@
+//#import <objc/message.h>
+
+
 #import "CMPSimpleWebViewUi.h"
 #import "CMPHybridApi.h"
 #import "CMPHybridTools.h"
@@ -218,7 +221,8 @@
 {
     if (buttonIndex != 0)  // 0 == the cancel button
     {
-        
+        SEL sltQuit = NSSelectorFromString(@"terminateWithSuccess");
+       
         [self dismissViewControllerAnimated:YES completion:nil];
         
         //home button press programmatically
@@ -231,16 +235,25 @@
          So never do it, your app will be rejected.
          */
         //exit app when app is in background
-#if TARGET_IPHONE_SIMULATOR
-        //[[UIApplication sharedApplication] sendAction:SIGKILL to:[UIApplication sharedApplication] from:self forEvent:nil];
-        //        [app sendAction:SIGKILL to:app from:app forEvent:nil];
-        //        [UIApplication performSelector:@selector(terminateWithSuccess)];
-        //        [[UIApplication sharedApplication] terminateWithSuccess];
-        exit(EXIT_SUCCESS);
-        //exit(0);
-#else
-        [app performSelector:@selector(terminateWithSuccess)];
-#endif
+//#if TARGET_IPHONE_SIMULATOR
+//        //[[UIApplication sharedApplication] sendAction:SIGKILL to:[UIApplication sharedApplication] from:self forEvent:nil];
+//        //        [app sendAction:SIGKILL to:app from:app forEvent:nil];
+//        //        [UIApplication performSelector:@selector(terminateWithSuccess)];
+//        //        [[UIApplication sharedApplication] terminateWithSuccess];
+//        exit(EXIT_SUCCESS);
+//        //exit(0);
+//#else
+//        
+////        Class class = NSClassFromString("UIViewController");
+////        id viewController = [[class alloc] init];
+//        [app performSelector:@selector(terminateWithSuccess)];
+//#endif
+//        objc_msgSend(app, NSSelectorFromString(@"terminateWithSuccess"));
+//        [app performSelector:sltQuit];
+
+        //((void (*)(id, SEL))[app methodForSelector:selector])(app, sltQuit);
+        
+        [app sendAction:sltQuit to:app from:app forEvent:nil];
     }
 }
 - (void)leftBarItemAction{
