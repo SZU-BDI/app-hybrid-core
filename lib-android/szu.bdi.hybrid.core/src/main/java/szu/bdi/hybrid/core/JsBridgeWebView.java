@@ -4,21 +4,16 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -54,7 +49,7 @@ import java.util.Map;
  */
 
 @SuppressLint("SetJavaScriptEnabled")
-public class JsBridgeWebView extends HybridWebViewBase {
+public class JsBridgeWebView extends HybridWebView {
 
     private final String TAG = "JsBridgeWebView";
 

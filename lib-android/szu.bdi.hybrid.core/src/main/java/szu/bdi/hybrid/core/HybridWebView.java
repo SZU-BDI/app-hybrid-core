@@ -4,16 +4,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 
-public class HybridWebViewBase extends WebView {
-    public HybridWebViewBase(final Context context) {
+public class HybridWebView extends WebView {
+    public HybridWebView(final Context context) {
         super(context);
     }
 
-    public HybridWebViewBase(Context context, AttributeSet attrs) {
+    public HybridWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public HybridWebViewBase(Context context, AttributeSet attrs, int defStyle) {
+    public HybridWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

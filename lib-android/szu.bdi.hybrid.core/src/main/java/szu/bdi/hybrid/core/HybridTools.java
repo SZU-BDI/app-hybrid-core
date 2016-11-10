@@ -13,7 +13,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -432,7 +431,7 @@ public class HybridTools {
         return _found;
     }
 
-    public static void bindWebViewApi(HybridWebViewBase wv, final HybridUi callerAct) {
+    public static void bindWebViewApi(HybridWebView wv, final HybridUi callerAct) {
         String name = optString(callerAct.getUiData("name"));
         if (isEmptyString(name)) {
             quickShowMsgMain("ConfigError: caller act name empty?");

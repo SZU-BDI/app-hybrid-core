@@ -1,8 +1,14 @@
-package szu.bdi.hybrid.core;
+package szu.bdi.hybrid.core.eg;
 
 import android.util.Log;
 
 import org.json.JSONObject;
+
+import szu.bdi.hybrid.core.HybridApi;
+import szu.bdi.hybrid.core.HybridTools;
+import szu.bdi.hybrid.core.ICallBackFunction;
+import szu.bdi.hybrid.core.ICallBackHandler;
+import szu.bdi.hybrid.core.JSO;
 
 //just an example Api return {STS:TODO} only
 

@@ -1,10 +1,16 @@
-package szu.bdi.hybrid.core;
+package szu.bdi.hybrid.core.eg;
 
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
 import android.util.Log;
 
 import org.json.JSONObject;
+
+import szu.bdi.hybrid.core.HybridApi;
+import szu.bdi.hybrid.core.HybridTools;
+import szu.bdi.hybrid.core.HybridUi;
+import szu.bdi.hybrid.core.ICallBackFunction;
+import szu.bdi.hybrid.core.ICallBackHandler;
 
 public class ApiUiOpen extends HybridApi {
     public ICallBackHandler getHandler() {

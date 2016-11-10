@@ -1,4 +1,4 @@
-package szu.bdi.hybrid.core;
+package szu.bdi.hybrid.core.eg;
 
 //TODO 设计要改，应该是 HybridUi => (NativeUi + XXXWebViewUi)
 //TODO 其中 RawWebViewUi 是指不支持 API 的 inAppBrowser
@@ -8,15 +8,14 @@ package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
+
+import szu.bdi.hybrid.core.HybridTools;
+import szu.bdi.hybrid.core.HybridUi;
+import szu.bdi.hybrid.core.HybridWebView;
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
@@ -35,7 +34,7 @@ public class SimpleWebViewUi extends HybridUi {
         final Context _ctx = this;
 
 //        JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
-        HybridWebViewBase _wv=new HybridWebViewBase(_ctx);
+        HybridWebView _wv=new HybridWebView(_ctx);
 
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";

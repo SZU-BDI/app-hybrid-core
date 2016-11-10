@@ -1,4 +1,4 @@
-package szu.bdi.hybrid.core;
+package szu.bdi.hybrid.core.eg;
 
 
 import android.annotation.SuppressLint;
@@ -12,6 +12,10 @@ import android.util.Log;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+
+import szu.bdi.hybrid.core.HybridTools;
+import szu.bdi.hybrid.core.HybridUi;
+import szu.bdi.hybrid.core.JsBridgeWebView;
 
 //@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
