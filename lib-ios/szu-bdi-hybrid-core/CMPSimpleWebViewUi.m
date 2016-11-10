@@ -214,6 +214,35 @@
     self.navigationItem.leftBarButtonItem = leftBar;
 }
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex != 0)  // 0 == the cancel button
+    {
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
+        
+        //home button press programmatically
+        UIApplication *app = [UIApplication sharedApplication];
+        [app performSelector:@selector(suspend)];
+        
+        /* Do not provide buttons or options for exiting from your application.
+         If you do so apple will reject your application.
+         Also if you call exit(0) from your application at certain point, apple will take it as a crash.
+         So never do it, your app will be rejected.
+         */
+        //exit app when app is in background
+#if TARGET_IPHONE_SIMULATOR
+        //[[UIApplication sharedApplication] sendAction:SIGKILL to:[UIApplication sharedApplication] from:self forEvent:nil];
+        //        [app sendAction:SIGKILL to:app from:app forEvent:nil];
+        //        [UIApplication performSelector:@selector(terminateWithSuccess)];
+        //        [[UIApplication sharedApplication] terminateWithSuccess];
+        exit(EXIT_SUCCESS);
+        //exit(0);
+#else
+        [app performSelector:@selector(terminateWithSuccess)];
+#endif
+    }
+}
 - (void)leftBarItemAction{
     
     // 判断是被push还是被modal出来的;
@@ -227,12 +256,16 @@
         }
     }
     else{
-        // present方式?
-        //        [self dismissViewControllerAnimated:YES completion:nil];
-        
-        //home button press programmatically
-        UIApplication *app = [UIApplication sharedApplication];
-        [app performSelector:@selector(suspend)];
+        //NOTES: modify the config.json, let the UiRoot with a "topbar":"Y" to test this case
+#warning TODO 对话框新建一个delate，不要用 self...最好做到 tools类
+        //show confirmation message to user
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Confirmation"
+                                                        message:@"Sure to Quit?"
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"OK", nil];
+        [alert show];
+
     }
     
     if (self.jsCallback) {
