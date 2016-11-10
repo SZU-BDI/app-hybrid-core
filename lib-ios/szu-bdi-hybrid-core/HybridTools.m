@@ -2,8 +2,6 @@
 
 #import "HybridTools.h"
 
-//github/szu-bdi/lib-ios-jso
-#import "JSO.h"
 
 @implementation HybridTools
 
@@ -30,7 +28,7 @@
     }
 }
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(id<HybridUi>)objCaller callback:(HybridCallback)callback{
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(HybridUi *)objCaller callback:(HybridCallback)callback{
     [self checkAppConfig];
     
     // 获取 UI 映射数据
@@ -45,18 +43,13 @@
     
     // 实例化动态获取的 UI 类:
     Class uiClass = NSClassFromString(className);
-    id <HybridUi> initUiClass = [[uiClass alloc] init];
+    HybridUi * theHybridUi = [[uiClass alloc] init];
     
     // 判断是否存在
-    if (!initUiClass) {
+    if (!theHybridUi) {
         [self showAlertMessage:[NSString stringWithFormat:@"%@ is not found", strUiName]];
         return;
     }
-
-    /*---- 若存在则执行以下步骤 -----------------
-     1、设置获取的 UI 类， 遵循 HybridUi 协议。*/
-    HybridUi *hyBridUi = [[HybridUi alloc] init];
-    hyBridUi.HybridUiDelegate = initUiClass;
     
     
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
@@ -91,22 +84,21 @@
     // 6、判断是否有回调函数
     if (callback) {
         // 7、设置回调
-        [hyBridUi setCallback:callback];
+        [theHybridUi setCallback:callback];
     }
     
     /*---------------- 开始设置 -----------------
      若为 WebView 类型，则通过HybridUi协议设置 ui 的 url*/
     if ([uiMode isEqualToString:@"WebView"]) {
-        [hyBridUi setWebViewUiUrl:webUrl];
+#warning 整个参数丢过去啊。。。唉
+        [theHybridUi setWebViewUiUrl:webUrl];
     }
     
-    // 设置 topBar 的显示状态
-    [hyBridUi setHaveTopBar:haveTopBar];
+    [theHybridUi setHaveTopBar:haveTopBar];
     
     // 若 topBar 为显示状态，则通过HybridUi协议设置 ui 的 topBar title
     if (haveTopBar) {
-        // 设置 topBar 的标题
-        [hyBridUi setTopBarTitle:title];
+        [theHybridUi setTopBarTitle:title];
     }
     
     /*---- 开始执行 ----*/
@@ -115,13 +107,13 @@
         
         id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
         
-        if ([initUiClass isKindOfClass:[UITabBarController class]]) {
+        if ([theHybridUi isKindOfClass:[UITabBarController class]]) {
             // 若为 UI 为 UITabBarController类型 则直接作为根视图
-            ddd.window.rootViewController = (UIViewController *)initUiClass;
+            ddd.window.rootViewController = (UIViewController *)theHybridUi;
         }
         else{
             // 否则，添加导航栏后，作为根视图
-            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:(UIViewController *)initUiClass];
+            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:(UIViewController *)theHybridUi];
             ddd.window.rootViewController = nav;
         }
     }
@@ -129,11 +121,11 @@
         
         if (((UIViewController *)objCaller).navigationController != nil) {
             // push
-            [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)initUiClass animated:YES];
+            [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{
             // moda
-            [(UIViewController *)objCaller presentViewController:(UIViewController *)initUiClass animated:YES completion:nil];
+            [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
         }
     }
 }

@@ -5,6 +5,8 @@ typedef void (^HybridCallback)(id responseData);
 
 typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
+//HybridUi *
+
 #endif /* Hybrid_h */
 
 

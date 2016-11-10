@@ -3,23 +3,26 @@
 #import "HybridTools.h"
 #import "JSO.h"
 
-//@interface SimpleWebViewUi() <UIWebViewDelegate>
-
 @interface SimpleWebViewUi()
 
-//@property (nonatomic, strong) UIWebView *webView;
+//private prop
 
+#warning dont do like this... too ugly.. use logic like android one
 @property (nonatomic) BOOL haveTopBar;
+
+#warning dont do like this... too ugly.. use logic like android one
 @property (nonatomic, copy) NSString *accessAddress; // 接口链接
-//@property (nonatomic, strong) WebViewJavascriptBridge *bridge;
+
 @property (nonatomic, strong) HybridCallback jsCallback;
 
 @end
 
+
+
 @implementation SimpleWebViewUi
 
 
-//------------ for  UIViewController ------------
+//------------  UIViewController ------------
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -66,21 +69,21 @@
     // Do any additional setup after loading the view.
     
     [self loadAccessAddress];
-
-//    if (_bridge) {
-//        return;
-//    }
+    
+    //    if (_bridge) {
+    //        return;
+    //    }
     // initial the webView and add webview in window：
     // [self configWebview];
     
     // Enable logging：
-//    [WebViewJavascriptBridge enableLogging];
+    //    [WebViewJavascriptBridge enableLogging];
     
     // initial the WebViewJavascriptBridge，With the webview binding：
-//    _bridge = [WebViewJavascriptBridge bridgeForWebView:_webView];
+    //    _bridge = [WebViewJavascriptBridge bridgeForWebView:_webView];
     
     // WebViewJavascriptBridge 的绑定，会导致webview原有的代理失效，加上这句即可解决。
-//    [_bridge setWebViewDelegate:self];
+    //    [_bridge setWebViewDelegate:self];
     
     // Registered WebViewJavascriptBridge handleApi：
     [self registerHandlerApi];
@@ -89,94 +92,96 @@
 
 
 
-//------------ for prototol UIWebViewDelegate ------------
+//------------  prototol UIWebViewDelegate ------------
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-        NSURL *url = [request URL];
-        NSLog(@" TODO shouldStartLoadWithRequest= %@ ",url);
+    NSURL *url = [request URL];
+    NSLog(@" TODO shouldStartLoadWithRequest= %@ ",url);
     
-    //    if (webView != _webView) { return YES; }
-
-//    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
-//    if ([_base isCorrectProcotocolScheme:url]) {
-//        //        if ([_base isBridgeLoadedURL:url]) {
-//        //            NSLog(@" skip injecting js %@ ",url);
-//        //            //[_base injectJavascriptFile];
-//        //        } else
-//        if ([_base isQueueMessageURL:url]) {
-//            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
-//            [_base flushMessageQueue:messageQueueString];
-//        } else {
-//            //NSLog(@" logUnkownMessage %@ ",url);
-//            //            [_base logUnkownMessage:url];
-//            NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
-//        }
-//        return NO;
-//    } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
-//        return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
-//    } else {
-//        return YES;
-//    }
+    //
+    if (webView != _webView) { return YES; }
+    
+    //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
+    //    if ([_base isCorrectProcotocolScheme:url]) {
+    //        //        if ([_base isBridgeLoadedURL:url]) {
+    //        //            NSLog(@" skip injecting js %@ ",url);
+    //        //            //[_base injectJavascriptFile];
+    //        //        } else
+    //        if ([_base isQueueMessageURL:url]) {
+    //            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+    //            [_base flushMessageQueue:messageQueueString];
+    //        } else {
+    //            //NSLog(@" logUnkownMessage %@ ",url);
+    //            //            [_base logUnkownMessage:url];
+    //            NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
+    //        }
+    //        return NO;
+    //    } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+    //        return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+    //    } else {
+    //        return YES;
+    //    }
     return YES;
 }
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     NSLog(@" TODO webViewDidStartLoad ");
-//    if (webView != _webView) { return; }
-//    
-//    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
-//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidStartLoad:)]) {
-//        [strongDelegate webViewDidStartLoad:webView];
-//    }
+    //    if (webView != _webView) { return; }
+    //
+    //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
+    //    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidStartLoad:)]) {
+    //        [strongDelegate webViewDidStartLoad:webView];
+    //    }
 }
 
 //- (void)webViewDidFinishLoad:(UIWebView *)webView;{
-//    
+//
 //    NSLog(@" TODO webViewDidFinishLoad ?");
 //}
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     NSLog(@" TODO webViewDidFinishLoad() ");
-//    if (webView != _webView) {
-//        NSLog(@" skip: not the same webview?? ");
-//        return;
-//    }
-//    
-//    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
-//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
-//        [strongDelegate webViewDidFinishLoad:webView];
-//    }
-//    NSLog(@" injecting js");
-//    [_base injectJavascriptFile];
-//    
-//    //NOTES: failed for the windowScriptObject is for macOS only...
-//    //TODO change to wkwebview later for better performance
-//    //    //[webView windowScriptObject];
-//    //    //[win setValue:littleBlackBook forKey:@"AddressBook"];
-//    //    UIWebDocumentView *documentView = (UIWebDocumentView *)_webView;
-//    //    WebScriptObject *wso = documentView.webView.windowScriptObject;
-//    //    [wso setValue:[WebScriptBridge getWebScriptBridge] forKey:@"nativejsb"];
+    //    if (webView != _webView) {
+    //        NSLog(@" skip: not the same webview?? ");
+    //        return;
+    //    }
+    //
+    //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
+    //    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
+    //        [strongDelegate webViewDidFinishLoad:webView];
+    //    }
+    //    NSLog(@" injecting js");
+    //    [_base injectJavascriptFile];
+    //
+    //    //NOTES: failed for the windowScriptObject is for macOS only...
+    //    //TODO change to wkwebview later for better performance
+    //    //    //[webView windowScriptObject];
+    //    //    //[win setValue:littleBlackBook forKey:@"AddressBook"];
+    //    //    UIWebDocumentView *documentView = (UIWebDocumentView *)_webView;
+    //    //    WebScriptObject *wso = documentView.webView.windowScriptObject;
+    //    //    [wso setValue:[WebScriptBridge getWebScriptBridge] forKey:@"nativejsb"];
 }
 
-//- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
-//    
-//    NSLog(@"WebViewUi %@",error);
-//}
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     NSLog(@" didFailLoadWithError() %@",error);
-//    if (webView != _webView) {
-//        NSLog(@" skip: not the same webview?? ");
-//        return;
-//    }
-//    
-//    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
-//    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:didFailLoadWithError:)]) {
-//        [strongDelegate webView:webView didFailLoadWithError:error];
-//    }
+    //    if (webView != _webView) {
+    //        NSLog(@" skip: not the same webview?? ");
+    //        return;
+    //    }
+    //
+    //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
+    //    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:didFailLoadWithError:)]) {
+    //        [strongDelegate webView:webView didFailLoadWithError:error];
+    //    }
 }
 
 
-//------------ for  HybridUi ------------
+//------------   <HybridUi> ------------
+
+#warning TODO add evalJs(js_s, callback)
+- (void)evalJs:(NSString *)js_s{
+    //
+}
 
 - (void)setHaveTopBar:(BOOL)haveTopBar{
     _haveTopBar = haveTopBar;
@@ -223,7 +228,7 @@
     }
     else{
         // present方式?
-//        [self dismissViewControllerAnimated:YES completion:nil];
+        //        [self dismissViewControllerAnimated:YES completion:nil];
         
         //home button press programmatically
         UIApplication *app = [UIApplication sharedApplication];
@@ -247,7 +252,7 @@
     // 获取 Api 映射数据
     JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
     NSString *jso_string_value = [JSO o2s:jso_api_mapping];
-
+    
     JSO *jso = [JSO s2o:jso_string_value];
     NSLog(@"TODO registerHandlerApi %@", [jso getChildKeys]);
     
@@ -267,31 +272,31 @@
         // NSLog(@"注册方法 %@" , key);
     }
     
-//    NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
-//    NSError *err;
-//    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
-//                                                        options:NSJSONReadingMutableContainers
-//                                                          error:&err];
-//    if (!err) {
-//        
-//        // get the apiMapping all keys:
-//        NSArray *appConfigkeys = [dic allKeys];
-//        
-//        // Iterate through all the value(The values in the appConfigkeys is key):
-//        for (NSString *key in appConfigkeys) {
-//            
-//            // Get the value through the key:
-//            HybridApi *api = [HybridTools getHybridApi:dic[key]];
-//            
-//            // 把当前控制器（ui）赋值给 api的成员变量
-//            api.currentUi = self;
-//            
-//            // Registered name of key handler:
-//            //            [self.bridge registerHandler:key handler:[api getHandler]];
-//            
-//            // NSLog(@"注册方法 %@" , key);
-//        }
-//    }
+    //    NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
+    //    NSError *err;
+    //    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+    //                                                        options:NSJSONReadingMutableContainers
+    //                                                          error:&err];
+    //    if (!err) {
+    //
+    //        // get the apiMapping all keys:
+    //        NSArray *appConfigkeys = [dic allKeys];
+    //
+    //        // Iterate through all the value(The values in the appConfigkeys is key):
+    //        for (NSString *key in appConfigkeys) {
+    //
+    //            // Get the value through the key:
+    //            HybridApi *api = [HybridTools getHybridApi:dic[key]];
+    //
+    //            // 把当前控制器（ui）赋值给 api的成员变量
+    //            api.currentUi = self;
+    //
+    //            // Registered name of key handler:
+    //            //            [self.bridge registerHandler:key handler:[api getHandler]];
+    //
+    //            // NSLog(@"注册方法 %@" , key);
+    //        }
+    //    }
 }
 - (void)loadAccessAddress{
     NSLog(@"WebViewUi.loadAccessAddress() %@",self.accessAddress);

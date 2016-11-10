@@ -10,10 +10,11 @@
 - (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {
         NSLog(@"ApiActivityClose()");
-        
-        HybridUi *hybridUi = [[HybridUi alloc] init];
-        hybridUi.HybridUiDelegate = self.currentUi;
-        [hybridUi activityClose];
+#warning todo
+//        HybridUi *hybridUi = [[HybridUi alloc] init];
+//        hybridUi.HybridUiDelegate = self.currentUi;
+//        [hybridUi activityClose];
+        //[self.currentUi closeActivity];
     };
 }
 
