@@ -1,11 +1,11 @@
-#import "NativeUi.h"
+#import "CMPNativeUi.h"
 
-@interface NativeUi()
+@interface CMPNativeUi()
 @property (nonatomic) BOOL haveTopBar;
 @property (nonatomic, strong) HybridCallback jsCallback;
 @end
 
-@implementation NativeUi
+@implementation CMPNativeUi
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil
                          bundle:(NSBundle *)nibBundleOrNil{

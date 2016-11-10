@@ -1,13 +1,13 @@
 #import <UIKit/UIKit.h>
 
-#import "HybridTools.h"
+#import "CMPHybridTools.h"
 
 
-@implementation HybridTools
+@implementation CMPHybridTools
 
 + (id)getSingleton{
     
-    static HybridTools *_sharedHybridTools = nil;
+    static CMPHybridTools *_sharedHybridTools = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedHybridTools = [[self alloc] init];
@@ -17,7 +17,7 @@
 
 + (void)checkAppConfig{
     
-    HybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self getSingleton];
     if(nil==hybridManager.jso){
         
         // readFileFromAsset()
@@ -28,7 +28,7 @@
     }
 }
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(HybridUi *)objCaller callback:(HybridCallback)callback{
++ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(CMPHybridUi *)objCaller callback:(HybridCallback)callback{
     [self checkAppConfig];
     
     // 获取 UI 映射数据
@@ -43,7 +43,7 @@
     
     // 实例化动态获取的 UI 类:
     Class uiClass = NSClassFromString(className);
-    HybridUi * theHybridUi = [[uiClass alloc] init];
+    CMPHybridUi * theHybridUi = [[uiClass alloc] init];
     
     // 判断是否存在
     if (!theHybridUi) {
@@ -130,7 +130,7 @@
     }
 }
 
-+ (HybridApi *)getHybridApi:(NSString *)name{
++ (CMPHybridApi *)getHybridApi:(NSString *)name{
     
     Class myApiClass = NSClassFromString(name);
     
@@ -149,7 +149,7 @@
 
 + (JSO *)wholeAppConfig{
     
-    HybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self getSingleton];
     return hybridManager.jso;
 }
 
@@ -205,7 +205,7 @@
 /******************************备用*********************************/
 + (void)saveAppConfig{
     
-    HybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self getSingleton];
     NSString *jsonString = [JSO o2s:hybridManager.jso];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];

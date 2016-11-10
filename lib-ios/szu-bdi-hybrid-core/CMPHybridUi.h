@@ -1,12 +1,12 @@
-#ifndef HybridUi_h
-#define HybridUi_h
+#ifndef CMPHybridUi_h
+#define CMPHybridUi_h
 
 
-#endif /* HybridUi_h */
+#endif /* CMPHybridUi_h */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "Hybrid.h"
+#import "CMPHybrid.h"
 
 @protocol HybridUiProtocol
 //@optional
@@ -34,7 +34,7 @@
 
 @end
 
-@interface HybridUi : UIViewController<HybridUiProtocol>
+@interface CMPHybridUi : UIViewController<HybridUiProtocol>
 
 
 

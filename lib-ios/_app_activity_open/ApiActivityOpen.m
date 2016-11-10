@@ -7,7 +7,7 @@
 //
 
 #import "ApiActivityOpen.h"
-#import "HybridTools.h"
+#import "CMPHybridTools.h"
 #import "JSO.h"
 
 @interface ApiActivityOpen ()
@@ -25,7 +25,7 @@
         JSO *jso = [JSO s2o:dataString];
         
         // start UiContent
-        [HybridTools startUi:@"UiContent" strInitParam:jso objCaller:self.currentUi callback:responseCallback];
+        [CMPHybridTools startUi:@"UiContent" strInitParam:jso objCaller:self.currentUi callback:responseCallback];
     };
 }
 

@@ -1,6 +1,6 @@
-#import "HybridUi.h"
+#import "CMPHybridUi.h"
 
-@implementation HybridUi
+@implementation CMPHybridUi
 
 - (void)setHaveTopBar:(BOOL)haveTopBar{
     

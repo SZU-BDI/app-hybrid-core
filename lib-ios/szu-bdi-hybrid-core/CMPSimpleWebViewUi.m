@@ -1,9 +1,9 @@
-#import "SimpleWebViewUi.h"
-#import "HybridApi.h"
-#import "HybridTools.h"
+#import "CMPSimpleWebViewUi.h"
+#import "CMPHybridApi.h"
+#import "CMPHybridTools.h"
 #import "JSO.h"
 
-@interface SimpleWebViewUi()
+@interface CMPSimpleWebViewUi()
 
 //private prop
 
@@ -19,7 +19,7 @@
 
 
 
-@implementation SimpleWebViewUi
+@implementation CMPSimpleWebViewUi
 
 
 //------------  UIViewController ------------
@@ -247,7 +247,7 @@
 - (void)registerHandlerApi{
     
     // get the appConfig:
-    JSO *jsonO = [HybridTools wholeAppConfig];
+    JSO *jsonO = [CMPHybridTools wholeAppConfig];
     
     // 获取 Api 映射数据
     JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
@@ -261,7 +261,7 @@
         // Get the value through the key:
         
         NSString *apiname = [[jso getChild:key] toString] ;
-        HybridApi *api = [HybridTools getHybridApi:apiname];
+        CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
         
         // 把当前控制器（ui）赋值给 api的成员变量
         api.currentUi = self;

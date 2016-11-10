@@ -1,5 +1,5 @@
-#import "HybridApi.h"
+#import "CMPHybridApi.h"
 
-@interface ApiActivityOpen : HybridApi
+@interface ApiActivityOpen : CMPHybridApi
 
 @end

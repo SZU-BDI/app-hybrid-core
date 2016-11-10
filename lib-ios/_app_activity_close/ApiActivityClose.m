@@ -1,5 +1,5 @@
 #import "ApiActivityClose.h"
-#import "HybridUi.h"
+#import "CMPHybridUi.h"
 
 @interface ApiActivityClose ()
 

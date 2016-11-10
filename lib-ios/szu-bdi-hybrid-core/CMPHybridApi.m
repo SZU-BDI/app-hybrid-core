@@ -1,6 +1,6 @@
-#import "HybridApi.h"
+#import "CMPHybridApi.h"
 
-@implementation HybridApi
+@implementation CMPHybridApi
 
 - (HybridHandler) getHandler{
     return nil;
