@@ -1,9 +1,10 @@
-#import "CMPSimpleWebViewUi.h"
+#import <Foundation/Foundation.h>
+#import "CMPHybridWebViewUi.h"
 #import "CMPHybridApi.h"
 #import "CMPHybridTools.h"
 #import "JSO.h"
 
-@interface CMPSimpleWebViewUi()
+@interface CMPHybridWebViewUi()
 
 //private prop
 
@@ -17,9 +18,7 @@
 
 @end
 
-
-
-@implementation CMPSimpleWebViewUi
+@implementation CMPHybridWebViewUi
 
 
 //------------  UIViewController ------------
@@ -262,11 +261,41 @@
         
         NSString *apiname = [[jso getChild:key] toString] ;
         CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
-
+        
+        // 把当前控制器（ui）赋值给 api的成员变量
         api.currentUi = self;
-
+        
+        // Registered name of key handler:
+        //            [self.bridge registerHandler:key handler:[api getHandler]];
+        
+        // NSLog(@"注册方法 %@" , key);
     }
-
+    
+    //    NSData *jsonData = [jso_string_value dataUsingEncoding:NSUTF8StringEncoding];
+    //    NSError *err;
+    //    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+    //                                                        options:NSJSONReadingMutableContainers
+    //                                                          error:&err];
+    //    if (!err) {
+    //
+    //        // get the apiMapping all keys:
+    //        NSArray *appConfigkeys = [dic allKeys];
+    //
+    //        // Iterate through all the value(The values in the appConfigkeys is key):
+    //        for (NSString *key in appConfigkeys) {
+    //
+    //            // Get the value through the key:
+    //            HybridApi *api = [HybridTools getHybridApi:dic[key]];
+    //
+    //            // 把当前控制器（ui）赋值给 api的成员变量
+    //            api.currentUi = self;
+    //
+    //            // Registered name of key handler:
+    //            //            [self.bridge registerHandler:key handler:[api getHandler]];
+    //
+    //            // NSLog(@"注册方法 %@" , key);
+    //        }
+    //    }
 }
 - (void)loadAccessAddress{
     NSLog(@"WebViewUi.loadAccessAddress() %@",self.accessAddress);

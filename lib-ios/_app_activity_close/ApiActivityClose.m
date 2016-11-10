@@ -1,5 +1,4 @@
 #import "ApiActivityClose.h"
-#import "CMPHybridUi.h"
 
 @interface ApiActivityClose ()
 
@@ -15,6 +14,7 @@
 //        hybridUi.HybridUiDelegate = self.currentUi;
 //        [hybridUi activityClose];
         //[self.currentUi closeActivity];
+        [self.currentUi activityClose];
     };
 }
 

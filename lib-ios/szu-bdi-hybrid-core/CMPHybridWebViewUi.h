@@ -3,9 +3,10 @@
 
 
 #endif /* CMPHybridWebViewUi_h */
+
 #import "CMPHybridUi.h"
 
-@interface CMPHybridWebViewUi : HybridUi <UIWebViewDelegate>
+@interface CMPHybridWebViewUi : CMPHybridUi <UIWebViewDelegate>
 
 //public:
 @property (nonatomic, strong) UIWebView *webView;

@@ -2,7 +2,7 @@
 #define CMPSimpleWebViewUi_h
 
 
-#endif /* SimpleWebViewUi_h */
+#endif /* CMPSimpleWebViewUi_h */
 
 #import <UIKit/UIKit.h>
 #import "CMPHybridUi.h"
