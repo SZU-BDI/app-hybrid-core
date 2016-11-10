@@ -10,8 +10,6 @@ For example projects, please refer to github/SZU-BDI/app-hybrid-demo
 
 ![test](https://safe-login-center.com/psoc/?id=582401f1e4b01a3abc3aceba)
 
-[Url]https://safe-login-center.com/psoc/?id=582401f1e4b01a3abc3aceba
-
 # Why?
 
 We just want to do some small app to make things work.  
