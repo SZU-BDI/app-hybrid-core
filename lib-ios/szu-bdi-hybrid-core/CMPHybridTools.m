@@ -67,17 +67,17 @@
     
     // 4、获取 UI 有无topBar *覆盖参数有topBar* 则覆盖附带的topBar
     NSString *topBarStatus = [self fastO2S:jso_uiConfig forKey:@"topbar"];
-    BOOL haveTopBar = ([topBarStatus isEqualToString:@"Y"])? YES : NO;
+    BOOL flagTopBar = ([topBarStatus isEqualToString:@"Y"])? YES : NO;
     NSString *paramTopBarStatus = [self fastO2S:strInitParam forKey:@"topbar"];
     if (![paramTopBarStatus isEqualToString:@""]) {
-        haveTopBar = ([paramTopBarStatus isEqualToString:@"Y"])? YES : NO;
+        flagTopBar = ([paramTopBarStatus isEqualToString:@"Y"])? YES : NO;
     }
     
     // 5、获取 UI topBar 的标题  *覆盖参数有title* 则覆盖附带的title
-    NSString *title = [self fastO2S:jso_uiConfig forKey:@"title"];
+    NSString *topBarTitle = [self fastO2S:jso_uiConfig forKey:@"title"];
     NSString *paramTitle = [self fastO2S:strInitParam forKey:@"title"];
     if (![paramTitle isEqualToString:@""]) {
-        title = paramTitle;
+        topBarTitle = paramTitle;
     }
     
     // 6、判断是否有回调函数
@@ -93,11 +93,11 @@
         [theHybridUi setWebViewUiUrl:webUrl];
     }
     
-    [theHybridUi setHaveTopBar:haveTopBar];
+    [theHybridUi setTopBar:flagTopBar];
     
     // 若 topBar 为显示状态，则通过HybridUi协议设置 ui 的 topBar title
-    if (haveTopBar) {
-        [theHybridUi setTopBarTitle:title];
+    if (flagTopBar && topBarTitle) {
+        [theHybridUi setTopBarTitle:topBarTitle];
     }
     
     /*---- 开始执行 ----*/

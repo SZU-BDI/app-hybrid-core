@@ -10,24 +10,23 @@ typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
 typedef void (^HybridAlertCallback)(UIAlertAction *action);
 
-#define HYBRID_ALERT_CALLBACK void (^)(UIAlertAction *action)
-
 #endif /* Hybrid_h */
 
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
 
-
 @protocol HybridUiProtocol
 
 @optional
 
-- (void)setHaveTopBar:(BOOL)haveTopBar;
+- (void)setTopBar:(BOOL)haveTopBar;
 
 - (void)setTopBarTitle:(NSString *)title;
 
+#warning move to pageUiData...
 - (void)setWebViewUiUrl:(NSString *)url;
 
+//callback for close..
 - (void)setCallback:(HybridCallback)callback;
 
 - (void)activityClose;
@@ -37,9 +36,5 @@ typedef void (^HybridAlertCallback)(UIAlertAction *action);
 @interface CMPHybridUi : UIViewController<HybridUiProtocol>
 
 
-
 @end
-
-
-
 #endif /* CMPHybridUi_h */

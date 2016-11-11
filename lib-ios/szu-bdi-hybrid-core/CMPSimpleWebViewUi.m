@@ -184,7 +184,7 @@
     //
 }
 
-- (void)setHaveTopBar:(BOOL)haveTopBar{
+- (void)setTopBar:(BOOL)haveTopBar{
     _haveTopBar = haveTopBar;
 }
 
