@@ -1,5 +1,3 @@
-//#import <objc/message.h>
-
 
 #import "CMPSimpleWebViewUi.h"
 #import "CMPHybridApi.h"
@@ -217,45 +215,6 @@
     self.navigationItem.leftBarButtonItem = leftBar;
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex != 0)  // 0 == the cancel button
-    {
-        SEL sltQuit = NSSelectorFromString(@"terminateWithSuccess");
-       
-        [self dismissViewControllerAnimated:YES completion:nil];
-        
-        //home button press programmatically
-        UIApplication *app = [UIApplication sharedApplication];
-        [app performSelector:@selector(suspend)];
-        
-        /* Do not provide buttons or options for exiting from your application.
-         If you do so apple will reject your application.
-         Also if you call exit(0) from your application at certain point, apple will take it as a crash.
-         So never do it, your app will be rejected.
-         */
-        //exit app when app is in background
-//#if TARGET_IPHONE_SIMULATOR
-//        //[[UIApplication sharedApplication] sendAction:SIGKILL to:[UIApplication sharedApplication] from:self forEvent:nil];
-//        //        [app sendAction:SIGKILL to:app from:app forEvent:nil];
-//        //        [UIApplication performSelector:@selector(terminateWithSuccess)];
-//        //        [[UIApplication sharedApplication] terminateWithSuccess];
-//        exit(EXIT_SUCCESS);
-//        //exit(0);
-//#else
-//        
-////        Class class = NSClassFromString("UIViewController");
-////        id viewController = [[class alloc] init];
-//        [app performSelector:@selector(terminateWithSuccess)];
-//#endif
-//        objc_msgSend(app, NSSelectorFromString(@"terminateWithSuccess"));
-//        [app performSelector:sltQuit];
-
-        //((void (*)(id, SEL))[app methodForSelector:selector])(app, sltQuit);
-        
-        [app sendAction:sltQuit to:app from:app forEvent:nil];
-    }
-}
 - (void)leftBarItemAction{
     
     // 判断是被push还是被modal出来的;
@@ -269,16 +228,23 @@
         }
     }
     else{
-        //NOTES: modify the config.json, let the UiRoot with a "topbar":"Y" to test this case
-#warning TODO 对话框新建一个delate，不要用 self...最好做到 tools类
-        //show confirmation message to user
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Confirmation"
-                                                        message:@"Sure to Quit?"
-                                                       delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"OK", nil];
-        [alert show];
-
+        
+        //quit app if prompted yes
+        [CMPHybridTools
+         quickConfirmMsgMain:@"Sure to Quit?"
+//         handlerYes:^(UIAlertAction *action)
+         handlerYes:^(UIAlertAction *action){
+             [self dismissViewControllerAnimated:YES completion:nil];
+             
+             //home button press programmatically
+             UIApplication *app = [UIApplication sharedApplication];
+             NSLog(@"Hide...");
+             [app performSelector:@selector(suspend)];
+             sleep(1);
+             NSLog(@"Really Quit...");
+             exit(EXIT_SUCCESS);
+         }
+         handlerNo:nil];
     }
     
     if (self.jsCallback) {

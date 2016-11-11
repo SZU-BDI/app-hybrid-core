@@ -16,6 +16,9 @@
 #import "CMPHybridApi.h"
 #import "JSO.h"
 
+//#import <UIKit/UIViewController.h>
+
+
 @interface CMPHybridTools : NSObject
 
 //inner data store
@@ -25,10 +28,26 @@
 
 + (CMPHybridApi *)getHybridApi:(NSString *)name;
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(CMPHybridUi *)objCaller callback:(HybridCallback)callback;
++ (void)startUi:(NSString *)strUiName
+   strInitParam:(JSO *)strInitParam
+      objCaller:(CMPHybridUi *)objCaller
+       callback:(HybridCallback)callback;
 
 + (JSO *)wholeAppConfig;
 
+
++ (void)quickShowMsgMain:(NSString *)message;
+
+
++ (void)quickConfirmMsgMain:(NSString *)msg
+//                 handlerYes:(void (^)(UIAlertAction *action))handlerYes
+//                  handlerNo:(void (^)(UIAlertAction *action))handlerNo
+                 handlerYes:(HybridAlertCallback) handlerYes
+                  handlerNo:(HybridAlertCallback) handlerNo
+;
+
++ (void) suspendApp;
++ (void) quitGraceFully;
 @end
 
 

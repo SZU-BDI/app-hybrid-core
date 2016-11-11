@@ -1,3 +1,6 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #ifndef Hybrid_h
 #define Hybrid_h
 
@@ -5,14 +8,14 @@ typedef void (^HybridCallback)(id responseData);
 
 typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
+typedef void (^HybridAlertCallback)(UIAlertAction *action);
+
+#define HYBRID_ALERT_CALLBACK void (^)(UIAlertAction *action)
+
 #endif /* Hybrid_h */
 
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
-
-
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 
 
 @protocol HybridUiProtocol

@@ -47,11 +47,10 @@
     
     // 判断是否存在
     if (!theHybridUi) {
-        [self showAlertMessage:[NSString stringWithFormat:@"%@ is not found", strUiName]];
+        [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is not found", strUiName]];
         return;
     }
-    
-    
+        
     // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
     NSString *uiMode = [self fastO2S:jso_uiConfig forKey:@"type"];
     NSString *paramUiMode = [self fastO2S:strInitParam forKey:@"type"];
@@ -141,7 +140,7 @@
         return myApiClassInstance;
     }
     else{
-        [self showAlertMessage:[NSString stringWithFormat:@"Api: %@ not found", name]];
+        [self quickShowMsgMain:[NSString stringWithFormat:@"Api: %@ not found", name]];
     }
     
     return nil;
@@ -163,7 +162,7 @@
         jso_value = [jsonJso getChild:key];
     }
     else{
-        [self showAlertMessage:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
+        [self quickShowMsgMain:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
         jso_value = nil;
     }
     
@@ -196,12 +195,107 @@
     return jsonString == nil ? @"":jsonString;
 }
 
-+ (void)showAlertMessage:(NSString *)message{
+//deprecated, see quickShowMsgMain()
+//+ (void)showAlertMessage:(NSString *)message{
+//    
+//    //deprecated UIAlertView and UIAlertViewDelegate
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+//        [alert show];
+//}
+
+//IOS 8+
++ (void)quickShowMsgMain:(NSString *)msg{
+
+
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
-    [alert show];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:ok];
+    
+    //[self presentViewController:alertController animated:YES completion:nil];
+
+    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while (topRootViewController.presentedViewController)
+    {
+        topRootViewController = topRootViewController.presentedViewController;
+    }
+    
+    [topRootViewController presentViewController:alertController animated:NO completion:nil];
+    
+    //NOTES: the alert above will not block the whole application, that's why need find the top view to show (so that block...)
+    NSLog(@"After show alert %@",msg);
 }
 
++ (UIViewController *) findTopRootView
+{
+    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while (topRootViewController.presentedViewController)
+    {
+        topRootViewController = topRootViewController.presentedViewController;
+    }
+    
+    return topRootViewController;
+}
+//IOS 8 +
++ (void)quickConfirmMsgMain:(NSString *)msg
+//                 handlerYes:(void (^)(UIAlertAction *action))handlerYes
+//                  handlerNo:(void (^)(UIAlertAction *action))handlerNo
+                 handlerYes:(HybridAlertCallback) handlerYes
+                  handlerNo:(HybridAlertCallback) handlerNo
+{
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:handlerYes]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleDefault handler:handlerNo]];
+    
+    [[self findTopRootView] presentViewController:alertController animated:NO completion:nil];
+}
+
++ (void) suspendApp
+{
+    //home button press programmatically
+    UIApplication *app = [UIApplication sharedApplication];
+    NSLog(@"Hide...");
+    [app performSelector:@selector(suspend)];
+   
+}
++ (void) quitGraceFully
+{
+    [[self findTopRootView] dismissViewControllerAnimated:YES completion:nil];
+    [self suspendApp];
+    sleep(1);
+    NSLog(@"Really Quit...");
+    exit(EXIT_SUCCESS);
+}
+//TODO for the multi buttons
+/*
+ UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Title" message:@"Message" preferredStyle:UIAlertControllerStyleAlert];
+ 
+ [alertController addAction:[UIAlertAction actionWithTitle:@"Button 1" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+ [self loadGooglrDrive];
+ }]];
+ 
+ [alertController addAction:[UIAlertAction actionWithTitle:@"Button 2" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+ [self loadDropBox];
+ }]];
+ 
+ [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+ [self closeAlertview];
+ }]];
+ 
+ dispatch_async(dispatch_get_main_queue(), ^ {
+ [self presentViewController:alertController animated:YES completion:nil];
+ });
+ 
+ 
+ 
+ -(void)closeAlertview
+ {
+ 
+ [self dismissViewControllerAnimated:YES completion:nil];
+ }
+ */
 /******************************备用*********************************/
 + (void)saveAppConfig{
     
