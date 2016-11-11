@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -40,13 +42,21 @@ public class HybridTools {
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
 
-    //IMPORTANT !!!: remember in the app entry, set HybridTools.setAppContext(getApplicationContext());
-    public static void setAppContext(Context appContext) {
-        if (appContext != null)
-            _appContext = appContext;
+    public static void setAppContext(Context ctx) {
+        _appContext = ctx;
     }
 
     public static Context getAppContext() {
+        if (_appContext == null) {
+            try {
+                Application thisApp = (Application) Class.forName("android.app.ActivityThread")
+                        .getMethod("currentApplication").invoke(null, (Object[]) null);
+                _appContext = thisApp.getApplicationContext();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                //TODO gracefully quit?
+            }
+        }
         return _appContext;
     }
 
@@ -255,7 +265,7 @@ public class HybridTools {
     }
 
     public static String readAssetInStr(String s) {
-        return readAssetInStr(_appContext, s);
+        return readAssetInStr(getAppContext(), s);
     }
 
     private static JSONObject _jAppConfig = new JSONObject();
@@ -431,7 +441,7 @@ public class HybridTools {
         return _found;
     }
 
-    public static void bindWebViewApi(HybridWebView wv, final HybridUi callerAct) {
+    public static void bindWebViewApi(JsBridgeWebView wv, final HybridUi callerAct) {
         String name = optString(callerAct.getUiData("name"));
         if (isEmptyString(name)) {
             quickShowMsgMain("ConfigError: caller act name empty?");

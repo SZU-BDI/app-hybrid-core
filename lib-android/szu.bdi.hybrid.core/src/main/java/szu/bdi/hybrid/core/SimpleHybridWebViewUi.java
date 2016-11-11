@@ -1,27 +1,26 @@
-package szu.bdi.hybrid.core.eg;
+package szu.bdi.hybrid.core;
 
-//TODO 设计要改，应该是 HybridUi => (NativeUi + XXXWebViewUi)
-//TODO 其中 RawWebViewUi 是指不支持 API 的 inAppBrowser
-//TODO 其中 SimpleHybridWebViewUi 是指简单全屏（TopBar可控）的支持API的
-
-//SimpleWebViewUi is a HybridUi with a full size "JBridgeWebView"
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.HybridUi;
-import szu.bdi.hybrid.core.HybridWebView;
+import szu.bdi.hybrid.core.JsBridgeWebView;
 
-//@ref http://stackoverflow.com/questions/20138434/alternate-solution-for-setjavascriptenabledtrue
-@SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
-public class SimpleWebViewUi extends HybridUi {
+//@SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
+public class SimpleHybridWebViewUi extends HybridUi {
 
-    final private static String LOGTAG = "SimpleWebViewUi";
+    final private static String LOGTAG = "SimpleHybridWebViewUi";
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -33,8 +32,7 @@ public class SimpleWebViewUi extends HybridUi {
 
         final Context _ctx = this;
 
-//        JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
-        HybridWebView _wv=new HybridWebView(_ctx);
+        JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
 
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";

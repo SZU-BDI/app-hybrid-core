@@ -1,11 +1,10 @@
 package szu.bdi.hybrid.core;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import android.util.Log;
 
-/**
- * Created by wanjochan on 7/11/16.
- */
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class JSO {
     public static final int JSO_NULL = 0;
@@ -37,7 +36,8 @@ public class JSO {
         if (t == JSO_OBJECT || t == JSO_ARRAY) {
             return v.toString();
         } else if (t == JSO_STRING) {
-            return JSONObject.quote((String) v);
+//            return JSONObject.quote((String) v);
+            return (String) v;
         } else {
             return null;
         }
@@ -79,5 +79,48 @@ public class JSO {
         jso.setValue(value);
         jso.setValueType(value_type);
         return jso;
+    }
+
+    public void setChild(String k, JSO chd) {
+        if (_value_type == JSO_NULL || _value == null) {
+            if (_value == null) {
+                _value = new JSONObject();
+                _value_type = JSO_OBJECT;
+            }
+        }
+        if (_value_type == JSO_OBJECT) {
+            if (_value == null) {
+                _value = new JSONObject();
+            }
+            try {
+                ((JSONObject) _value).putOpt(k, chd.getValue());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public JSO getChild(String k) {
+        JSO rt = new JSO();
+        if (_value_type == JSO_OBJECT) {
+            if (_value == null) {
+                _value = new JSONObject();
+            }
+            Object v = ((JSONObject) _value).opt(k);
+            if (v != null) {
+                if (v instanceof String) {
+                    rt.setValue(v);
+                    rt.setValueType(JSO_STRING);
+                } else {
+                    Log.v("JSO", v.toString());
+                    rt = JSO.s2o(v.toString());
+                }
+            }
+//            if(v instanceof JSONObject){
+//
+//            }
+        }
+        if (rt == null) rt = new JSO();
+        return rt;
     }
 }

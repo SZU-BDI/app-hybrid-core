@@ -49,7 +49,7 @@ import java.util.Map;
  */
 
 @SuppressLint("SetJavaScriptEnabled")
-public class JsBridgeWebView extends HybridWebView {
+public class JsBridgeWebView extends WebView {
 
     private final String TAG = "JsBridgeWebView";
 

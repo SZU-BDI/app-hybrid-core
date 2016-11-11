@@ -17,6 +17,6 @@ public class HybridApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Log.v(LOGTAG, "HybridApplication.onCreate");
-        HybridTools.setAppContext(getApplicationContext());
+        //HybridTools.setAppContext(getApplicationContext());
     }
 }

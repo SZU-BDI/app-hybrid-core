@@ -23,6 +23,18 @@ public class ApiWebRequest extends HybridApi {
 
                 JSO data_o = JSO.s2o(dataStr);
 
+                JSO urlJSO = data_o.getChild("url");
+
+                String url = urlJSO.toString();
+                if (!HybridTools.isEmptyString(url)) {
+                    String rt_s = HybridTools.webPost(url, "");
+                    Log.v("ApiWebRequest", url + " => " + rt_s);
+                    cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
+                    return;
+                }else{
+                    cb.onCallBack("{\"STS\":\"KO\"}");
+                }
+                /*
                 Object v = data_o.getValue();
                 if (v != null && v instanceof JSONObject) {
                     String url = ((JSONObject) data_o.getValue()).optString("url");
@@ -34,6 +46,8 @@ public class ApiWebRequest extends HybridApi {
                     }
                 }
                 cb.onCallBack("{\"STS\":\"TODO\"}");
+
+                */
             }
         };
     }
