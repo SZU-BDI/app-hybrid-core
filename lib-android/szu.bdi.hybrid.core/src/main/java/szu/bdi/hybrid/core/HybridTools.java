@@ -1,6 +1,5 @@
 package szu.bdi.hybrid.core;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
@@ -27,9 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import szu.bdi.hybrid.core.eg.ApiUiClose;
-import szu.bdi.hybrid.core.eg.ApiUiOpen;
 
 
 public class HybridTools {
@@ -279,23 +275,6 @@ public class HybridTools {
         b2.show();
     }
 
-    //shallow merge
-    private static JSO basicMerge(JSO... jsos) {
-        JSO jsonObject = new JSO();
-        for (JSO temp : jsos) {
-            if (temp == null) continue;
-            Iterator<String> keys = temp.getChildKeys().listIterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if (isEmpty(key)) {
-                    continue;
-                }
-                jsonObject.setChild(key, temp.getChild(key));
-            }
-        }
-        return jsonObject;
-    }
-
     public static void startUi(String name, String overrideParam_s, HybridUi caller) {
         startUi(name, overrideParam_s, caller, null);
     }
@@ -316,7 +295,7 @@ public class HybridTools {
         }
 
         JSO overrideParam = JSO.s2o(overrideParam_s);
-        JSO callParam = basicMerge(defaultParam, overrideParam);
+        JSO callParam = JSO.basicMerge(defaultParam, overrideParam);
         Log.v(LOGTAG, "param after merge=" + callParam);
 
         String clsName = callParam.getChild("class").toString();
@@ -324,17 +303,25 @@ public class HybridTools {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
             return;
         }
-        Class targetClass = null;
+        HybridUi callee = null;
         try {
             //reflection:
-            targetClass = Class.forName(clsName);
+            callee = (HybridUi) Class.forName(clsName).newInstance();
             Log.v(LOGTAG, "class " + clsName + " found for name " + name);
         } catch (ClassNotFoundException e) {
             HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
             return;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            HybridTools.quickShowMsgMain("config.json error!!! class not HybridUi " + clsName);
+            return;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            HybridTools.quickShowMsgMain("config.json error!!! class failed " + clsName);
+            return;
         }
 
-        Intent intent = new Intent(caller, targetClass);
+        Intent intent = new Intent(caller, callee.getClass());
 
         if (!isEmptyString(name)) {
             callParam.setChild("name", JSO.s2o(name));
@@ -343,12 +330,9 @@ public class HybridTools {
         String uiData_s = JSO.o2s(callParam);
 
         intent.putExtra("uiData", uiData_s);
-        //if (cbh != null) {
-        //((HybridUi) targetClass).setCallBackFunction(cbh);
-        //}
-//        HybridApi api = (HybridApi) new ApiUiOpen();
-//        api.setCallerUi(caller);
+
         if (cb != null) {
+            //callee.setCallBackFunction(cb);
             caller.setCallBackFunction(cb);
         }
         try {

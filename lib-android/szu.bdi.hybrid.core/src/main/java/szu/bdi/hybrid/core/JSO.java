@@ -15,11 +15,44 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public final class JSO {
     private JsonValue _value = Json.NULL;
+
+    //TODO Use JsonObject.merge()
+    //shallow merge
+    public static JSO basicMerge(JSO... jsos) {
+        JSO rt = new JSO();
+        for (JSO temp : jsos) {
+            rt.merge(temp);
+//            if (temp == null) continue;
+//            Iterator<String> keys = temp.getChildKeys().listIterator();
+//            while (keys.hasNext()) {
+//                String key = keys.next();
+//                if (HybridTools.isEmpty(key)) {
+//                    continue;
+//                }
+//                jsonObject.setChild(key, temp.getChild(key));
+//            }
+        }
+        return rt;
+    }
+
+    public void merge(JSO jso) {
+        JsonValue jv = _value;
+        if (_value == null || _value.isNull()) {
+            _value = Json.object();
+        }
+        if (_value instanceof JsonObject) {
+            JsonValue jv2 = jso.getValue();
+            if (jv2 instanceof JsonObject) {
+                ((JsonObject) _value).merge(jv2.asObject());
+            }
+        }
+    }
 
     private void setValue(Object v) {
         if (v instanceof JsonValue) _value = (JsonValue) v;
@@ -40,12 +73,6 @@ public final class JSO {
         return null;
     }
 
-    //TODO
-//    public long asLong() {
-//        if (_value != null) return _value.asLong();
-//        return null
-//    }
-
     public String toString(boolean quote) {
         if (_value == null) return null;
         if (_value.isNull()) {
@@ -57,8 +84,6 @@ public final class JSO {
         }
         if (_value.isString()) {
             if (quote) {
-                //TODO ...
-//                s = JSONObject.quote(s);
                 return _value.toString();
             } else {
                 return _value.asString();
@@ -80,18 +105,18 @@ public final class JSO {
         return result;
     }
 
-    //TODO...TMP...
+    //TMP borrow from JSONObject
+    //@ref http://stackoverflow.com/questions/21858528/convert-a-bundle-to-json
+    //@ref https://android.googlesource.com/platform/libcore/+/master/json/src/main/java/org/json/JSONObject.java
     protected static Object _wrap(Object o) {
         if (o == null) {
             return JSONObject.NULL;
-            //return null;
         }
         if (o instanceof JSONArray || o instanceof JSONObject) {
             return o;
         }
         if (o.equals(JSONObject.NULL)) {
             return o;
-            //return null;
         }
         try {
             if (o instanceof Collection) {
@@ -174,13 +199,6 @@ public final class JSO {
         }
         return _value.isNull();
     }
-
-    //if JSO is null, convert to array
-    //if JSO is array, append to child,
-    //else ignore...
-//    public void append(JSO o) {
-////TODO
-//    }
 
     public List<String> getChildKeys() {
         if (_value instanceof JsonObject) {
