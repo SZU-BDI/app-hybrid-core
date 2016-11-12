@@ -93,13 +93,136 @@
 
 //------------  prototol UIWebViewDelegate ------------
 
+//- (void)injectJavascriptFile {
+//    //TODO 要优化缓存（等下OK再弄)
+//    
+//    //get path of asset (config.json)
+//    NSString *filepath = [[NSBundle mainBundle] pathForResource:@"WebViewJavascriptBridge"ofType:@"js"];
+//    
+//    //get the content of the config.json
+//    NSData *filedata = [[NSData alloc] initWithContentsOfFile:filepath];
+//    
+//    //decoded as string of utf-8
+//    NSString *js = [[NSString alloc] initWithData:filedata encoding:NSUTF8StringEncoding];
+//    
+//    [self _evaluateJavascript:js];
+//    if (self.startupMessageQueue) {
+//        NSArray* queue = self.startupMessageQueue;
+//        self.startupMessageQueue = nil;
+//        for (id queuedMessage in queue) {
+//            [self _dispatchMessage:queuedMessage];
+//        }
+//    }
+//}
+-(BOOL)isCorrectProcotocolScheme:(NSURL*)url {
+    if([[url scheme] isEqualToString:S_JSB_PROTOCOL]){
+        return YES;
+    } else {
+        return NO;
+    }
+}
+-(BOOL)isQueueMessageURL:(NSURL*)url {
+    if([[url host] isEqualToString:S_JSB_Q_MSG]){
+        return YES;
+    } else {
+        return NO;
+    }
+}
+- (NSString *)_serializeMessage:(id)message pretty:(BOOL)pretty{
+    return [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:message options:(NSJSONWritingOptions)(pretty ? NSJSONWritingPrettyPrinted : 0) error:nil] encoding:NSUTF8StringEncoding];
+}
+
+- (NSArray*)_deserializeMessageJSON:(NSString *)messageJSON {
+    return [NSJSONSerialization JSONObjectWithData:[messageJSON dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingAllowFragments error:nil];
+}
+
+-(NSString *)webViewJavascriptFetchQueyCommand {
+    return @"WebViewJavascriptBridge._fetchQueue(true);";
+}
+//- (void)flushMessageQueue:(NSString *)messageQueueString{
+//    if (messageQueueString == nil || messageQueueString.length == 0) {
+//        NSLog(@"WebViewJavascriptBridge: WARNING: ObjC got nil while fetching the message queue JSON from webview. This can happen if the WebViewJavascriptBridge JS is not currently present in the webview, e.g if the webview just loaded a new page.");
+//        return;
+//    }
+//    
+//    id messages = [self _deserializeMessageJSON:messageQueueString];
+//    for (WVJBMessage* message in messages) {
+//        if (![message isKindOfClass:[WVJBMessage class]]) {
+//            NSLog(@"WebViewJavascriptBridge: WARNING: Invalid %@ received: %@", [message class], message);
+//            continue;
+//        }
+//        //[self _log:@"RCVD" json:message];
+//        
+//        NSString* responseId = message[@"responseId"];
+//        if (responseId) {
+//            HybridCallback responseCallback = _responseCallbacks[responseId];
+//            responseCallback(message[@"responseData"]);
+//            [self.responseCallbacks removeObjectForKey:responseId];
+//        } else {
+//            HybridCallback responseCallback = NULL;
+//            NSString* callbackId = message[@"callbackId"];
+//            if (callbackId) {
+//                responseCallback = ^(id responseData) {
+//                    if (responseData == nil) {
+//                        responseData = [NSNull null];
+//                    }
+//                    
+//                    WVJBMessage* msg = @{ @"responseId":callbackId, @"responseData":responseData };
+//                    [self _queueMessage:msg];
+//                };
+//            } else {
+//                responseCallback = ^(id ignoreResponseData) {
+//                    // Do nothing
+//                };
+//            }
+//            
+//            HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
+//            
+//            if (!handler) {
+//                NSLog(@"WVJBNoHandlerException, No handler for message from JS: %@", message);
+//                continue;
+//            }
+//            
+//            handler(message[@"data"], responseCallback);
+//        }
+//    }
+//}
+
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *url = [request URL];
     NSLog(@" TODO shouldStartLoadWithRequest= %@ ",url);
     
     //
     if (webView != _webView) { return YES; }
+
+        if ([self isCorrectProcotocolScheme:url]) {
+            //        if ([_base isBridgeLoadedURL:url]) {
+            //            NSLog(@" skip injecting js %@ ",url);
+            //            //[_base injectJavascriptFile];
+            //        } else
+            if ([self isQueueMessageURL:url]) {
+//                NSString *messageQueueString = [self _evaluateJavascript:[self webViewJavascriptFetchQueyCommand]];
+                NSString *messageQueueString = [webView stringByEvaluatingJavaScriptFromString:[self webViewJavascriptFetchQueyCommand]];
+//                [self flushMessageQueue:messageQueueString];
+            } else {
+                //NSLog(@" logUnkownMessage %@ ",url);
+                //            [_base logUnkownMessage:url];
+                NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
+            }
+            return NO;
+//        } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+//            return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+        } else {
+            return YES;
+        }
     
+//    if (self.startupMessageQueue) {
+//        NSArray* queue = self.startupMessageQueue;
+//        self.startupMessageQueue = nil;
+//        for (id queuedMessage in queue) {
+//            [self _dispatchMessage:queuedMessage];
+//        }
+//    }
     //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
     //    if ([_base isCorrectProcotocolScheme:url]) {
     //        //        if ([_base isBridgeLoadedURL:url]) {
@@ -139,11 +262,24 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     NSLog(@" TODO webViewDidFinishLoad() ");
-    //    if (webView != _webView) {
-    //        NSLog(@" skip: not the same webview?? ");
-    //        return;
-    //    }
-    //
+    if (webView != _webView) {
+        NSLog(@" skip: not the same webview?? ");
+        return;
+    }
+    
+    //TODO 好像有个函数读asset，等下换
+    //get path of asset (config.json)
+    NSString *filepath = [[NSBundle mainBundle] pathForResource:@"WebViewJavascriptBridge"ofType:@"js"];
+    
+    //get the content of the config.json
+    NSData *filedata = [[NSData alloc] initWithContentsOfFile:filepath];
+    
+    //decoded as string of utf-8
+    NSString *js = [[NSString alloc] initWithData:filedata encoding:NSUTF8StringEncoding];
+    
+    NSString *debug=[webView stringByEvaluatingJavaScriptFromString:js];
+    NSLog(@"get %@ by run js: %@",debug,js);
+    
     //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
     //    if (strongDelegate && [strongDelegate respondsToSelector:@selector(webViewDidFinishLoad:)]) {
     //        [strongDelegate webViewDidFinishLoad:webView];
@@ -151,13 +287,14 @@
     //    NSLog(@" injecting js");
     //    [_base injectJavascriptFile];
     //
-    //    //NOTES: failed for the windowScriptObject is for macOS only...
-    //    //TODO change to wkwebview later for better performance
-    //    //    //[webView windowScriptObject];
-    //    //    //[win setValue:littleBlackBook forKey:@"AddressBook"];
-    //    //    UIWebDocumentView *documentView = (UIWebDocumentView *)_webView;
-    //    //    WebScriptObject *wso = documentView.webView.windowScriptObject;
-    //    //    [wso setValue:[WebScriptBridge getWebScriptBridge] forKey:@"nativejsb"];
+
+    //NOTES: failed for the windowScriptObject is for macOS only...
+    //TODO change to wkwebview later for better performance
+    //    //[webView windowScriptObject];
+    //    //[win setValue:littleBlackBook forKey:@"AddressBook"];
+    //    UIWebDocumentView *documentView = (UIWebDocumentView *)_webView;
+    //    WebScriptObject *wso = documentView.webView.windowScriptObject;
+    //    [wso setValue:[WebScriptBridge getWebScriptBridge] forKey:@"nativejsb"];
 }
 
 
@@ -182,7 +319,7 @@
     //
 }
 
-- (void)setHaveTopBar:(BOOL)haveTopBar{
+- (void)setTopBar:(BOOL)haveTopBar{
     _haveTopBar = haveTopBar;
 }
 
@@ -203,6 +340,21 @@
 }
 
 //------------ self -----------------
+
+-(id)init {
+    self = [super init];
+//    self.messageHandlers = [NSMutableDictionary dictionary];
+//    self.startupMessageQueue = [NSMutableArray array];
+//    self.responseCallbacks = [NSMutableDictionary dictionary];
+//    _uniqueId = 0;
+    return(self);
+}
+
+- (void)dealloc {
+//    self.startupMessageQueue = nil;
+//    self.responseCallbacks = nil;
+//    self.messageHandlers = nil;
+}
 
 
 // Custom topBar left back buttonItem
@@ -226,12 +378,23 @@
         }
     }
     else{
-        // present方式?
-        //        [self dismissViewControllerAnimated:YES completion:nil];
         
-        //home button press programmatically
-        UIApplication *app = [UIApplication sharedApplication];
-        [app performSelector:@selector(suspend)];
+        //quit app if prompted yes
+        [CMPHybridTools
+         quickConfirmMsgMain:@"Sure to Quit?"
+         //         handlerYes:^(UIAlertAction *action)
+         handlerYes:^(UIAlertAction *action){
+             [self dismissViewControllerAnimated:YES completion:nil];
+             
+             //home button press programmatically
+             UIApplication *app = [UIApplication sharedApplication];
+             NSLog(@"Hide...");
+             [app performSelector:@selector(suspend)];
+             sleep(1);
+             NSLog(@"Really Quit...");
+             exit(EXIT_SUCCESS);
+         }
+         handlerNo:nil];
     }
     
     if (self.jsCallback) {
@@ -297,8 +460,14 @@
     //        }
     //    }
 }
+
+
+//TODO 改为 getUiData("address");然后操作
 - (void)loadAccessAddress{
     NSLog(@"WebViewUi.loadAccessAddress() %@",self.accessAddress);
+    
+    //TODO 要根据 地址的协议判断是否本地的，如果是本地的在前面pack上路径，然后统一 load....
+    
     if ([self.accessAddress isEqualToString:@"root.htm"])  {
         [self LoadLocalhtmlName:@"root"];
     }
@@ -307,6 +476,7 @@
     }
 }
 
+//TODO 下面的代码的通用性好差。。。
 - (void)LoadLocalhtmlName:(NSString *)loadLocalhtml{
     NSString* htmlPath = [[NSBundle mainBundle] pathForResource:loadLocalhtml ofType:@"htm"];
     NSString* appHtml = [NSString stringWithContentsOfFile:htmlPath encoding:NSUTF8StringEncoding error:nil];

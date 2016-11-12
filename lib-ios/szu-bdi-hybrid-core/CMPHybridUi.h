@@ -10,6 +10,12 @@ typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
 typedef void (^HybridAlertCallback)(UIAlertAction *action);
 
+#define S_JSB_PROTOCOL @"jsb1"
+#define S_JSB_Q_MSG      @"__QUEUE_MESSAGE__"
+
+#warning TODO change as JSO
+typedef NSDictionary WVJBMessage;
+
 #endif /* Hybrid_h */
 
 #ifndef CMPHybridUi_h
