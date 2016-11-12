@@ -95,16 +95,16 @@
 
 //- (void)injectJavascriptFile {
 //    //TODO 要优化缓存（等下OK再弄)
-//    
+//
 //    //get path of asset (config.json)
 //    NSString *filepath = [[NSBundle mainBundle] pathForResource:@"WebViewJavascriptBridge"ofType:@"js"];
-//    
+//
 //    //get the content of the config.json
 //    NSData *filedata = [[NSData alloc] initWithContentsOfFile:filepath];
-//    
+//
 //    //decoded as string of utf-8
 //    NSString *js = [[NSString alloc] initWithData:filedata encoding:NSUTF8StringEncoding];
-//    
+//
 //    [self _evaluateJavascript:js];
 //    if (self.startupMessageQueue) {
 //        NSArray* queue = self.startupMessageQueue;
@@ -128,6 +128,24 @@
         return NO;
     }
 }
+- (void)_dispatchMessage:(WVJBMessage*)message {
+    NSString *json_string = [self _serializeMessage:message pretty:NO];
+    
+    //TODO if "" or null change to "null"...
+    
+    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", json_string];
+    
+    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
+    if ([[NSThread currentThread] isMainThread]) {
+        [self evalJs:javascriptCommand];
+        
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self evalJs:javascriptCommand];
+        });
+    }
+}
+
 - (NSString *)_serializeMessage:(id)message pretty:(BOOL)pretty{
     return [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:message options:(NSJSONWritingOptions)(pretty ? NSJSONWritingPrettyPrinted : 0) error:nil] encoding:NSUTF8StringEncoding];
 }
@@ -144,7 +162,7 @@
 //        NSLog(@"WebViewJavascriptBridge: WARNING: ObjC got nil while fetching the message queue JSON from webview. This can happen if the WebViewJavascriptBridge JS is not currently present in the webview, e.g if the webview just loaded a new page.");
 //        return;
 //    }
-//    
+//
 //    id messages = [self _deserializeMessageJSON:messageQueueString];
 //    for (WVJBMessage* message in messages) {
 //        if (![message isKindOfClass:[WVJBMessage class]]) {
@@ -152,7 +170,7 @@
 //            continue;
 //        }
 //        //[self _log:@"RCVD" json:message];
-//        
+//
 //        NSString* responseId = message[@"responseId"];
 //        if (responseId) {
 //            HybridCallback responseCallback = _responseCallbacks[responseId];
@@ -166,7 +184,7 @@
 //                    if (responseData == nil) {
 //                        responseData = [NSNull null];
 //                    }
-//                    
+//
 //                    WVJBMessage* msg = @{ @"responseId":callbackId, @"responseData":responseData };
 //                    [self _queueMessage:msg];
 //                };
@@ -175,14 +193,14 @@
 //                    // Do nothing
 //                };
 //            }
-//            
+//
 //            HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
-//            
+//
 //            if (!handler) {
 //                NSLog(@"WVJBNoHandlerException, No handler for message from JS: %@", message);
 //                continue;
 //            }
-//            
+//
 //            handler(message[@"data"], responseCallback);
 //        }
 //    }
@@ -194,35 +212,35 @@
     
     //
     if (webView != _webView) { return YES; }
-
-        if ([self isCorrectProcotocolScheme:url]) {
-            //        if ([_base isBridgeLoadedURL:url]) {
-            //            NSLog(@" skip injecting js %@ ",url);
-            //            //[_base injectJavascriptFile];
-            //        } else
-            if ([self isQueueMessageURL:url]) {
-//                NSString *messageQueueString = [self _evaluateJavascript:[self webViewJavascriptFetchQueyCommand]];
-                NSString *messageQueueString = [webView stringByEvaluatingJavaScriptFromString:[self webViewJavascriptFetchQueyCommand]];
-//                [self flushMessageQueue:messageQueueString];
-            } else {
-                //NSLog(@" logUnkownMessage %@ ",url);
-                //            [_base logUnkownMessage:url];
-                NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
-            }
-            return NO;
-//        } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
-//            return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
-        } else {
-            return YES;
-        }
     
-//    if (self.startupMessageQueue) {
-//        NSArray* queue = self.startupMessageQueue;
-//        self.startupMessageQueue = nil;
-//        for (id queuedMessage in queue) {
-//            [self _dispatchMessage:queuedMessage];
-//        }
-//    }
+    if ([self isCorrectProcotocolScheme:url]) {
+        //        if ([_base isBridgeLoadedURL:url]) {
+        //            NSLog(@" skip injecting js %@ ",url);
+        //            //[_base injectJavascriptFile];
+        //        } else
+        if ([self isQueueMessageURL:url]) {
+            //                NSString *messageQueueString = [self _evaluateJavascript:[self webViewJavascriptFetchQueyCommand]];
+            NSString *messageQueueString = [webView stringByEvaluatingJavaScriptFromString:[self webViewJavascriptFetchQueyCommand]];
+            //                [self flushMessageQueue:messageQueueString];
+        } else {
+            //NSLog(@" logUnkownMessage %@ ",url);
+            //            [_base logUnkownMessage:url];
+            NSLog(@"WebViewJavascriptBridge: WARNING: Received unknown WebViewJavascriptBridge command url=%@", url);
+        }
+        return NO;
+        //        } else if (strongDelegate && [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+        //            return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+    } else {
+        return YES;
+    }
+    
+    //    if (self.startupMessageQueue) {
+    //        NSArray* queue = self.startupMessageQueue;
+    //        self.startupMessageQueue = nil;
+    //        for (id queuedMessage in queue) {
+    //            [self _dispatchMessage:queuedMessage];
+    //        }
+    //    }
     //    __strong NSObject<UIWebViewDelegate> * strongDelegate = _webViewDelegate;
     //    if ([_base isCorrectProcotocolScheme:url]) {
     //        //        if ([_base isBridgeLoadedURL:url]) {
@@ -287,7 +305,7 @@
     //    NSLog(@" injecting js");
     //    [_base injectJavascriptFile];
     //
-
+    
     //NOTES: failed for the windowScriptObject is for macOS only...
     //TODO change to wkwebview later for better performance
     //    //[webView windowScriptObject];
@@ -317,6 +335,7 @@
 #warning TODO add evalJs(js_s, callback)
 - (void)evalJs:(NSString *)js_s{
     //
+    [_webView stringByEvaluatingJavaScriptFromString:js_s];
 }
 
 - (void)setTopBar:(BOOL)haveTopBar{
@@ -343,17 +362,17 @@
 
 -(id)init {
     self = [super init];
-//    self.messageHandlers = [NSMutableDictionary dictionary];
-//    self.startupMessageQueue = [NSMutableArray array];
-//    self.responseCallbacks = [NSMutableDictionary dictionary];
-//    _uniqueId = 0;
+    //    self.messageHandlers = [NSMutableDictionary dictionary];
+    //    self.startupMessageQueue = [NSMutableArray array];
+    //    self.responseCallbacks = [NSMutableDictionary dictionary];
+    //    _uniqueId = 0;
     return(self);
 }
 
 - (void)dealloc {
-//    self.startupMessageQueue = nil;
-//    self.responseCallbacks = nil;
-//    self.messageHandlers = nil;
+    //    self.startupMessageQueue = nil;
+    //    self.responseCallbacks = nil;
+    //    self.messageHandlers = nil;
 }
 
 

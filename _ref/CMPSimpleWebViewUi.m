@@ -1,3 +1,9 @@
+/**
+ Simple 最大的不同其实只是绑定的 Api数量不同，所以 Simple是有可能被删除的！
+ 
+ 
+ */
+
 
 #import "CMPSimpleWebViewUi.h"
 #import "CMPHybridApi.h"
