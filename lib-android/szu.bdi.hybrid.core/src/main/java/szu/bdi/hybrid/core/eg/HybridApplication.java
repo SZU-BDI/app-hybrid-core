@@ -3,7 +3,6 @@ package szu.bdi.hybrid.core.eg;
 import android.app.Application;
 import android.util.Log;
 
-import szu.bdi.hybrid.core.HybridTools;
 
 public class HybridApplication extends Application {
     final private static String LOGTAG = "" + (new Object() {
@@ -17,6 +16,6 @@ public class HybridApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Log.v(LOGTAG, "HybridApplication.onCreate");
-        //HybridTools.setAppContext(getApplicationContext());
+
     }
 }

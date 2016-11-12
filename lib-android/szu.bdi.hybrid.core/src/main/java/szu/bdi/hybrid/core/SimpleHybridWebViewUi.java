@@ -1,21 +1,11 @@
 package szu.bdi.hybrid.core;
 
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-
-import szu.bdi.hybrid.core.HybridTools;
-import szu.bdi.hybrid.core.HybridUi;
-import szu.bdi.hybrid.core.JsBridgeWebView;
 
 //@SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class SimpleHybridWebViewUi extends HybridUi {
@@ -37,14 +27,14 @@ public class SimpleHybridWebViewUi extends HybridUi {
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";
         if (address == null || "".equals(address)) {
-            url = "file://" + HybridTools.localWebRoot + "error.htm";
+            url = "file://" + HybridTools.getLocalWebRoot() + "error.htm";
         } else {
             if (address.matches("^\\w+://.*$")) {
                 //if have schema already
                 url = address;
             } else {
                 //shuld be local?
-                url = "file://" + HybridTools.localWebRoot + address;
+                url = "file://" + HybridTools.getLocalWebRoot() + address;
             }
         }
 

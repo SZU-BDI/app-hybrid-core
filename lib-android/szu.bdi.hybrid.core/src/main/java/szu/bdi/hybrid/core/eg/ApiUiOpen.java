@@ -4,19 +4,18 @@ package szu.bdi.hybrid.core.eg;
 
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import szu.bdi.hybrid.core.HybridApi;
+import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.HybridUi;
-import szu.bdi.hybrid.core.ICallBackFunction;
-import szu.bdi.hybrid.core.ICallBackHandler;
+import szu.bdi.hybrid.core.HybridHandler;
+import szu.bdi.hybrid.core.JSO;
 
 public class ApiUiOpen extends HybridApi {
-    public ICallBackHandler getHandler() {
-        return new ICallBackHandler() {
+    public HybridHandler getHandler() {
+        return new HybridHandler() {
             @Override
-            public void handler(String dataStr, ICallBackFunction cb) {
+            public void handler(String dataStr, HybridCallback cb) {
                 HybridUi callerAct = getCallerUi();
                 Log.v("_app_activity_open", dataStr);
 
@@ -24,15 +23,19 @@ public class ApiUiOpen extends HybridApi {
 
                 String uiName = "UiContent";//default
 
-                JSONObject data_o = HybridTools.s2o(dataStr);
+                JSO data_o = JSO.s2o(dataStr);
 
-                //try override by the callParam.name
-                if (data_o != null) {
-                    String t = data_o.optString("name");
-                    if (!HybridTools.isEmptyString(t)) {
-                        uiName = t;
-                    }
+                String t = data_o.getChild("name").toString();
+                if (!HybridTools.isEmptyString(t)) {
+                    uiName = t;
                 }
+                //try override by the callParam.name
+//                if (data_o != null) {
+//                    String t = data_o.optString("name");
+//                    if (!HybridTools.isEmptyString(t)) {
+//                        uiName = t;
+//                    }
+//                }
                 HybridTools.startUi(uiName, dataStr, callerAct);
             }
         };

@@ -1,5 +1,5 @@
 package szu.bdi.hybrid.core;
 
-public interface ICallBackFunction {
+public interface HybridCallback {
     void onCallBack(String cbStr);
 }

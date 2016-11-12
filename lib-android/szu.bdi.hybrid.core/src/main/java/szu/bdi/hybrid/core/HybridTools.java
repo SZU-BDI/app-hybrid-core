@@ -11,10 +11,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -24,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -33,11 +28,15 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import szu.bdi.hybrid.core.eg.ApiUiClose;
+import szu.bdi.hybrid.core.eg.ApiUiOpen;
+
+
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
 
     private static Context _appContext = null;
-    public static String localWebRoot;
+    private static String _localWebRoot = "";
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
@@ -68,7 +67,8 @@ public class HybridTools {
 
     public static void quickShowMsg(Context mContext, String msg) {
         //@ref http://blog.csdn.net/droid_zhlu/article/details/7685084
-        //A toast is a view containing a quick little message for the user.  The toast class helps you create and show those.
+        //A toast is a view containing a quick little message for the user.
+        // The toast class helps you create and show those.
         try {
             Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
@@ -95,29 +95,7 @@ public class HybridTools {
         String return_s = null;
 
         try {
-            /**
-             * URL url = new URL("http://www.android.com/");
-             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-             try {
-             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-             readStream(in);
-             } finally {
-             urlConnection.disconnect();
-             }
-             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-             try {
-             urlConnection.setDoOutput(true);
-             urlConnection.setChunkedStreamingMode(0);
 
-             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-             writeStream(out);
-
-             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-             readStream(in);
-             } finally {
-             urlConnection.disconnect();
-             }
-             */
             URL url = new URL(uu);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
@@ -129,13 +107,6 @@ public class HybridTools {
                 //write to the stream
                 out.write(post_s.getBytes("UTF-8"));
 
-//                InputStream in = new BufferedInputStream(conn.getInputStream());
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-//                String s;
-//                while ((s = reader.readLine()) != null) {
-//                    return_s += s;
-//                }
-//                reader.close();
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 return_s = HybridTools.stream2string(in);
             } finally {
@@ -144,29 +115,7 @@ public class HybridTools {
                 } catch (Throwable t) {
                 }
             }
-            /**
-             HttpClient httpClient = new DefaultHttpClient();
-             //it's said that in future is:
-             // HttpClient httpClient = HttpClientBuilder.create().build();
-             //            CloseableHttpClient httpClient;
-             //            httpClient = HttpClientBuilder.create()
-             //                    .setDefaultConnectionConfig(config)
-             //                    .build();
 
-             //NOTES:  to improve this timeout better maybe...
-             // Connect Timeout
-             httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 12000);
-             // Socket Timeout
-             httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
-
-             HttpPost httpPost = new HttpPost(uu);
-             Log.v(LOGTAG, "To Post : " + uu + "\n" + post_s);
-
-             StringEntity se = new StringEntity(post_s);
-             httpPost.setEntity(se);
-             HttpResponse httpResponse = httpClient.execute(httpPost);
-             return_s = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
-             */
         } catch (Throwable ex) {
             //TODO 如果是 filenotfound的exception，多数是因为远程错误400之类的，待处理
             ex.printStackTrace();
@@ -178,27 +127,8 @@ public class HybridTools {
         return return_s;
     }
 
-    //@deprecated, using JSO.s2o()
-    public static JSONObject s2o(String s) {
-        if (s == null || "".equals(s)) return null;
-        try {
-            return new JSONObject(s);
-        } catch (Exception ex) {
-            Log.v(LOGTAG, "failed to parse json=" + s);
-            ex.printStackTrace();
-            //JSONArray
-        }
-        return null;
-    }
-
-    //@deprecated using JSO.o2s() ?
-    public static String o2s(JSONObject o) {
-        if (o == null) return null;
-        return o.toString();
-    }
-
     //Wrap the raw webPost for cmp api call
-    public static JSONObject apiPost(String url, JSONObject jo) {
+    public static JSO apiPost(String url, JSO jo) {
         String return_s = null;
         try {
             String post_s = jo.toString();
@@ -212,16 +142,18 @@ public class HybridTools {
         }
         try {
             if (return_s != null && return_s != "")
-                return new JSONObject(return_s);
+                return JSO.s2o(return_s);
         } catch (Exception ex) {
         }
-        JSONObject rt = new JSONObject();
-        try {
-            rt.put("STS", "KO");
-            rt.put("errmsg", "" + return_s);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSO rt = new JSO();
+        rt.setChild("STS", JSO.s2o("KO"));
+        rt.setChild("errmsg", JSO.s2o(return_s));
+//        try {
+//            rt.put("STS", "KO");
+//            rt.put("errmsg", "" + return_s);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
         return rt;
     }
 
@@ -268,28 +200,38 @@ public class HybridTools {
         return readAssetInStr(getAppContext(), s);
     }
 
-    private static JSONObject _jAppConfig = new JSONObject();
+    //private static JSONObject _jAppConfig = new JSONObject();
+    private static JSO _jAppConfig = null;//new JSO();
 
     //init (replace the app config)
-    public static void initAppConfig(JSONObject o) {
+    public static void initAppConfig(JSO o) {
         _jAppConfig = o;
     }
 
-    public static JSONObject wholeAppConfig() {
+    public static JSO wholeAppConfig() {
         return _jAppConfig;
     }
 
-    public static void setAppConfig(String K, Object V) {
-        try {
-            _jAppConfig.put(K, V);
-        } catch (JSONException e) {
-            Log.d(LOGTAG, "setConfig " + K);
-            e.printStackTrace();
+    public static void setAppConfig(String K, JSO V) {
+//        try {
+        //_jAppConfig.put(K, V);
+        _jAppConfig.setChild(K, V);
+//        } catch (JSONException e) {
+//            Log.d(LOGTAG, "setConfig " + K);
+//            e.printStackTrace();
+//        }
+    }
+
+    public static void checkAppConfig() {
+        if (_jAppConfig == null || _jAppConfig.isNull()) {
+            final String sJsonConf = readAssetInStr("config.json");
+            final JSO o = JSO.s2o(sJsonConf);
+            HybridTools.initAppConfig(o);
         }
     }
 
-    public static Object getAppConfig(String k) {
-        return _jAppConfig.opt(k);
+    public static JSO getAppConfig(String k) {
+        return _jAppConfig.getChild(k);
     }
 
     public static boolean isEmptyString(String s) {
@@ -337,58 +279,47 @@ public class HybridTools {
         b2.show();
     }
 
-    //    public static JSONObject deepMerge(JSONObject source, JSONObject target) throws JSONException {
-    //        for (String key: JSONObject.getNames(source)) {
-    //            Object value = source.get(key);
-    //            if (!target.has(key)) {
-    //                target.put(key, value);
-    //            } else {
-    //                if (value instanceof JSONObject) {
-    //                    JSONObject valueJson = (JSONObject)value;
-    //                    deepMerge(valueJson, target.getJSONObject(key));
-    //                } else {
-    //                    target.put(key, value);
-    //                }
-    //            }
-    //        }
-    //        return target;
-    //    }
-
     //shallow merge
-    public static JSONObject basicMerge(JSONObject... jsonObjects) {
-        JSONObject jsonObject = new JSONObject();
-        for (JSONObject temp : jsonObjects) {
+    private static JSO basicMerge(JSO... jsos) {
+        JSO jsonObject = new JSO();
+        for (JSO temp : jsos) {
             if (temp == null) continue;
-            Iterator<String> keys = temp.keys();
+            Iterator<String> keys = temp.getChildKeys().listIterator();
             while (keys.hasNext()) {
                 String key = keys.next();
-                try {
-                    jsonObject.put(key, temp.get(key));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (isEmpty(key)) {
+                    continue;
                 }
+                jsonObject.setChild(key, temp.getChild(key));
             }
         }
         return jsonObject;
     }
 
-    public static void startUi(String name, String overrideParam_s, Activity caller) {
-        Object uia = getAppConfig(UI_MAPPING);
+    public static void startUi(String name, String overrideParam_s, HybridUi caller) {
+        startUi(name, overrideParam_s, caller, null);
+    }
+
+    public static void startUi(String name, String overrideParam_s, HybridUi caller, HybridCallback cb) {
+        checkAppConfig();
+
+        JSO uia = getAppConfig(UI_MAPPING);
         if (uia == null) {
             HybridTools.quickShowMsgMain("config.json error!!!");
             return;
         }
-        JSONObject defaultParam = ((JSONObject) uia).optJSONObject(name);
+
+        JSO defaultParam = uia.getChild(name);
         if (defaultParam == null) {
             HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
             return;
         }
 
-        JSONObject overrideParam = s2o(overrideParam_s);
-        JSONObject callParam = basicMerge(defaultParam, overrideParam);
+        JSO overrideParam = JSO.s2o(overrideParam_s);
+        JSO callParam = basicMerge(defaultParam, overrideParam);
         Log.v(LOGTAG, "param after merge=" + callParam);
 
-        String clsName = callParam.optString("class");
+        String clsName = callParam.getChild("class").toString();
         if (isEmptyString(clsName)) {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
             return;
@@ -405,17 +336,21 @@ public class HybridTools {
 
         Intent intent = new Intent(caller, targetClass);
 
-        try {
-            if (!isEmptyString(name)) {
-                callParam.put("name", name);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (!isEmptyString(name)) {
+            callParam.setChild("name", JSO.s2o(name));
         }
 
-        String uiData_s = o2s(callParam);
+        String uiData_s = JSO.o2s(callParam);
 
         intent.putExtra("uiData", uiData_s);
+        //if (cbh != null) {
+        //((HybridUi) targetClass).setCallBackFunction(cbh);
+        //}
+//        HybridApi api = (HybridApi) new ApiUiOpen();
+//        api.setCallerUi(caller);
+        if (cb != null) {
+            caller.setCallBackFunction(cb);
+        }
         try {
             caller.startActivityForResult(intent, 1);//onActivityResult()
         } catch (Throwable t) {
@@ -423,14 +358,14 @@ public class HybridTools {
         }
     }
 
-    protected static JSONArray findSubAuth(JSONObject obj, String nameOf) {
-        JSONArray _found = null;
-        Iterator it = obj.keys();
+    protected static JSO findSubAuth(JSO jso, String nameOf) {
+        JSO _found = null;
+        Iterator it = jso.getChildKeys().iterator();
         while (it.hasNext()) {
             String key = (String) it.next();
             try {
                 if (Pattern.matches(key, nameOf)) {
-                    _found = obj.optJSONArray(key);
+                    _found = jso.getChild(key);
                     break;
                 }
             } catch (PatternSyntaxException ex) {
@@ -447,61 +382,63 @@ public class HybridTools {
             quickShowMsgMain("ConfigError: caller act name empty?");
             return;
         }
-        JSONObject uia = (JSONObject) getAppConfig(API_AUTH);
+        JSO uia = getAppConfig(API_AUTH);
         if (uia == null) {
             HybridTools.quickShowMsgMain("ConfigError: empty " + API_AUTH);
             return;
         }
-        JSONObject apia = (JSONObject) getAppConfig(API_MAPPING);
+        JSO apia = getAppConfig(API_MAPPING);
         if (apia == null) {
             HybridTools.quickShowMsgMain("ConfigError: empty " + API_MAPPING);
             return;
         }
 
-        JSONObject authObj = uia.optJSONObject(name);
-        if (authObj == null) {
+        //JSONObject authObj = uia.optJSONObject(name);
+        JSO authObj = uia.getChild(name);
+        if (authObj == null || authObj.isNull()) {
             HybridTools.quickShowMsgMain("ConfigError: not found auth for " + name + " !!!");
             return;
         }
         Log.v(LOGTAG, " authObj=" + authObj);
 
         String address = optString(callerAct.getUiData("address"));
-        JSONArray foundAuth = findSubAuth(authObj, address);
+        JSO foundAuth = findSubAuth(authObj, address);
         if (foundAuth == null) {
             //TODO
             HybridTools.quickShowMsgMain("ConfigError: not found match auth for address (" + address + ") !!!");
             return;
         }
         Log.v(LOGTAG, " foundAuth=" + foundAuth);
-        for (int i = 0; i < foundAuth.length(); i++) {
-            String v = foundAuth.optString(i);
-            if (!isEmptyString(v)) {
-                String clsName = apia.optString(v);
-                Log.v(LOGTAG, "binding api " + v + " => " + clsName);
-                if (isEmptyString(clsName)) {
-                    HybridTools.quickShowMsgMain("ConfigError: config not found for api=" + v);
-                    continue;
-                }
-                Class targetClass = null;
-                try {
-                    //reflection:
-                    targetClass = Class.forName(clsName);
-                    Log.v(LOGTAG, "class " + clsName + " found for name " + name);
-                } catch (ClassNotFoundException e) {
-                    HybridTools.quickShowMsgMain("ConfigError: class not found " + clsName);
-                    continue;
-                }
-                try {
-                    HybridApi api = (HybridApi) targetClass.newInstance();
-                    api.setCallerUi(callerAct);
-                    wv.registerHandler(v, api.getHandler());
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);
-                    continue;
-                }
-            }
-        }
+        //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        for (int i = 0; i < foundAuth.length(); i++) {
+//            String v = foundAuth.optString(i);
+//            if (!isEmptyString(v)) {
+//                String clsName = apia.optString(v);
+//                Log.v(LOGTAG, "binding api " + v + " => " + clsName);
+//                if (isEmptyString(clsName)) {
+//                    HybridTools.quickShowMsgMain("ConfigError: config not found for api=" + v);
+//                    continue;
+//                }
+//                Class targetClass = null;
+//                try {
+//                    //reflection:
+//                    targetClass = Class.forName(clsName);
+//                    Log.v(LOGTAG, "class " + clsName + " found for name " + name);
+//                } catch (ClassNotFoundException e) {
+//                    HybridTools.quickShowMsgMain("ConfigError: class not found " + clsName);
+//                    continue;
+//                }
+//                try {
+//                    HybridApi api = (HybridApi) targetClass.newInstance();
+//                    api.setCallerUi(callerAct);
+//                    wv.registerHandler(v, api.getHandler());
+//                } catch (Throwable t) {
+//                    t.printStackTrace();
+//                    HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);
+//                    continue;
+//                }
+//            }
+//        }
 
     }
 
@@ -582,6 +519,18 @@ public class HybridTools {
     public static int getStrLen(String rt_s) {
         if (rt_s == null) return -1;
         return rt_s.length();
+    }
+
+    static public String classNameOf(Object o) {
+        if (o == null) return "null";
+        return o.getClass().getName();
+    }
+
+    public static String getLocalWebRoot() {
+        if (isEmptyString(_localWebRoot)) {
+            _localWebRoot = "/android_asset/web/";
+        }
+        return _localWebRoot;
     }
 }
 

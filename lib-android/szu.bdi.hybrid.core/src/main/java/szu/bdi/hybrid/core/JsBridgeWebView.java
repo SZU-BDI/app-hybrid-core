@@ -20,10 +20,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,8 +59,8 @@ public class JsBridgeWebView extends WebView {
 //    final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
     //NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
-    Map<String, ICallBackFunction> responseCallbacks = new HashMap<String, ICallBackFunction>();
-    Map<String, ICallBackHandler> messageHandlers = new HashMap<String, ICallBackHandler>();
+    Map<String, HybridCallback> responseCallbacks = new HashMap<String, HybridCallback>();
+    Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
     class MyWebChromeClient extends WebChromeClient {
         Context _ctx = null;
@@ -331,7 +327,7 @@ public class JsBridgeWebView extends WebView {
                 @JavascriptInterface
                 public String js2app(final String callBackId, String handlerName, final String param_s) {
 
-                    final ICallBackFunction responseFunction = new ICallBackFunction() {
+                    final HybridCallback responseFunction = new HybridCallback() {
                         @Override
                         public void onCallBack(final String data_s) {
                             ((Activity) context).runOnUiThread(new Runnable() {
@@ -350,7 +346,7 @@ public class JsBridgeWebView extends WebView {
                             });
                         }
                     };
-                    final ICallBackHandler handler = messageHandlers.get(handlerName);
+                    final HybridHandler handler = messageHandlers.get(handlerName);
 
                     //TODO 这里要有个 auth-mapping (whitelist) check?
                     if (handler != null) {
@@ -380,7 +376,7 @@ public class JsBridgeWebView extends WebView {
 
     void handlerReturnData(String url) {
         String functionName = getFunctionFromReturnUrl(url);
-        ICallBackFunction f = responseCallbacks.get(functionName);
+        HybridCallback f = responseCallbacks.get(functionName);
         String data = getDataFromReturnUrl(url);
         if (f != null) {
             f.onCallBack(data);
@@ -389,7 +385,7 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-//    private void _app2js(String handlerName, String data, ICallBackFunction responseCallback) {
+//    private void _app2js(String handlerName, String data, HybridCallback responseCallback) {
 //        Jsb1Msg m = new Jsb1Msg();
 //        if (!TextUtils.isEmpty(data)) {
 //            m.setDataStr(data);
@@ -429,7 +425,7 @@ public class JsBridgeWebView extends WebView {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 
             //call the _fetchQueue()
-            loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new ICallBackFunction() {
+            loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new HybridCallback() {
 
                 @Override
                 public void onCallBack(String data) {
@@ -454,18 +450,18 @@ public class JsBridgeWebView extends WebView {
 
                         if (!TextUtils.isEmpty(responseId)) {
                             //if has reponseId, find the callback
-                            ICallBackFunction function = responseCallbacks.get(responseId);
+                            HybridCallback function = responseCallbacks.get(responseId);
                             String responseData = m.getResponseData();
                             function.onCallBack(responseData);
                             //after call, clean it up
                             responseCallbacks.remove(responseId);
                         } else {
                             //new call or a callback from js
-                            ICallBackFunction responseFunction = null;
+                            HybridCallback responseFunction = null;
                             final String callbackId = m.getCallbackId();
                             if (!TextUtils.isEmpty(callbackId)) {
                                 //it is a callback from js
-                                responseFunction = new ICallBackFunction() {
+                                responseFunction = new HybridCallback() {
                                     @Override
                                     public void onCallBack(String data_s) {
                                         Jsb1Msg responseMsg = new Jsb1Msg();
@@ -475,7 +471,7 @@ public class JsBridgeWebView extends WebView {
                                     }
                                 };
                             }
-                            ICallBackHandler handler = null;
+                            HybridHandler handler = null;
                             if (!TextUtils.isEmpty(m.getHandlerName())) {
                                 handler = messageHandlers.get(m.getHandlerName());
                                 //TODO 这里要有个 auth-mapping (whitelist) check?
@@ -492,19 +488,19 @@ public class JsBridgeWebView extends WebView {
         }
     }
 
-    public void loadUrl(String jsUrl, ICallBackFunction returnCallback) {
+    public void loadUrl(String jsUrl, HybridCallback returnCallback) {
         responseCallbacks.put(parseFunctionName(jsUrl), returnCallback);
         this.loadUrl(jsUrl);
     }
 
-    public void registerHandler(String handlerName, ICallBackHandler handler) {
+    public void registerHandler(String handlerName, HybridHandler handler) {
         if (handler != null) {
             messageHandlers.put(handlerName, handler);
         }
     }
 
     //from java call js...
-//    public void callHandler(String handlerName, String data_s, ICallBackFunction cb) {
+//    public void callHandler(String handlerName, String data_s, HybridCallback cb) {
 //        _app2js(handlerName, data_s, cb);
 //    }
 
@@ -564,37 +560,34 @@ public class JsBridgeWebView extends WebView {
         }
 
         public String toJson() {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put(CALLBACK_ID_STR, getCallbackId());
-                jsonObject.put(DATA_STR, getDataStr());
-                jsonObject.put(HANDLER_NAME_STR, getHandlerName());
-                jsonObject.put(RESPONSE_DATA_STR, getResponseData());
-                jsonObject.put(RESPONSE_ID_STR, getResponseId());
-                return jsonObject.toString();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
+            JSO jso = new JSO();
+            jso.setChild(CALLBACK_ID_STR, getCallbackId());
+            jso.setChild(DATA_STR, getDataStr());
+            jso.setChild(HANDLER_NAME_STR, getHandlerName());
+            jso.setChild(RESPONSE_DATA_STR, getResponseData());
+            jso.setChild(RESPONSE_ID_STR, getResponseId());
+
+            return jso.toString();
         }
 
         public static List<Jsb1Msg> toArrayList(String jsonStr) {
             List<Jsb1Msg> list = new ArrayList<Jsb1Msg>();
-            try {
-                JSONArray jsonArray = new JSONArray(jsonStr);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    Jsb1Msg m = new Jsb1Msg();
-                    m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR) : null);
-                    m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
-                    m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
-                    m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
-                    m.setDataStr(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
-                    list.add(m);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            //TODO jso.arrayAdd(JSO);
+//            try {
+//                JSO jso = new JSO(jsonStr);
+//                for (int i = 0; i < jsonArray.length(); i++) {
+//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                    Jsb1Msg m = new Jsb1Msg();
+//                    m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR) : null);
+//                    m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
+//                    m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
+//                    m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
+//                    m.setDataStr(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
+//                    list.add(m);
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
             return list;
         }
     }

@@ -11,5 +11,5 @@ abstract public class HybridApi {
         return __callerUi;
     }
 
-    abstract public ICallBackHandler getHandler();
+    abstract public HybridHandler getHandler();
 }

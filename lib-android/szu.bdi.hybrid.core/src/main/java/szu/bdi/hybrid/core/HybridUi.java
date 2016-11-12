@@ -12,14 +12,11 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class HybridUi extends Activity {
 
     private static String LOGTAG = "HybridUi";
 
-    JSONObject _uiData;
+    JSO _uiData;
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -29,7 +26,7 @@ public class HybridUi extends Activity {
         Intent iin = getIntent();
         String s_uiData = iin.getStringExtra("uiData");
 
-        initUiData(HybridTools.s2o(s_uiData));
+        initUiData(JSO.s2o(s_uiData));
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
         String topbar = HybridTools.optString(getUiData("topbar"));
 
@@ -67,13 +64,9 @@ public class HybridUi extends Activity {
 
     public void close() {
         //{name: $name, address: adress}
-        JSONObject o = new JSONObject();
-        try {
-            o.put("name", getUiData("name"));
-            o.put("address", getUiData("address"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSO o = new JSO();
+        o.setChild("name", getUiData("name"));
+        o.setChild("address", getUiData("address"));
 
         Intent rtIntent = new Intent();
         rtIntent.putExtra("rt", o.toString());
@@ -112,34 +105,36 @@ public class HybridUi extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void initUiData(JSONObject o) {
+    public void initUiData(JSO o) {
         if (o == null) return;
         _uiData = o;
-        this.setUiData("_init_time_", HybridTools.isoDateTime());
+        this.setUiData("_init_time_", JSO.s2o(HybridTools.isoDateTime()));
     }
 
-    public JSONObject wholeUiData() {
+    public JSO wholeUiData() {
         return _uiData;
     }
 
-    public void setUiData(String k, Object v) {
-        try {
-            _uiData.put(k, v);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void setUiData(String k, JSO v) {
+        _uiData.setChild(k, v);
+//        try {
+//            _uiData.put(k, v);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
-    public Object getUiData(String k) {
+    public JSO getUiData(String k) {
         if (null == _uiData) return null;
         Log.v(LOGTAG, " _uiData=" + _uiData);
-        Log.v(LOGTAG, " getUiData " + k + "=>" + _uiData.opt(k));
-        return _uiData.opt(k);
+//        Log.v(LOGTAG, " getUiData " + k + "=>" + _uiData.opt(k));
+//        return _uiData.opt(k);
+        return _uiData.getChild(k);
     }
 
-    protected ICallBackFunction _cb = null;
+    protected HybridCallback _cb = null;
 
-    public void setCallBackFunction(ICallBackFunction cb) {
+    public void setCallBackFunction(HybridCallback cb) {
         _cb = cb;
     }
 

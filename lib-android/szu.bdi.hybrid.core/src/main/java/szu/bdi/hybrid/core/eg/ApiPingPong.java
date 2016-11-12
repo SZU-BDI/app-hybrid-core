@@ -2,20 +2,18 @@ package szu.bdi.hybrid.core.eg;
 
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import java.util.Date;
 
 import szu.bdi.hybrid.core.HybridApi;
-import szu.bdi.hybrid.core.ICallBackFunction;
-import szu.bdi.hybrid.core.ICallBackHandler;
+import szu.bdi.hybrid.core.HybridCallback;
+import szu.bdi.hybrid.core.HybridHandler;
 import szu.bdi.hybrid.core.JSO;
 
 public class ApiPingPong extends HybridApi {
-    public ICallBackHandler getHandler() {
-        return new ICallBackHandler() {
+    public HybridHandler getHandler() {
+        return new HybridHandler() {
             @Override
-            public void handler(String dataStr, ICallBackFunction cb) {
+            public void handler(String dataStr, HybridCallback cb) {
                 Log.v("ApiPingPong", dataStr);
 
                 JSO data_o = JSO.s2o(dataStr);
