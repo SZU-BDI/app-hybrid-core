@@ -4,6 +4,7 @@ package szu.bdi.hybrid.core;
 import android.util.Log;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.ParseException;
@@ -71,6 +72,13 @@ public final class JSO {
     public String asString() {
         if (_value != null) return _value.asString();
         return null;
+    }
+
+    public JsonArray asArray() {
+        if (_value != null && _value.isArray()) {
+            return _value.asArray();
+        }
+        return Json.array();
     }
 
     public String toString(boolean quote) {

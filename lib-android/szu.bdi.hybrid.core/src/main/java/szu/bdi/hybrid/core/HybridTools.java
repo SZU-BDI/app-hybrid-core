@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.eclipsesource.json.JsonArray;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -393,36 +395,36 @@ public class HybridTools {
             return;
         }
         Log.v(LOGTAG, " foundAuth=" + foundAuth);
-        //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        for (int i = 0; i < foundAuth.length(); i++) {
-//            String v = foundAuth.optString(i);
-//            if (!isEmptyString(v)) {
-//                String clsName = apia.optString(v);
-//                Log.v(LOGTAG, "binding api " + v + " => " + clsName);
-//                if (isEmptyString(clsName)) {
-//                    HybridTools.quickShowMsgMain("ConfigError: config not found for api=" + v);
-//                    continue;
-//                }
-//                Class targetClass = null;
-//                try {
-//                    //reflection:
-//                    targetClass = Class.forName(clsName);
-//                    Log.v(LOGTAG, "class " + clsName + " found for name " + name);
-//                } catch (ClassNotFoundException e) {
-//                    HybridTools.quickShowMsgMain("ConfigError: class not found " + clsName);
-//                    continue;
-//                }
-//                try {
-//                    HybridApi api = (HybridApi) targetClass.newInstance();
-//                    api.setCallerUi(callerAct);
-//                    wv.registerHandler(v, api.getHandler());
-//                } catch (Throwable t) {
-//                    t.printStackTrace();
-//                    HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);
-//                    continue;
-//                }
-//            }
-//        }
+        JsonArray ja = foundAuth.asArray();//tmp...
+        for (int i = 0; i < ja.size(); i++) {
+            String v = ja.get(i).asString();
+            if (!isEmptyString(v)) {
+                String clsName = apia.getChild(v).asString();
+                Log.v(LOGTAG, "binding api " + v + " => " + clsName);
+                if (isEmptyString(clsName)) {
+                    HybridTools.quickShowMsgMain("ConfigError: config not found for api=" + v);
+                    continue;
+                }
+                Class targetClass = null;
+                try {
+                    //reflection:
+                    targetClass = Class.forName(clsName);
+                    Log.v(LOGTAG, "class " + clsName + " found for name " + name);
+                } catch (ClassNotFoundException e) {
+                    HybridTools.quickShowMsgMain("ConfigError: class not found " + clsName);
+                    continue;
+                }
+                try {
+                    HybridApi api = (HybridApi) targetClass.newInstance();
+                    api.setCallerUi(callerAct);
+                    wv.registerHandler(v, api.getHandler());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);
+                    continue;
+                }
+            }
+        }
 
     }
 

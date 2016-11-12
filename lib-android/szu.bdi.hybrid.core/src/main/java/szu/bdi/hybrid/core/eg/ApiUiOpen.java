@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core.eg;
 
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
+import android.os.Looper;
 import android.util.Log;
 
 import szu.bdi.hybrid.core.HybridApi;
@@ -19,7 +20,7 @@ public class ApiUiOpen extends HybridApi {
                 HybridUi callerAct = getCallerUi();
                 Log.v("_app_activity_open", dataStr);
 
-                callerAct.setCallBackFunction(cb);
+                //callerAct.setCallBackFunction(cb);
 
                 String uiName = "UiContent";//default
 
@@ -36,7 +37,8 @@ public class ApiUiOpen extends HybridApi {
 //                        uiName = t;
 //                    }
 //                }
-                HybridTools.startUi(uiName, dataStr, callerAct);
+                Looper.prepare();
+                HybridTools.startUi(uiName, dataStr, callerAct, cb);
             }
         };
     }
