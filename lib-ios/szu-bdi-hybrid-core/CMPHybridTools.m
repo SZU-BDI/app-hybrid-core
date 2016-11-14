@@ -268,12 +268,16 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     return nil;
 }
+
 +(NSString *) fullPathOfAsset :(NSString *) filename
 {
-    return [[NSBundle mainBundle]
-            pathForResource:[filename stringByDeletingPathExtension]
-            ofType:[filename pathExtension]];
+    NSString *rt
+    = [[NSBundle mainBundle]
+       pathForResource:[filename stringByDeletingPathExtension]
+       ofType:[filename pathExtension]];
+    return rt;
 }
+
 +(NSString *)readAssetInStr :(NSString *)filename
 {
     return [NSString
@@ -281,10 +285,12 @@ SINGLETON_shareInstance(CMPHybridTools);
             encoding:NSUTF8StringEncoding
             error:NULL];
 }
+
 +(BOOL) isEmptyString :(NSString *)s
 {
     return (nil==s || [@"" isEqualToString:s]);
 }
+
 +(void) promptUserQuit
 {
     [CMPHybridTools

@@ -29,6 +29,8 @@
 
 + (UIViewController *) findTopRootView;
 
++ (NSString *) fullPathOfAsset :(NSString *)filename;
+
 + (void)quickShowMsgMain:(NSString *)message;
 
 //- (void)someMethodThatTakesABlock:(returnType (^nullability)(parameterTypes))blockName;

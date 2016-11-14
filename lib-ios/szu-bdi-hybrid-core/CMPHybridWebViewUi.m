@@ -148,7 +148,7 @@
     //        topBarTitle = paramTitle;
     //    }
     
-    [self CustomLeftBarButtonItem ];
+    [self CustomTopBar ];
     
     //    if (self.haveTopBar) {
     //        [[self navigationController] setNavigationBarHidden:NO animated:YES];
@@ -159,7 +159,9 @@
     // Do any additional setup after loading the view.
 #warning 先临时用旧的代码测试，要改的！！！唉
     
-    [self LoadLocalhtmlName:@"root"];
+//    [self LoadLocalhtmlName:@"root"];
+    [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:@"root.htm"]]];
+    
     //[self loadAccessAddress];
     
     //    if (_bridge) {
@@ -359,61 +361,30 @@
     
 }
 
-// Custom topBar left back buttonItem
-- (void)CustomLeftBarButtonItem{
+//NOTES: can be overrided!
+- (void) CustomTopBar{
     
-    UIBarButtonItem *leftBar
-    = [[UIBarButtonItem alloc]
-       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]
-       style:UIBarButtonItemStylePlain
-       target:self
-       action:@selector(closeUi) //on('click')=>close()
-       ];
-    leftBar.tintColor = [UIColor blackColor];
-    self.navigationItem.leftBarButtonItem = leftBar;
-}
+    //    UIBarButtonItem *leftBar
+    //    = [[UIBarButtonItem alloc]
+    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+    //       style:UIBarButtonItemStylePlain
+    //       target:self
+    //       action:@selector(closeUi) //on('click')=>close()
+    //       ];
+    //    leftBar.tintColor = [UIColor blueColor];
 
-//- (void)leftBarItemAction{
-//
-//    // 判断是被push还是被modal出来的;
-//    NSArray *viewcontrollers = self.navigationController.viewControllers;
-//
-//    if (viewcontrollers.count > 1) {
-//
-//        if ([viewcontrollers objectAtIndex:viewcontrollers.count-1] == self){
-//            //push方式
-//            [self.navigationController popViewControllerAnimated:YES];
-//        }
-//    }
-//    else{
-//
-//        //quit app if prompted yes
-//        [CMPHybridTools
-//         quickConfirmMsgMain:@"Sure to Quit?"
-//         //         handlerYes:^(UIAlertAction *action)
-//         handlerYes:^(UIAlertAction *action){
-//             [self dismissViewControllerAnimated:YES completion:nil];
-//
-//             //home button press programmatically
-//             UIApplication *app = [UIApplication sharedApplication];
-//             NSLog(@"Hide...");
-//             [app performSelector:@selector(suspend)];
-//             sleep(1);
-//             NSLog(@"Really Quit...");
-//             exit(EXIT_SUCCESS);
-//         }
-//         handlerNo:nil];
-//    }
-//
-//#warning TODO here
-////    if (self.callback) {
-////
-////        //        JSO *jsoValue = [JSO s2o:self.accessAddress];
-////        //        [jsoValue setChild:@"address" JSO:jsoValue];
-////        NSString *address = [NSString stringWithFormat:@"%@", self.accessAddress];
-////        self.callback(@{@"address":address});
-////    }
-//}
+    self.navigationItem.leftBarButtonItem
+    = [[UIBarButtonItem alloc]
+       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+       target:self
+       action:@selector(closeUi)];
+    
+//    UIBarButtonItem *rightBtn
+//    = [[UIBarButtonItem alloc]
+//       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+//    self.navigationItem.rightBarButtonItem = rightBtn;
+
+}
 
 - (void)registerHandlerApi{
     
