@@ -27,6 +27,7 @@
 
 + (JSO *)wholeAppConfig;
 
++ (UIViewController *) findTopRootView;
 
 + (void)quickShowMsgMain:(NSString *)message;
 

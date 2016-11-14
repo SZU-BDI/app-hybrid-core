@@ -52,7 +52,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 
 + (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(CMPHybridUi *)objCaller callback:(HybridCallback)callback{
-
+    
     [self checkAppConfig];
     
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
@@ -76,27 +76,25 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     
     theHybridUi.uiData=uiConfig;
-
+    
     if (callback) {
         theHybridUi.callback=callback;
     }else{
         //TODO attach to a default callback handler??
     }
-
-    if (objCaller == nil) {
-        
-        id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
-        
+    
+    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
+    if (ddd.window.rootViewController==nil){
         if ([theHybridUi isKindOfClass:[UITabBarController class]]) {
-            // 若为 UI 为 UITabBarController类型 则直接作为根视图
             ddd.window.rootViewController = (UIViewController *)theHybridUi;
         }
         else{
-            // 否则，添加导航栏后，作为根视图
             UINavigationController *nav = [[UINavigationController alloc]
                                            initWithRootViewController:(UIViewController *)theHybridUi];
             ddd.window.rootViewController = nav;
         }
+    }
+    if (objCaller == nil) {
     }
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
@@ -172,7 +170,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 //IOS 8+
 + (void)quickShowMsgMain:(NSString *)msg{
-
+    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
@@ -237,10 +235,15 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 + (void) quitGracefully
 {
-    [[self findTopRootView] dismissViewControllerAnimated:YES completion:nil];
+    //close top
+    //[[self findTopRootView] dismissViewControllerAnimated:YES completion:nil];
+    
     [self suspendApp];
+    
     sleep(1);
+    
     NSLog(@"Really Quit...");
+    
     exit(EXIT_SUCCESS);
 }
 
@@ -288,7 +291,7 @@ SINGLETON_shareInstance(CMPHybridTools);
      quickConfirmMsgMain:@"Sure to Quit?"
      //         handlerYes:^(UIAlertAction *action)
      handlerYes:^(UIAlertAction *action){
-//         [self dismissViewControllerAnimated:YES completion:nil];
+         //         [self dismissViewControllerAnimated:YES completion:nil];
          
          //home button press programmatically
          UIApplication *app = [UIApplication sharedApplication];

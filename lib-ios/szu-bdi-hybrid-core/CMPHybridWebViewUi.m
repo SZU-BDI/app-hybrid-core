@@ -95,7 +95,11 @@
     self.myWebView.scrollView.bounces = NO;
     self.view = self.myWebView;
 }
-
+-(void)viewDidUnload
+{
+    NSLog(@"TODO viewDidUnload() 要不要在这里呼叫callback....");
+    [super viewDidLoad];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -153,7 +157,9 @@
     //    }
     
     // Do any additional setup after loading the view.
+#warning 先临时用旧的代码测试，要改的！！！唉
     
+    [self LoadLocalhtmlName:@"root"];
     //[self loadAccessAddress];
     
     //    if (_bridge) {
@@ -248,7 +254,15 @@
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param_s){
         //,JSValue *handlerName,JSStringRef param_s
         NSLog(@"JavaScript %@ callBackId: %@ handlerName %@ param_s %@", [JSContext currentContext], callBackId, handlerName, param_s);
-        
+#warning 暂时用 _app_activity_close 测试，稍后要接回对应的api
+        if( [@"_app_activity_close" isEqualToString:[handlerName toString]] ){
+            [self closeUi];
+        }
+        if( [@"_app_activity_open" isEqualToString:[handlerName toString]] ){
+            [CMPHybridTools startUi:@"UiRoot" strInitParam:nil objCaller:self callback:^(id responseData){
+                NSLog(@"on startUi callback %@",responseData);
+            }];
+        }
         //find the api and call...
         //                responseCallback = ^(id responseData) {
         //                    if (responseData == nil) {
@@ -353,7 +367,7 @@
        initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]
        style:UIBarButtonItemStylePlain
        target:self
-       action:@selector(close) //on('click')=>close()
+       action:@selector(closeUi) //on('click')=>close()
        ];
     leftBar.tintColor = [UIColor blackColor];
     self.navigationItem.leftBarButtonItem = leftBar;

@@ -36,7 +36,8 @@ return _sharedInstance;\
 @property (strong) JSO *uiData;
 @property (strong) HybridCallback callback;
 
-- (void) close;
+//- (void) close;//the close is taken
+-(void) closeUi;
 
 @end
 
