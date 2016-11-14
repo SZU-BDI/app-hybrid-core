@@ -2,8 +2,6 @@
 //#define CMPHybridUi_h
 
 
-//#endif /* CMPHybridUi_h */
-
 
 #import "CMPHybridUi.h"
 
@@ -14,4 +12,14 @@
 @property (nonatomic, weak) CMPHybridUi *currentUi;
 
 @end
+
+
+
+
+
+
+
+
+//#endif /* CMPHybridUi_h */
+
 

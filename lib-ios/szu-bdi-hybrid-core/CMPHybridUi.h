@@ -1,46 +1,46 @@
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
+@import UIKit;
+@class JSO;
 
 #ifndef Hybrid_h
 #define Hybrid_h
+
 
 typedef void (^HybridCallback)(id responseData);
 
 typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
-typedef void (^HybridAlertCallback)(UIAlertAction *action);
+typedef void (^HybridDialogCallback)(UIAlertAction *action);
 
-#define S_JSB_PROTOCOL @"jsb1"
-#define S_JSB_Q_MSG      @"__QUEUE_MESSAGE__"
-
-#warning TODO change as JSO
-typedef NSDictionary WVJBMessage;
+#define SINGLETON_shareInstance(classname) \
++ (classname *)shareInstance\
+{\
+static classname *_sharedInstance = nil;\
+static dispatch_once_t onceToken;\
+dispatch_once(&onceToken, ^{\
+_sharedInstance = [[self alloc] init];\
+});\
+return _sharedInstance;\
+}
 
 #endif /* Hybrid_h */
+
 
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
 
-@protocol HybridUiProtocol
 
-@optional
+@interface CMPHybridUi : UIViewController
 
-- (void)setTopBar:(BOOL)haveTopBar;
+@property (strong) JSO *uiData;
+@property (strong) HybridCallback callback;
 
-- (void)setTopBarTitle:(NSString *)title;
-
-#warning move to pageUiData...
-- (void)setWebViewUiUrl:(NSString *)url;
-
-//callback for close..
-- (void)setCallback:(HybridCallback)callback;
-
-- (void)activityClose;
+- (void) close;
 
 @end
 
-@interface CMPHybridUi : UIViewController<HybridUiProtocol>
 
 
-@end
+
 #endif /* CMPHybridUi_h */

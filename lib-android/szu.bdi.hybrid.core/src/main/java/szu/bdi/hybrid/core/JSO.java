@@ -70,7 +70,13 @@ public final class JSO {
     }
 
     public String asString() {
-        if (_value != null) return _value.asString();
+        if (_value != null) {
+            try {
+                return _value.asString();
+            } catch (UnsupportedOperationException ex) {
+                ex.printStackTrace();
+            }
+        }
         return null;
     }
 

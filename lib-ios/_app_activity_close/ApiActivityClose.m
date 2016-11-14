@@ -8,7 +8,7 @@
 
 - (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {
-        [self.currentUi activityClose];
+        [self.currentUi close];
     };
 }
 

@@ -2,106 +2,87 @@
 
 #import "CMPHybridTools.h"
 
+#import "CMPHybridTools.h"
+@import JavaScriptCore;
+
+/////////////////////////////////////////////////////////////
+//internal class(CmpUIAlertView) to handle the callback
+//quickAlertMsg()
+@interface CmpUIAlertView : UIAlertView
+
+@property () void (^callback)();
+
+-(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback;
+
+@end
+
+@implementation CmpUIAlertView
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(self.callback)
+        self.callback();
+}
+
+-(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback
+{
+    self.callback=callback;
+    return [self initWithTitle:msg
+                       message:@""
+                      delegate:self
+             cancelButtonTitle:nil
+             otherButtonTitles:@"OK",
+            nil];
+}
+@end
+/////////////////////////////////////////////////////////////
 
 @implementation CMPHybridTools
 
-+ (id)getSingleton{
-    
-    static CMPHybridTools *_sharedHybridTools = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedHybridTools = [[self alloc] init];
-    });
-    return _sharedHybridTools;
-}
+
+SINGLETON_shareInstance(CMPHybridTools);
+
 
 + (void)checkAppConfig{
     
-    CMPHybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self shareInstance];
     if(nil==hybridManager.jso){
-        
-        // readFileFromAsset()
-        NSString *jsonString = [self readFileFromAsset:@"config" ofType:@"json"];
-        
-        JSO *jsonJso = [JSO s2o:jsonString];
-        hybridManager.jso = jsonJso;
+        hybridManager.jso = [JSO s2o:[self readAssetInStr:@"config.json"]];
     }
 }
 
 + (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(CMPHybridUi *)objCaller callback:(HybridCallback)callback{
+
     [self checkAppConfig];
     
-    // 获取 UI 映射数据
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
-    // 获取 UI 的配置文件
-    JSO *jso_uiConfig = [jso_uiMapping getChild:strUiName];
+    JSO *uiConfig = [jso_uiMapping getChild:strUiName];
     
-    // 动态获取 UI 类:
-    JSO *jso_className = [jso_uiConfig getChild:@"class"];
+    JSO *jso_className = [uiConfig getChild:@"class"];
     NSString *className = [JSO o2s:jso_className];
     
-    // 实例化动态获取的 UI 类:
+    if ( [self isEmptyString :className]) {
+        [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
+        return;
+    }
+    
     Class uiClass = NSClassFromString(className);
     CMPHybridUi * theHybridUi = [[uiClass alloc] init];
     
-    // 判断是否存在
     if (!theHybridUi) {
-        [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is not found", strUiName]];
+        [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return;
     }
-        
-    // 2、获取 UI 的类型  *覆盖参数有type* 则覆盖附带的type
-    NSString *uiMode = [self fastO2S:jso_uiConfig forKey:@"type"];
-    NSString *paramUiMode = [self fastO2S:strInitParam forKey:@"type"];
-    if (![paramUiMode isEqualToString:@""]) {
-        uiMode = paramUiMode;
-    }
     
-    // 3、获取 UI 的url  *覆盖参数有url* 则覆盖附带的url
-    NSString *webUrl = [self fastO2S:jso_uiConfig forKey:@"url"];
-    NSString *paramWebUrl = [self fastO2S:strInitParam forKey:@"address"];
-    if (![paramWebUrl isEqualToString:@""]) {
-        webUrl = paramWebUrl;
-    }
-    
-    // 4、获取 UI 有无topBar *覆盖参数有topBar* 则覆盖附带的topBar
-    NSString *topBarStatus = [self fastO2S:jso_uiConfig forKey:@"topbar"];
-    BOOL flagTopBar = ([topBarStatus isEqualToString:@"Y"])? YES : NO;
-    NSString *paramTopBarStatus = [self fastO2S:strInitParam forKey:@"topbar"];
-    if (![paramTopBarStatus isEqualToString:@""]) {
-        flagTopBar = ([paramTopBarStatus isEqualToString:@"Y"])? YES : NO;
-    }
-    
-    // 5、获取 UI topBar 的标题  *覆盖参数有title* 则覆盖附带的title
-    NSString *topBarTitle = [self fastO2S:jso_uiConfig forKey:@"title"];
-    NSString *paramTitle = [self fastO2S:strInitParam forKey:@"title"];
-    if (![paramTitle isEqualToString:@""]) {
-        topBarTitle = paramTitle;
-    }
-    
-    // 6、判断是否有回调函数
+    theHybridUi.uiData=uiConfig;
+
     if (callback) {
-        // 7、设置回调
-        [theHybridUi setCallback:callback];
+        theHybridUi.callback=callback;
+    }else{
+        //TODO attach to a default callback handler??
     }
-    
-    /*---------------- 开始设置 -----------------
-     若为 WebView 类型，则通过HybridUi协议设置 ui 的 url*/
-    if ([uiMode isEqualToString:@"WebView"]) {
-#warning 整个参数丢过去啊。。。唉
-        [theHybridUi setWebViewUiUrl:webUrl];
-    }
-    
-    [theHybridUi setTopBar:flagTopBar];
-    
-    // 若 topBar 为显示状态，则通过HybridUi协议设置 ui 的 topBar title
-    if (flagTopBar && topBarTitle) {
-        [theHybridUi setTopBarTitle:topBarTitle];
-    }
-    
-    /*---- 开始执行 ----*/
-    // 调用者为nil 则表示是启动
+
     if (objCaller == nil) {
         
         id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
@@ -112,18 +93,18 @@
         }
         else{
             // 否则，添加导航栏后，作为根视图
-            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:(UIViewController *)theHybridUi];
+            UINavigationController *nav = [[UINavigationController alloc]
+                                           initWithRootViewController:(UIViewController *)theHybridUi];
             ddd.window.rootViewController = nav;
         }
     }
     else{
-        
         if (((UIViewController *)objCaller).navigationController != nil) {
             // push
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{
-            // moda
+            // modal
             [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
         }
     }
@@ -148,7 +129,7 @@
 
 + (JSO *)wholeAppConfig{
     
-    CMPHybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self shareInstance];
     return hybridManager.jso;
 }
 
@@ -181,23 +162,9 @@
     return jsonString;
 }
 
-+ (NSString *)readFileFromAsset:(NSString *)asset ofType:(NSString *)type{
-    
-    // get path of asset (config.json)
-    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:asset ofType:type];
-    
-    // get the content of the config.json
-    NSData *jsonData = [[NSData alloc] initWithContentsOfFile:configFilePath];
-    
-    // decoded as string of utf-8
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    return jsonString == nil ? @"":jsonString;
-}
-
 //deprecated, see quickShowMsgMain()
 //+ (void)showAlertMessage:(NSString *)message{
-//    
+//
 //    //deprecated UIAlertView and UIAlertViewDelegate
 //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
 //        [alert show];
@@ -206,24 +173,31 @@
 //IOS 8+
 + (void)quickShowMsgMain:(NSString *)msg{
 
-
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
     [alertController addAction:ok];
     
     //[self presentViewController:alertController animated:YES completion:nil];
-
-    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (topRootViewController.presentedViewController)
-    {
-        topRootViewController = topRootViewController.presentedViewController;
-    }
     
-    [topRootViewController presentViewController:alertController animated:NO completion:nil];
+    //    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    //    while (topRootViewController.presentedViewController)
+    //    {
+    //        topRootViewController = topRootViewController.presentedViewController;
+    //    }
+    //
+    //    [topRootViewController presentViewController:alertController animated:NO completion:nil];
     
-    //NOTES: the alert above will not block the whole application, that's why need find the top view to show (so that block...)
+    [[self findTopRootView] presentViewController:alertController animated:NO completion:nil];
+    
+    //NOTES: the alert above will not block the whole application,
+    //that's why need to find the top view to show?
     NSLog(@"After show alert %@",msg);
+}
+
++ (void)quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
+{
+    [[[CmpUIAlertView alloc] initWithMsg:msg callback:callback] show];
 }
 
 + (UIViewController *) findTopRootView
@@ -236,12 +210,13 @@
     
     return topRootViewController;
 }
+
 //IOS 8 +
 + (void)quickConfirmMsgMain:(NSString *)msg
 //                 handlerYes:(void (^)(UIAlertAction *action))handlerYes
 //                  handlerNo:(void (^)(UIAlertAction *action))handlerNo
-                 handlerYes:(HybridAlertCallback) handlerYes
-                  handlerNo:(HybridAlertCallback) handlerNo
+                 handlerYes:(HybridDialogCallback) handlerYes
+                  handlerNo:(HybridDialogCallback) handlerNo
 {
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
@@ -258,9 +233,9 @@
     UIApplication *app = [UIApplication sharedApplication];
     NSLog(@"Hide...");
     [app performSelector:@selector(suspend)];
-   
+    
 }
-+ (void) quitGraceFully
++ (void) quitGracefully
 {
     [[self findTopRootView] dismissViewControllerAnimated:YES completion:nil];
     [self suspendApp];
@@ -268,38 +243,69 @@
     NSLog(@"Really Quit...");
     exit(EXIT_SUCCESS);
 }
-//TODO for the multi buttons
-/*
- UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Title" message:@"Message" preferredStyle:UIAlertControllerStyleAlert];
- 
- [alertController addAction:[UIAlertAction actionWithTitle:@"Button 1" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
- [self loadGooglrDrive];
- }]];
- 
- [alertController addAction:[UIAlertAction actionWithTitle:@"Button 2" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
- [self loadDropBox];
- }]];
- 
- [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
- [self closeAlertview];
- }]];
- 
- dispatch_async(dispatch_get_main_queue(), ^ {
- [self presentViewController:alertController animated:YES completion:nil];
- });
- 
- 
- 
- -(void)closeAlertview
- {
- 
- [self dismissViewControllerAnimated:YES completion:nil];
- }
- */
+
++ (JSContext *) getWebViewJsCtx:(UIWebView *) _webview
+{
+    return [_webview
+            valueForKeyPath:
+            (@"documentView"
+             @".webView"
+             @".mainFrame"
+             @".javaScriptContext")];
+}
+
++ (JSValue *) callWebViewDoJs:(UIWebView *) _webview :(NSString *)js_s
+{
+    @try {
+        return [[self getWebViewJsCtx:_webview] evaluateScript:js_s];
+    } @catch (NSException *exception) {
+        NSLog(@"callWebViewDoJs error %@", exception);
+    } @finally {
+        
+    }
+    return nil;
+}
++(NSString *) fullPathOfAsset :(NSString *) filename
+{
+    return [[NSBundle mainBundle]
+            pathForResource:[filename stringByDeletingPathExtension]
+            ofType:[filename pathExtension]];
+}
++(NSString *)readAssetInStr :(NSString *)filename
+{
+    return [NSString
+            stringWithContentsOfFile:[self fullPathOfAsset:filename]
+            encoding:NSUTF8StringEncoding
+            error:NULL];
+}
++(BOOL) isEmptyString :(NSString *)s
+{
+    return (nil==s || [@"" isEqualToString:s]);
+}
++(void) promptUserQuit
+{
+    [CMPHybridTools
+     quickConfirmMsgMain:@"Sure to Quit?"
+     //         handlerYes:^(UIAlertAction *action)
+     handlerYes:^(UIAlertAction *action){
+//         [self dismissViewControllerAnimated:YES completion:nil];
+         
+         //home button press programmatically
+         UIApplication *app = [UIApplication sharedApplication];
+         NSLog(@"Hide...");
+         [app performSelector:@selector(suspend)];
+         sleep(1);
+         NSLog(@"Really Quit...");
+         exit(EXIT_SUCCESS);
+     }
+     handlerNo:nil];
+}
+
+
 /******************************备用*********************************/
 + (void)saveAppConfig{
     
-    CMPHybridTools *hybridManager = [self getSingleton];
+    CMPHybridTools *hybridManager = [self shareInstance];
     NSString *jsonString = [JSO o2s:hybridManager.jso];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];

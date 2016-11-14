@@ -2,17 +2,19 @@
 #define CMPHybridTools_h
 
 #import <Foundation/Foundation.h>
+#import "JSO.h"
 #import "CMPHybridUi.h"
 #import "CMPHybridApi.h"
-#import "JSO.h"
-
-//#import <UIKit/UIViewController.h>
-
+#import "CMPHybridTools.h"
+@import JavaScriptCore;
 
 @interface CMPHybridTools : NSObject
 
-//inner data store
-@property (nonatomic, strong) JSO *jso;
+//inner data store, hold until program exit.
+@property (strong) JSO *jso;
+
+//Singleton Pattern:
++ (CMPHybridTools *)shareInstance;
 
 + (void)checkAppConfig;
 
@@ -28,16 +30,21 @@
 
 + (void)quickShowMsgMain:(NSString *)message;
 
+//- (void)someMethodThatTakesABlock:(returnType (^nullability)(parameterTypes))blockName;
++ (void)quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
 
 + (void)quickConfirmMsgMain:(NSString *)msg
-//                 handlerYes:(void (^)(UIAlertAction *action))handlerYes
-//                  handlerNo:(void (^)(UIAlertAction *action))handlerNo
-                 handlerYes:(HybridAlertCallback) handlerYes
-                  handlerNo:(HybridAlertCallback) handlerNo
+                 handlerYes:(HybridDialogCallback) handlerYes
+                  handlerNo:(HybridDialogCallback) handlerNo
 ;
 
 + (void) suspendApp;
-+ (void) quitGraceFully;
++ (void) quitGracefully;
+
++ (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
++ (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
+
+
 @end
 
 

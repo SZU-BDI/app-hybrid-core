@@ -1,4 +1,5 @@
 #import "CMPNativeUi.h"
+#import "CMPHybridTools.h"
 
 @interface CMPNativeUi()
 @property (nonatomic) BOOL haveTopBar;
@@ -39,19 +40,36 @@
     if (viewcontrollers.count > 1) {
         
         if ([viewcontrollers objectAtIndex:viewcontrollers.count-1] == self){
-            
             //push方式
             [self.navigationController popViewControllerAnimated:YES];
         }
     }
     else{
         
-        // present方式
-        [self dismissViewControllerAnimated:YES completion:nil];
+        //quit app if prompted yes
+        [CMPHybridTools
+         quickConfirmMsgMain:@"Sure to Quit?"
+         //         handlerYes:^(UIAlertAction *action)
+         handlerYes:^(UIAlertAction *action){
+             [self dismissViewControllerAnimated:YES completion:nil];
+             
+             //home button press programmatically
+             UIApplication *app = [UIApplication sharedApplication];
+             NSLog(@"Hide...");
+             [app performSelector:@selector(suspend)];
+             sleep(1);
+             NSLog(@"Really Quit...");
+             exit(EXIT_SUCCESS);
+         }
+         handlerNo:nil];
     }
     
     if (self.jsCallback) {
-        self.jsCallback(@"Native");
+//TODO
+        //        JSO *jsoValue = [JSO s2o:self.accessAddress];
+        //        [jsoValue setChild:@"address" JSO:jsoValue];
+        //NSString *address = [NSString stringWithFormat:@"%@", self.accessAddress];
+        //self.jsCallback(@{@"address":address});
     }
 }
 

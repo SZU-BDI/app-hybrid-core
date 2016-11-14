@@ -44,22 +44,27 @@ import java.util.Map;
  * 3, the _app2js(), _js2app(), _fetchQueue() are the hidden protocol
  */
 
+
+//NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
+
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
 
-    private final String TAG = "JsBridgeWebView";
+    private final String LOGTAG = "JsBridgeWebView";
 
-    final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
-    final static String JSB1_RETURN_DATA = JSB1_OVERRIDE_SCHEMA + "return/";
-    final static String JSB1_FETCH_QUEUE = JSB1_RETURN_DATA + "_fetchQueue/";
+    //final static String JSB1_OVERRIDE_SCHEMA = "jsb1://";//v1
+    //final static String JSB1_RETURN_DATA = JSB1_OVERRIDE_SCHEMA + "return/";
+    //final static String JSB1_FETCH_QUEUE = JSB1_RETURN_DATA + "_fetchQueue/";
 
-    final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
-    final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
-    final static String JAVA_TO_JS = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._app2js";
+    //final static String WEB_VIEW_JAVASCRIPT_BRIDGE = "WebViewJavascriptBridge";//v1
+//    final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + "._fetchQueue();";
+
+//    final static String JAVA_TO_JS = "javascript:WebViewJavascriptBridge._app2js";
+
 //    final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
 
-    //NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
-    Map<String, HybridCallback> responseCallbacks = new HashMap<String, HybridCallback>();
+    //    Map<String, HybridCallback> responseCallbacks = new HashMap<String, HybridCallback>();
+
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
     class MyWebChromeClient extends WebChromeClient {
@@ -95,7 +100,7 @@ public class JsBridgeWebView extends WebView {
             });
             return true;
         }
-        //TODO hacking prompt.
+        //TODO hacking prompt...
 //        @Override
 //        public boolean onJsPrompt(WebView view, String origin, String message, String defaultValue, final JsPromptResult result) {
 //            // Unlike the @JavascriptInterface bridge, this method is always called on the UI thread.
@@ -132,36 +137,39 @@ public class JsBridgeWebView extends WebView {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            JsBridgeWebView webView = JsBridgeWebView.this;
+//            JsBridgeWebView webView = JsBridgeWebView.this;
 
-            if (url.startsWith(JSB1_RETURN_DATA)) {
-                // app2js callback
-                webView.handlerReturnData(url);
-                return true;
-            } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
-                // js2java call
-                //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
-                webView.flushMessageQueue();
-                return true;
-            } else {
-                return super.shouldOverrideUrlLoading(view, url);
-            }
+            //remove the old fashion
+//            if (url.startsWith(JSB1_RETURN_DATA)) {
+//                // app2js callback
+//                webView.handlerReturnData(url);
+//                return true;
+//            } else if (url.startsWith(JSB1_OVERRIDE_SCHEMA)) {
+//                // js2java call
+//                //@ref WebViewJavascriptBridge.js  _js2java  __QUEUE_MESSAGE__
+//                webView.flushMessageQueue();
+//                return true;
+//            } else {
+//                return super.shouldOverrideUrlLoading(view, url);
+//            }
+            return super.shouldOverrideUrlLoading(view, url);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            //inject
             webViewLoadLocalJs(view, "WebViewJavascriptBridge.js");
 
-            JsBridgeWebView webView = JsBridgeWebView.this;
-
-            if (webView.startupJsb1Msg != null) {
-                //if something is called before the page is loaded, do them now...
-                for (Jsb1Msg m : startupJsb1Msg) {
-                    webView.dispatchMessage(m);
-                }
-                //clear it
-                webView.startupJsb1Msg = null;
-            }
+//            JsBridgeWebView webView = JsBridgeWebView.this;
+//
+//            if (webView.startupJsb1Msg != null) {
+//                //if something is called before the page is loaded, do them now...
+//                for (Jsb1Msg m : startupJsb1Msg) {
+//                    webView.dispatchMessage(m);
+//                }
+//                //clear it
+//                webView.startupJsb1Msg = null;
+//            }
             super.onPageFinished(view, url);
         }
 
@@ -214,80 +222,83 @@ public class JsBridgeWebView extends WebView {
 
     }
 
+    //addJavascriptInterface
+
     //msg Q before page loaded.
-    public List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
+//    public List<Jsb1Msg> startupJsb1Msg = new ArrayList<Jsb1Msg>();
 
-    //get the target function name.
-    public static String parseFunctionName(String jsUrl) {
-        //example
-        //javascript:jsb1://WebViewJavascriptBridge._fetchQueue(...);
-        // => _fetchQueue
-        return jsUrl.replace("javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + ".", "").replaceAll("\\(.*\\);", "");
-    }
+//    //get the target function name.
+//    public static String parseFunctionName(String jsUrl) {
+//        //example
+//        //javascript:jsb1://WebViewJavascriptBridge._fetchQueue(...);
+//        // => _fetchQueue
+//        return jsUrl.replace("javascript:" + WEB_VIEW_JAVASCRIPT_BRIDGE + ".", "").replaceAll("\\(.*\\);", "");
+//    }
 
-    public static String getDataFromReturnUrl(String url) {
-        if (url.startsWith(JSB1_FETCH_QUEUE)) {
-            return url.replace(JSB1_FETCH_QUEUE, "");
-        }
-
-        String temp = url.replace(JSB1_RETURN_DATA, "");
-        String[] functionAndData = temp.split("/");
-
-        if (functionAndData.length >= 2) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < functionAndData.length; i++) {
-                sb.append(functionAndData[i]);
-            }
-            return sb.toString();
-        }
-        return null;
-    }
-
-    public static String getFunctionFromReturnUrl(String url) {
-        String temp = url.replace(JSB1_RETURN_DATA, "");
-        String[] functionAndData = temp.split("/");
-        if (functionAndData.length >= 1) {
-            return functionAndData[0];
-        }
-        return null;
-    }
+//    public static String getDataFromReturnUrl(String url) {
+//        if (url.startsWith(JSB1_FETCH_QUEUE)) {
+//            return url.replace(JSB1_FETCH_QUEUE, "");
+//        }
+//
+//        String temp = url.replace(JSB1_RETURN_DATA, "");
+//        String[] functionAndData = temp.split("/");
+//
+//        if (functionAndData.length >= 2) {
+//            StringBuilder sb = new StringBuilder();
+//            for (int i = 1; i < functionAndData.length; i++) {
+//                sb.append(functionAndData[i]);
+//            }
+//            return sb.toString();
+//        }
+//        return null;
+//    }
+//
+//    public static String getFunctionFromReturnUrl(String url) {
+//        String temp = url.replace(JSB1_RETURN_DATA, "");
+//        String[] functionAndData = temp.split("/");
+//        if (functionAndData.length >= 1) {
+//            return functionAndData[0];
+//        }
+//        return null;
+//    }
 
     public static void webViewLoadLocalJs(WebView view, String path) {
-        String jsContent = readJs(view.getContext(), path);
+        String jsContent = HybridTools.readAssetInStr(view.getContext(),path);
+//        String jsContent = readJs(view.getContext(), path);
         view.loadUrl("javascript:" + jsContent);
     }
 
-    public static String readJs(Context c, String urlStr) {
-        InputStream in = null;
-        try {
-            in = c.getAssets().open(urlStr);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            StringBuilder sb = new StringBuilder();
-            do {
-                line = bufferedReader.readLine();
-                //NOTES:  skip comments //....
-                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                    sb.append(line);
-                }
-            } while (line != null);
-
-            bufferedReader.close();
-            in.close();
-
-            return sb.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-        return null;
-    }
+//    public static String readJs(Context c, String urlStr) {
+//        InputStream in = null;
+//        try {
+//            in = c.getAssets().open(urlStr);
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+//            String line = null;
+//            StringBuilder sb = new StringBuilder();
+//            do {
+//                line = bufferedReader.readLine();
+//                //NOTES:  skip comments //....
+//                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
+//                    sb.append(line);
+//                }
+//            } while (line != null);
+//
+//            bufferedReader.close();
+//            in.close();
+//
+//            return sb.toString();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (in != null) {
+//                try {
+//                    in.close();
+//                } catch (IOException e) {
+//                }
+//            }
+//        }
+//        return null;
+//    }
 //
 //    public List<Jsb1Msg> getStartupJsb1Msg() {
 //        return startupJsb1Msg;
@@ -309,21 +320,61 @@ public class JsBridgeWebView extends WebView {
         init(context);
     }
 
-    class androidjsb {
+//    @SuppressLint("JavascriptInterface")
+//    @Override
+//    public void addJavascriptInterface(Object object, String name) {
+//        if (object == null) {
+//            return;
+//        }
+//        super.addJavascriptInterface(object, name);
+//        WebViewCore.JSInterfaceData arg = new WebViewCore.JSInterfaceData();
+//        arg.mObject = object;
+//        arg.mInterfaceName = name;
+//        mWebViewCore.sendMessage(EventHub.ADD_JS_INTERFACE, arg);
+//    }
 
-        @JavascriptInterface
-        public String getVersion(String p1) {
-            return p1;
-        }
-    }
-
+    @SuppressLint("AddJavascriptInterface")
     public JsBridgeWebView(final Context context) {
         super(context);
         init(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            //try this new way
+
             this.addJavascriptInterface(new Object() {
 
+//                @JavascriptInterface
+//                public Object sendMsg(String msg_s) {
+//                    Log.v(LOGTAG, "sendMsg " + msg_s);
+//                    JSO jso = JSO.s2o(msg_s);
+//                    String callBackId = jso.getChild("callbackId").asString();
+//                    String handlerName = jso.getChild("handlerName").asString();
+//                    String param_s = jso.getChild("data").toString();
+//                    return js2app(callBackId, handlerName, param_s);
+////                    return new Object(){
+////                        //public String test2="test2test2";//KO
+////                        @JavascriptInterface
+////                        public String test2(String p1){
+////                            Log.v(LOGTAG, "test2 " + p1);
+////                            return p1;
+////                        }
+////                        @JavascriptInterface
+////                        public String test(String p1){
+////                            Log.v(LOGTAG, "test " + p1);
+////                            return p1;
+////                        }
+////                        @JavascriptInterface
+////                        public String test(Object p1){
+////                            Log.v(LOGTAG, "test Object " + p1);
+////                            return ""+p1;
+////                        }
+////                        @JavascriptInterface
+////                        public String toString(){
+////                            return "hahaha toString";
+////                        }
+////                    };
+//                }
+
+                //                protected String _js2app(final String callBackId, String handlerName, final String param_s) {
+//                }
                 @JavascriptInterface
                 public String js2app(final String callBackId, String handlerName, final String param_s) {
 
@@ -339,8 +390,9 @@ public class JsBridgeWebView extends WebView {
                                     String s = responseMsg.toJson();
                                     //quick hack
                                     if ("".equals(s) || s == null) s = "null";
-                                    Log.v(TAG, "s ==> " + s);
-                                    loadUrl(JAVA_TO_JS + "(" + s + ");");
+                                    Log.v(LOGTAG, "js2app s ==> " + s);
+                                    loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
+                                    //loadUrl(JAVA_TO_JS + "(" + s + ");");
                                     //loadUrl("javascript:console.log(o2s("+s+"));");
                                 }
                             });
@@ -374,16 +426,16 @@ public class JsBridgeWebView extends WebView {
         this.setWebChromeClient(new MyWebChromeClient(context));
     }
 
-    void handlerReturnData(String url) {
-        String functionName = getFunctionFromReturnUrl(url);
-        HybridCallback f = responseCallbacks.get(functionName);
-        String data = getDataFromReturnUrl(url);
-        if (f != null) {
-            f.onCallBack(data);
-            responseCallbacks.remove(functionName);
-            return;
-        }
-    }
+//    void handlerReturnData(String url) {
+//        String functionName = getFunctionFromReturnUrl(url);
+//        HybridCallback f = responseCallbacks.get(functionName);
+//        String data = getDataFromReturnUrl(url);
+//        if (f != null) {
+//            f.onCallBack(data);
+//            responseCallbacks.remove(functionName);
+//            return;
+//        }
+//    }
 
 //    private void _app2js(String handlerName, String data, HybridCallback responseCallback) {
 //        Jsb1Msg m = new Jsb1Msg();
@@ -401,97 +453,98 @@ public class JsBridgeWebView extends WebView {
 //        queueMessage(m);
 //    }
 
-    private void queueMessage(Jsb1Msg m) {
-        if (startupJsb1Msg != null) {
-            startupJsb1Msg.add(m);
-        } else {
-            dispatchMessage(m);
-        }
-    }
+//    private void queueMessage(Jsb1Msg m) {
+//        if (startupJsb1Msg != null) {
+//            startupJsb1Msg.add(m);
+//        } else {
+//            dispatchMessage(m);
+//        }
+//    }
 
-    void dispatchMessage(Jsb1Msg m) {
-        String s = m.toJson();
+//    void dispatchMessage(Jsb1Msg m) {
+//        String s = m.toJson();
+//
+//        //quick hack
+//        if ("".equals(s) || s == null) s = "null";
+//
+//        //NOTES: run the js in the main thread of browser:
+//        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+//            loadUrl(JAVA_TO_JS + "(" + s + ");");
+//        }
+//    }
 
-        //quick hack
-        if ("".equals(s) || s == null) s = "null";
-
-        //NOTES: run the js in the main thread of browser:
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            loadUrl(JAVA_TO_JS + "(" + s + ");");
-        }
-    }
-
-    void flushMessageQueue() {
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-
-            //call the _fetchQueue()
-            loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new HybridCallback() {
-
-                @Override
-                public void onCallBack(String data) {
-                    // deserializeMessage
-                    List<Jsb1Msg> list = null;
-                    try {
-                        list = Jsb1Msg.toArrayList(data);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                    if (list == null || list.size() == 0) {
-                        return;
-                    }
-                    for (int i = 0; i < list.size(); i++) {
-                        Jsb1Msg m = list.get(i);
-                        if (m == null) {
-                            Log.w(TAG, "??? m==null ???");
-                            continue;
-                        }
-                        String responseId = m.getResponseId();
-
-                        if (!TextUtils.isEmpty(responseId)) {
-                            //if has reponseId, find the callback
-                            HybridCallback function = responseCallbacks.get(responseId);
-                            String responseData = m.getResponseData();
-                            function.onCallBack(responseData);
-                            //after call, clean it up
-                            responseCallbacks.remove(responseId);
-                        } else {
-                            //new call or a callback from js
-                            HybridCallback responseFunction = null;
-                            final String callbackId = m.getCallbackId();
-                            if (!TextUtils.isEmpty(callbackId)) {
-                                //it is a callback from js
-                                responseFunction = new HybridCallback() {
-                                    @Override
-                                    public void onCallBack(String data_s) {
-                                        Jsb1Msg responseMsg = new Jsb1Msg();
-                                        responseMsg.setResponseId(callbackId);
-                                        responseMsg.setResponseData(data_s);
-                                        queueMessage(responseMsg);
-                                    }
-                                };
-                            }
-                            HybridHandler handler = null;
-                            if (!TextUtils.isEmpty(m.getHandlerName())) {
-                                handler = messageHandlers.get(m.getHandlerName());
-                                //TODO 这里要有个 auth-mapping (whitelist) check?
-                                if (handler != null) {
-                                    handler.handler(m.getDataStr(), responseFunction);
-                                }
-                            } else {
-                                Log.w(TAG, "??? what the hell m= " + m.toString());
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    public void loadUrl(String jsUrl, HybridCallback returnCallback) {
-        responseCallbacks.put(parseFunctionName(jsUrl), returnCallback);
-        this.loadUrl(jsUrl);
-    }
+//    void flushMessageQueue() {
+//        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+//
+//            //call the _fetchQueue()
+//            loadUrl(JS_FETCH_QUEUE_FROM_JAVA, new HybridCallback() {
+//
+//                @Override
+//                public void onCallBack(String data) {
+//                    // deserializeMessage
+//                    List<Jsb1Msg> list = null;
+//                    try {
+//                        list = Jsb1Msg.toArrayList(data);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        return;
+//                    }
+//                    if (list == null || list.size() == 0) {
+//                        return;
+//                    }
+//                    for (int i = 0; i < list.size(); i++) {
+//                        Jsb1Msg m = list.get(i);
+//                        if (m == null) {
+//                            Log.w(LOGTAG, "??? m==null ???");
+//                            continue;
+//                        }
+//                        String responseId = m.getResponseId();
+//
+//                        if (!TextUtils.isEmpty(responseId)) {
+//                            //if has reponseId, find the callback
+//                            HybridCallback function = responseCallbacks.get(responseId);
+//                            String responseData = m.getResponseData();
+//                            function.onCallBack(responseData);
+//                            //after call, clean it up
+//                            responseCallbacks.remove(responseId);
+//                        } else {
+//                            //new call or a callback from js
+//                            HybridCallback responseFunction = null;
+//                            final String callbackId = m.getCallbackId();
+//                            if (!TextUtils.isEmpty(callbackId)) {
+//                                //it is a callback from js
+//                                responseFunction = new HybridCallback() {
+//                                    @Override
+//                                    public void onCallBack(String data_s) {
+//                                        Jsb1Msg responseMsg = new Jsb1Msg();
+//                                        responseMsg.setResponseId(callbackId);
+//                                        responseMsg.setResponseData(data_s);
+//                                        //queueMessage(responseMsg);
+//                                        dispatchMessage(responseMsg);
+//                                    }
+//                                };
+//                            }
+//                            HybridHandler handler = null;
+//                            if (!TextUtils.isEmpty(m.getHandlerName())) {
+//                                handler = messageHandlers.get(m.getHandlerName());
+//                                //TODO 这里要有个 auth-mapping (whitelist) check?
+//                                if (handler != null) {
+//                                    handler.handler(m.getDataStr(), responseFunction);
+//                                }
+//                            } else {
+//                                Log.w(LOGTAG, "??? what the hell m= " + m.toString());
+//                            }
+//                        }
+//                    }
+//                }
+//            });
+//        }
+//    }
+//
+//    public void loadUrl(String jsUrl, HybridCallback returnCallback) {
+//        responseCallbacks.put(parseFunctionName(jsUrl), returnCallback);
+//        this.loadUrl(jsUrl);
+//    }
 
     public void registerHandler(String handlerName, HybridHandler handler) {
         if (handler != null) {
@@ -500,9 +553,11 @@ public class JsBridgeWebView extends WebView {
     }
 
     //from java call js...
-//    public void callHandler(String handlerName, String data_s, HybridCallback cb) {
-//        _app2js(handlerName, data_s, cb);
-//    }
+    public void callHandler(String handlerName, String data_s, HybridCallback cb) {
+        //_app2js(handlerName, data_s, cb);
+        //TODO make msg_s = o2s({msg.handlerName, ....})
+        //loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
+    }
 
     //prototol(java<=>js)
     public static class Jsb1Msg {
@@ -570,25 +625,25 @@ public class JsBridgeWebView extends WebView {
             return jso.toString();
         }
 
-        public static List<Jsb1Msg> toArrayList(String jsonStr) {
-            List<Jsb1Msg> list = new ArrayList<Jsb1Msg>();
-            //TODO jso.arrayAdd(JSO);
-//            try {
-//                JSO jso = new JSO(jsonStr);
-//                for (int i = 0; i < jsonArray.length(); i++) {
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    Jsb1Msg m = new Jsb1Msg();
-//                    m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR) : null);
-//                    m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
-//                    m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
-//                    m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
-//                    m.setDataStr(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
-//                    list.add(m);
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-            return list;
-        }
+//        public static List<Jsb1Msg> toArrayList(String jsonStr) {
+//            List<Jsb1Msg> list = new ArrayList<Jsb1Msg>();
+//            //TODO jso.arrayAdd(JSO);
+////            try {
+////                JSO jso = new JSO(jsonStr);
+////                for (int i = 0; i < jsonArray.length(); i++) {
+////                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+////                    Jsb1Msg m = new Jsb1Msg();
+////                    m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR) : null);
+////                    m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR) : null);
+////                    m.setResponseData(jsonObject.has(RESPONSE_DATA_STR) ? jsonObject.getString(RESPONSE_DATA_STR) : null);
+////                    m.setResponseId(jsonObject.has(RESPONSE_ID_STR) ? jsonObject.getString(RESPONSE_ID_STR) : null);
+////                    m.setDataStr(jsonObject.has(DATA_STR) ? jsonObject.getString(DATA_STR) : null);
+////                    list.add(m);
+////                }
+////            } catch (JSONException e) {
+////                e.printStackTrace();
+////            }
+//            return list;
+//        }
     }
 }
