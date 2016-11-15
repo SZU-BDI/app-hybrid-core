@@ -1,11 +1,16 @@
 #ifndef CMPHybridTools_h
 #define CMPHybridTools_h
 
-#import <Foundation/Foundation.h>
+//#import <Foundation/Foundation.h>
+@import Foundation;
+
 #import "JSO.h"
+
 #import "CMPHybridUi.h"
 #import "CMPHybridApi.h"
 #import "CMPHybridTools.h"
+
+
 @import JavaScriptCore;
 
 @interface CMPHybridTools : NSObject
@@ -14,32 +19,38 @@
 @property (strong) JSO *jso;
 
 //Singleton Pattern:
-+ (CMPHybridTools *)shareInstance;
++ (CMPHybridTools *) shareInstance;
 
-+ (void)checkAppConfig;
++ (void) checkAppConfig;
 
-+ (CMPHybridApi *)getHybridApi:(NSString *)name;
++ (CMPHybridApi *) getHybridApi:(NSString *)name;
 
-+ (void)startUi:(NSString *)strUiName
-   strInitParam:(JSO *)strInitParam
-      objCaller:(CMPHybridUi *)objCaller
-       callback:(HybridCallback)callback;
++ (CMPHybridUi *) startUi :(NSString *)strUiName
+              strInitParam:(JSO *)strInitParam
+                 objCaller:(CMPHybridUi *)objCaller;
 
-+ (JSO *)wholeAppConfig;
+//+ (CMPHybridUi *)startUi :(NSString *)strUiName
+//             strInitParam:(JSO *)strInitParam
+//                objCaller:(CMPHybridUi *)objCaller
+//                 callback:(HybridCallback)callback;
+
++ (JSO *) wholeAppConfig;
 
 + (UIViewController *) findTopRootView;
 
 + (NSString *) fullPathOfAsset :(NSString *)filename;
++(NSString *)readAssetInStr :(NSString *)filename;
 
-+ (void)quickShowMsgMain:(NSString *)message;
++ (void) quickShowMsgMain:(NSString *)message;
 
-//- (void)someMethodThatTakesABlock:(returnType (^nullability)(parameterTypes))blockName;
-+ (void)quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
+//- (void) someMethodThatTakesABlock:(returnType (^nullability)(parameterTypes))blockName;
++ (void) quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
 
-+ (void)quickConfirmMsgMain:(NSString *)msg
-                 handlerYes:(HybridDialogCallback) handlerYes
-                  handlerNo:(HybridDialogCallback) handlerNo
++ (void) quickConfirmMsgMain:(NSString *)msg
+                  handlerYes:(HybridDialogCallback) handlerYes
+                   handlerNo:(HybridDialogCallback) handlerNo
 ;
++(BOOL) isEmptyString :(NSString *)s;
 
 + (void) suspendApp;
 + (void) quitGracefully;

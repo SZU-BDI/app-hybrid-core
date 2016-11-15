@@ -28,7 +28,9 @@
 			msg.time=callTime;
 		}
 		if("undefined"!=typeof nativejsb){
-			nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
+			var rt= nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
+			//TODO if 0==rt.getStatus() pushToObserveStack(callbackId,msg,rt,cb);
+			return rt;
 			//nativejsb.sendMsg(o2s(msg));
 		}else{
             alert("ERROR nativejsb is missing");
@@ -81,7 +83,7 @@
 	}
 
 	function callHandler(handlerName, data, cb) {
-		_js2app({
+		return _js2app({
 			handlerName: handlerName,
 			data: data
 		}, cb);

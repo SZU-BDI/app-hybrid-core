@@ -13,6 +13,8 @@ typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
 
 typedef void (^HybridDialogCallback)(UIAlertAction *action);
 
+typedef void (^HybridEventHandler)(NSString *eventName, id extraData);
+
 #define SINGLETON_shareInstance(classname) \
 + (classname *)shareInstance\
 {\
@@ -34,10 +36,19 @@ return _sharedInstance;\
 @interface CMPHybridUi : UIViewController
 
 @property (strong) JSO *uiData;
-@property (strong) HybridCallback callback;
+
+#warning HybridCallback is going to delete very soon.
+//@property (strong) HybridCallback callback;
 
 //- (void) close;//the close is taken
 -(void) closeUi;
+
+-(void) CustomTopBar;
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler;
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData;
+
+-(void) trigger :(NSString *)eventName :(id)extraData;
 
 @end
 

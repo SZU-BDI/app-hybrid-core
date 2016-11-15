@@ -48,3 +48,30 @@ If you find yourself needing syntax not listed here, it is likely that a typedef
 
 Unable to access this site due to the profanity in the URL? http://goshdarnblocksyntax.com is a more work-friendly mirror.
 By Mike Lazer-Walker, who has a very bad memory for this sort of thing.
+
+# threading
+
+## async or after
+
+
+    //    // 创建队列
+    //    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    //    // 设置延时，单位秒
+    //    double delay = 1;
+    
+    //    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
+    // 3秒后需要执行的任务
+    
+    
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    
+    //    });
+		#warning important for callback : run on ui thread
+        //        if ([[NSThread currentThread] isMainThread]) {
+        //            [self _evaluateJavascript:javascriptCommand];
+        //
+        //        } else {
+        //            dispatch_sync(dispatch_get_main_queue(), ^{
+        //                [self _evaluateJavascript:javascriptCommand];
+        //            });
+        //        }

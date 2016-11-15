@@ -1,10 +1,6 @@
-#import "ApiActivityClose.h"
+#import "ApiUiClose.h"
 
-@interface ApiActivityClose ()
-
-@end
-
-@implementation ApiActivityClose
+@implementation ApiUiClose
 
 - (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {

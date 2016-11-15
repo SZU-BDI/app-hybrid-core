@@ -51,7 +51,10 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
 }
 
-+ (void)startUi:(NSString *)strUiName strInitParam:(JSO *)strInitParam objCaller:(CMPHybridUi *)objCaller callback:(HybridCallback)callback{
++ (CMPHybridUi *) startUi :(NSString *)strUiName
+              strInitParam:(JSO *)strInitParam
+                 objCaller:(CMPHybridUi *)objCaller
+{
     
     [self checkAppConfig];
     
@@ -64,7 +67,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     if ( [self isEmptyString :className]) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
-        return;
+        return nil;
     }
     
     Class uiClass = NSClassFromString(className);
@@ -72,17 +75,18 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     if (!theHybridUi) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
-        return;
+        return nil;
     }
     
     theHybridUi.uiData=uiConfig;
-    
-    if (callback) {
-        theHybridUi.callback=callback;
-    }else{
-        //TODO attach to a default callback handler??
-    }
-    
+
+//    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
+//    UINavigationController *nav = [[UINavigationController alloc]
+//                                   initWithRootViewController:(UIViewController *)theHybridUi];
+//    ddd.window.rootViewController = nav;
+//    [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
+
+//    //TODO need to release the name_s??
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
     if (ddd.window.rootViewController==nil){
         if ([theHybridUi isKindOfClass:[UITabBarController class]]) {
@@ -99,6 +103,8 @@ SINGLETON_shareInstance(CMPHybridTools);
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
             // push
+            theHybridUi.view.backgroundColor = [UIColor whiteColor];//important for speed
+            //http://stackoverflow.com/questions/19917928/uinavigationcontroller-pushviewcontroller-pauses-freezes-midway-through/19919081#19919081
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{
@@ -106,6 +112,10 @@ SINGLETON_shareInstance(CMPHybridTools);
             [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
         }
     }
+    //    });
+    //            [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(run:) userInfo:@"abc" repeats:NO];
+
+    return theHybridUi;
 }
 
 + (CMPHybridApi *)getHybridApi:(NSString *)name{
