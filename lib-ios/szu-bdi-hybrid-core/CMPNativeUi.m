@@ -20,7 +20,12 @@
 // viewWillAppear() is called before it's display.  some effect can be configurated here
 - (void)viewWillAppear:(BOOL)animated{
     //self.view.backgroundColor = [UIColor grayColor];
-    [self CustomTopBar];
+
+    [self CustomTopBarBtn];
+ 
+    NSString *mode = [[self.uiData getChild:@"topbar"] toString];
+    [self CustomTopBar:mode];
+    
     [super viewWillAppear:animated];
 }
 - (void)viewDidLoad {

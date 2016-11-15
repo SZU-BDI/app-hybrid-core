@@ -4,10 +4,32 @@
 
 @implementation CMPHybridUi
 
-//NOTES: can be overrided!
-- (void) CustomTopBar
+-(void) CustomTopBar :(NSString *)mode
 {
-//    [[self navigationController] setNavigationBarHidden:YES animated:NO];
+    if ([CMPHybridTools isEmptyString:mode])
+        mode=@"Y";
+    
+    if([@"F" isEqualToString:mode]){
+        [self hideTopStatusBar];
+        [self hideTopBar];
+    }
+    if([@"M" isEqualToString:mode]){
+        [self hideTopStatusBar];
+        [self showTopBar];
+    }
+    if([@"Y" isEqualToString:mode]){
+        [self showTopStatusBar];
+        [self showTopBar];
+    }
+    if([@"N" isEqualToString:mode]){
+        [self showTopStatusBar];
+        [self hideTopBar];
+    }
+}
+//NOTES: can be overrided!
+- (void) CustomTopBarBtn
+{
+    //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
     //    UIBarButtonItem *leftBar
     //    = [[UIBarButtonItem alloc]
     //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
@@ -27,20 +49,6 @@
     //    = [[UIBarButtonItem alloc]
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
     //    self.navigationItem.rightBarButtonItem = rightBtn;
-    
-    // topbar: "Y","N","F","M"
-    //    if (self.haveTopBar) {
-    //        [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    //    }else{
-    //        [[self navigationController] setNavigationBarHidden:YES animated:YES];
-    //    }
-    
-#warning ODO if "N"
-    //[[self navigationController] setNavigationBarHidden:YES animated:NO];
-    
-    //TODO
-    //_webView.frame = CGRectMake(0,0,_webView.frame.size.width,_webView.frame.size.height+topFrame.size.height+bottomFrame.size.height);
-
 }
 
 //NOTES: child can override the behavior...
@@ -115,29 +123,29 @@
 //- (void)enterFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {
 //    CGRect topFrame = _topToolbar.frame;
 //    CGRect bottomFrame = _bottomToolbar.frame;
-//    
+//
 //    [UIView animateWithDuration:duration animations:^{
 //        _topToolbar.frame = CGRectMake(topFrame.origin.x, topFrame.origin.y-topFrame.size.height, topFrame.size.width, topFrame.size.height);
 //        _bottomToolbar.frame = CGRectMake(bottomFrame.origin.x, bottomFrame.origin.y+bottomFrame.size.height, bottomFrame.size.width, bottomFrame.size.height);
-//        
+//
 //        _webView.frame = CGRectMake(0,0,_webView.frame.size.width,_webView.frame.size.height+topFrame.size.height+bottomFrame.size.height);
 //    } completion:^(BOOL finished) {
 //        if (complete != nil) {
 //            complete();
 //        }
 //    }];
-//    
+//
 //    _fullscreenToggled = YES;
 //}
 //
 //- (void)exitFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {
 //    CGRect topFrame = _topToolbar.frame;
 //    CGRect bottomFrame = _bottomToolbar.frame;
-//    
+//
 //    [UIView animateWithDuration:duration animations:^{
 //        _topToolbar.frame = CGRectMake(topFrame.origin.x, topFrame.origin.y+topFrame.size.height, topFrame.size.width, topFrame.size.height);
 //        _bottomToolbar.frame = CGRectMake(bottomFrame.origin.x, bottomFrame.origin.y-bottomFrame.size.height, bottomFrame.size.width, bottomFrame.size.height);
-//        
+//
 //        _webView.frame = CGRectMake(0,topFrame.size.height,_webView.frame.size.width,_webView.frame.size.height);
 //    } completion:^(BOOL finished) {
 //        // Clip off the extra bottom. It wasn't in the animation
@@ -152,7 +160,43 @@
 //            complete();
 //        }
 //    }];
-//    
+//
 //    _fullscreenToggled = NO;
 //}
+
+/* About FullScreen (hide top status bar)
+ //It works for iOS 5 and iOS 6 , but not in iOS 7.
+ //[UIApplication sharedApplication].statusBarHidden = YES;//NOTES: Info.plist need add:
+ //    <key>UIStatusBarHidden</key>
+ //    <true/>
+ //
+ //    <key>UIViewControllerBasedStatusBarAppearance</key>
+ //    <false/>
+ 
+ //    [[UIApplication sharedApplication] setStatusBarHidden:YES
+ //                                            withAnimation:UIStatusBarAnimationFade];
+ //    [[UIApplication sharedApplication] setStatusBarHidden:NO
+ //                                            withAnimation:UIStatusBarAnimationFade];
+ 
+ //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
+ */
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
+-(void) hideTopStatusBar
+{
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+}
+-(void) showTopStatusBar
+{
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+}
+-(void) hideTopBar
+{
+    [[self navigationController] setNavigationBarHidden:YES animated:NO];
+}
+-(void) showTopBar
+{
+    [[self navigationController] setNavigationBarHidden:NO animated:NO];
+}
 @end

@@ -37,13 +37,15 @@ return _sharedInstance;\
 
 @property (strong) JSO *uiData;
 
-#warning HybridCallback is going to delete very soon.
-//@property (strong) HybridCallback callback;
-
 //- (void) close;//the close is taken
 -(void) closeUi;
 
--(void) CustomTopBar;
+-(void) CustomTopBarBtn;
+-(void) CustomTopBar :(NSString *)mode;
+-(void) hideTopStatusBar;
+-(void) showTopStatusBar;
+-(void) hideTopBar;
+-(void) showTopBar;
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler;
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData;

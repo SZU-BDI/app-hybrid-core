@@ -23,21 +23,11 @@ import java.util.Map;
 public final class JSO {
     private JsonValue _value = Json.NULL;
 
-    //TODO Use JsonObject.merge()
     //shallow merge
     public static JSO basicMerge(JSO... jsos) {
         JSO rt = new JSO();
         for (JSO temp : jsos) {
             rt.merge(temp);
-//            if (temp == null) continue;
-//            Iterator<String> keys = temp.getChildKeys().listIterator();
-//            while (keys.hasNext()) {
-//                String key = keys.next();
-//                if (HybridTools.isEmpty(key)) {
-//                    continue;
-//                }
-//                jsonObject.setChild(key, temp.getChild(key));
-//            }
         }
         return rt;
     }

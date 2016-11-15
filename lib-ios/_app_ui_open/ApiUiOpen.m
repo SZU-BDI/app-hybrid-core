@@ -13,7 +13,7 @@
         JSO *jso = [JSO s2o:dataString];
         
         // start UiContent
-        CMPHybridUi *rt=[CMPHybridTools startUi:@"UiContent" strInitParam:jso objCaller:self.currentUi
+        CMPHybridUi *rt=[CMPHybridTools startUi:@"UiContent" initData:jso objCaller:self.currentUi
                          //callback:responseCallback
                          ];
         if(rt!=nil){

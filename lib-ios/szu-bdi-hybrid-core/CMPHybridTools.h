@@ -26,7 +26,7 @@
 + (CMPHybridApi *) getHybridApi:(NSString *)name;
 
 + (CMPHybridUi *) startUi :(NSString *)strUiName
-              strInitParam:(JSO *)strInitParam
+                  initData:(JSO *)initData
                  objCaller:(CMPHybridUi *)objCaller;
 
 //+ (CMPHybridUi *)startUi :(NSString *)strUiName
@@ -40,6 +40,7 @@
 
 + (NSString *) fullPathOfAsset :(NSString *)filename;
 +(NSString *)readAssetInStr :(NSString *)filename;
++(BOOL) isEmptyString :(NSString *)s;
 
 + (void) quickShowMsgMain:(NSString *)message;
 
@@ -50,7 +51,6 @@
                   handlerYes:(HybridDialogCallback) handlerYes
                    handlerNo:(HybridDialogCallback) handlerNo
 ;
-+(BOOL) isEmptyString :(NSString *)s;
 
 + (void) suspendApp;
 + (void) quitGracefully;

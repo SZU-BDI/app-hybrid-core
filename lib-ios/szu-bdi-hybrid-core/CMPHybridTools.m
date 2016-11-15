@@ -52,7 +52,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 
 + (CMPHybridUi *) startUi :(NSString *)strUiName
-              strInitParam:(JSO *)strInitParam
+              initData:(JSO *) initData
                  objCaller:(CMPHybridUi *)objCaller
 {
     
@@ -77,8 +77,8 @@ SINGLETON_shareInstance(CMPHybridTools);
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return nil;
     }
-    
     theHybridUi.uiData=uiConfig;
+    [theHybridUi.uiData basicMerge:initData];
 
 //    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
 //    UINavigationController *nav = [[UINavigationController alloc]
@@ -158,17 +158,17 @@ SINGLETON_shareInstance(CMPHybridTools);
     return jso_value;
 }
 
-+ (NSString *)fastO2S:(JSO *)jso forKey:(NSString *)key{
-    
-    JSO *jsoValue = [jso getChild:key];
-    NSString *jsonString = [JSO o2s:jsoValue];
-    
-    if ([jsonString isEqualToString:@"null"]){
-        return @"";
-    }
-    
-    return jsonString;
-}
+//+ (NSString *)fastO2S:(JSO *)jso forKey:(NSString *)key{
+//    
+//    JSO *jsoValue = [jso getChild:key];
+//    NSString *jsonString = [JSO o2s:jsoValue];
+//    
+//    if ([jsonString isEqualToString:@"null"]){
+//        return @"";
+//    }
+//    
+//    return jsonString;
+//}
 
 //deprecated, see quickShowMsgMain()
 //+ (void)showAlertMessage:(NSString *)message{

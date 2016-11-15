@@ -17,10 +17,6 @@
 //viewWilLAppear: Whatever processing that needs to change every time the page is loaded.
 
 
-//http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
-- (BOOL)prefersStatusBarHidden {
-    return YES;
-}
 
 -(void)viewDidUnload
 {
@@ -33,7 +29,6 @@
     
     [self initUi];
 }
-
 
 //------------  prototol UIWebViewDelegate ------------
 
@@ -94,21 +89,22 @@
     
     JSContext *ctx = [webView valueForKeyPath:(@"documentView" @".webView" @".mainFrame" @".javaScriptContext")];
     [ctx evaluateScript:@"nativejsb={};"];
-    ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param_s){
+    ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
         //,JSValue *handlerName,JSStringRef param_s
-        NSLog(@"JavaScript %@ callBackId: %@ handlerName %@ param_s %@", [JSContext currentContext], callBackId, handlerName, param_s);
-#warning 暂时用 _app_activity_close 测试，稍后要接回对应的api
+        NSLog(@"JavaScript %@ callBackId: %@ handlerName %@ param_s %@", [JSContext currentContext], callBackId, handlerName, param);
+#warning TODO find api config..
         if( [@"_app_activity_close" isEqualToString:[handlerName toString]] ){
             [self closeUi];
         }
+        NSString *param_s=[param toString];
         if( [@"_app_activity_open" isEqualToString:[handlerName toString]] ){
-            JSO *param =[JSO s2o:[param_s toString]];
+            JSO *param =[JSO s2o:param_s];
             JSO *name=[param getChild:@"name"];
             NSString *name_s= [name toString];
             if([CMPHybridTools isEmptyString:name_s]){
                 name_s=@"UiRoot";//TMP !!! need UiError...
             }
-            CMPHybridUi *ui=[CMPHybridTools startUi:name_s strInitParam:nil objCaller:self];
+            CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:param objCaller:self];
             if(ui!=nil){
                 [ui on:@"close" :^(NSString *eventName, id extraData){
                     //responseCallback(extraData);
@@ -122,11 +118,10 @@
             }
         }
         if( [@"app_set_topbar" isEqualToString:[handlerName toString]] ){
-            JSO *param =[JSO s2o:[param_s toString]];
+            JSO *param =[JSO s2o:param_s];
             JSO *topbarmode=[param getChild:@"mode"];
-            if([@"F" isEqualToString:topbarmode]){
-                
-            }
+            NSString *topbarmode_s=[JSO o2s:topbarmode];
+            [self CustomTopBar :topbarmode_s];
         }
         
         //                HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
@@ -250,7 +245,6 @@
 
 -(void) initUi
 {
-    
     // initial the webView and add webview in window：
     CGRect rect = [UIScreen mainScreen].bounds;
     //NSLog(@"rect %@", rect);
@@ -272,29 +266,13 @@
     
     self.view = self.myWebView;
     
-    //    _webView.frame = CGRectMake(0,0,_webView.frame.size.width,_webView.frame.size.height+topFrame.size.height+bottomFrame.size.height);
+    [self CustomTopBarBtn];
     
+    NSString *mode = [[self.uiData getChild:@"topbar"] toString];
+    [self CustomTopBar:mode];
     
-    //It works for iOS 5 and iOS 6 , but not in iOS 7.
-    //[UIApplication sharedApplication].statusBarHidden = YES;//NOTES: Info.plist need add:
-    //    <key>UIStatusBarHidden</key>
-    //    <true/>
-    //
-    //    <key>UIViewControllerBasedStatusBarAppearance</key>
-    //    <false/>
-    
-    //    [[UIApplication sharedApplication] setStatusBarHidden:YES
-    //                                            withAnimation:UIStatusBarAnimationFade];
-    //    [[UIApplication sharedApplication] setStatusBarHidden:NO
-    //                                            withAnimation:UIStatusBarAnimationFade];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO
-     //                                            withAnimation:UIStatusBarAnimationFade
-                                            withAnimation:UIStatusBarAnimationNone
-     ];
-    [self CustomTopBar];
-    
+#warning TODO from address in uiData
     [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:@"root.htm"]]];
-    
 }
 
 @end
