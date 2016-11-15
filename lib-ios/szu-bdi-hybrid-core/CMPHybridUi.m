@@ -4,6 +4,13 @@
 
 @implementation CMPHybridUi
 
+-(void) restoreTopBarStatus
+{
+    JSO *param =self.uiData;
+    JSO *topbarmode=[param getChild:@"topbar"];
+    NSString *topbarmode_s=[JSO o2s:topbarmode];
+    [self CustomTopBar :topbarmode_s];
+}
 -(void) CustomTopBar :(NSString *)mode
 {
     if ([CMPHybridTools isEmptyString:mode])
@@ -107,10 +114,15 @@
 }
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData
 {
-    NSLog(@"TODO on %@ callback ", eventName);
+#warning TODO make mapper here...
+    self.tmpHandler=handler;
 }
 -(void) trigger :(NSString *)eventName :(id)extraData
 {
+    HybridEventHandler hdl=self.tmpHandler;
+    if(nil!=hdl){
+        hdl(eventName, extraData);
+    }
     NSLog(@"TODO trigger event %@", eventName);
 }
 //    - (void)toggleFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {

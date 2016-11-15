@@ -14,9 +14,17 @@
 
 //NOTES:
 //viewDidLoad: Whatever processing you have that needs to be done once.
-//viewWilLAppear: Whatever processing that needs to change every time the page is loaded.
+//viewWillAppear: Whatever processing that needs to change every time the page is loaded.
 
-
+-(void) viewWillAppear:(BOOL)animated
+{
+    [self CustomTopBarBtn];
+    
+    NSString *mode = [[self.uiData getChild:@"topbar"] toString];
+    [self CustomTopBar:mode];
+    
+    [super viewWillAppear:animated];
+}
 
 -(void)viewDidUnload
 {
@@ -78,7 +86,9 @@
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    
+
+    CMPHybridUi *caller=self;
+
     NSLog(@" TODO webViewDidFinishLoad() ");
     if (webView != self.myWebView) {
         NSLog(@" skip: not the same webview?? ");
@@ -104,11 +114,14 @@
             if([CMPHybridTools isEmptyString:name_s]){
                 name_s=@"UiRoot";//TMP !!! need UiError...
             }
+            //[self backupTopBarStatus];
             CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:param objCaller:self];
             if(ui!=nil){
                 [ui on:@"close" :^(NSString *eventName, id extraData){
                     //responseCallback(extraData);
                     NSLog(@" TODO !!! 转回给 API...");
+                    [caller restoreTopBarStatus];
+                    
                 }];
                 //[self toggleFullscreen:nil withDuration:0.3];
                 
@@ -266,13 +279,16 @@
     
     self.view = self.myWebView;
     
-    [self CustomTopBarBtn];
+    NSString *address = [[self.uiData getChild:@"address"] toString];
+    NSURL *address_url = [NSURL URLWithString:address];
+    NSString *scheme_s=[address_url scheme];
     
-    NSString *mode = [[self.uiData getChild:@"topbar"] toString];
-    [self CustomTopBar:mode];
-    
-#warning TODO from address in uiData
-    [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:@"root.htm"]]];
+    if( [ CMPHybridTools isEmptyString:scheme_s ])
+    {
+        [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+    }else{
+        [self loadUrl:[address_url absoluteString]];
+    }
 }
 
 @end

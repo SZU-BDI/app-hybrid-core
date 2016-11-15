@@ -60,7 +60,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
-    JSO *uiConfig = [jso_uiMapping getChild:strUiName];
+    JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one!!
     
     JSO *jso_className = [uiConfig getChild:@"class"];
     NSString *className = [JSO o2s:jso_className];
@@ -77,9 +77,11 @@ SINGLETON_shareInstance(CMPHybridTools);
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return nil;
     }
+    [uiConfig basicMerge:initData];
     theHybridUi.uiData=uiConfig;
-    [theHybridUi.uiData basicMerge:initData];
+//    [theHybridUi.uiData basicMerge:initData];
 
+    
 //    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
 //    UINavigationController *nav = [[UINavigationController alloc]
 //                                   initWithRootViewController:(UIViewController *)theHybridUi];

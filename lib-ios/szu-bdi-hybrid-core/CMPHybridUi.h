@@ -37,9 +37,12 @@ return _sharedInstance;\
 
 @property (strong) JSO *uiData;
 
+@property (strong) HybridEventHandler tmpHandler;
+
 //- (void) close;//the close is taken
 -(void) closeUi;
 
+-(void) restoreTopBarStatus;
 -(void) CustomTopBarBtn;
 -(void) CustomTopBar :(NSString *)mode;
 -(void) hideTopStatusBar;
