@@ -1,8 +1,7 @@
 #ifndef CMPHybridWebViewUi_h
 #define CMPHybridWebViewUi_h
-@import JavaScriptCore;
 
-#endif /* CMPHybridWebViewUi_h */
+@import JavaScriptCore;
 
 #import "CMPHybridUi.h"
 
@@ -16,3 +15,6 @@
 - (JSValue *) evalJs :(NSString *)js_s;
 
 @end
+
+
+#endif /* CMPHybridWebViewUi_h */

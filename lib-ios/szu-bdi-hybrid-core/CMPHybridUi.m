@@ -4,28 +4,68 @@
 
 @implementation CMPHybridUi
 
+//------------  UIViewController ------------
+
 
 -(void) viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     [self trigger:@"close" :@{@"debug":@"closeUi"}];
 }
+
+-(void) viewWillAppear:(BOOL)animated
+{
+    [self initUi];
+    [super viewWillAppear:animated];
+}
+//- (void)viewDidLoad {
+//    
+//    [super viewDidLoad];
+//    
+//}
+
+//------------   <HybridUi> ------------
+
+/* About FullScreen (hide top status bar)
+ // Plan A, It works for iOS 5 and iOS 6 , but not in iOS 7.
+ // [UIApplication sharedApplication].statusBarHidden = YES;
+ // Info.plist need add:
+ //    <key>UIStatusBarHidden</key>
+ //    <true/>
+ // Plan B: Info.plist
+ //    <key>UIViewControllerBasedStatusBarAppearance</key>
+ //    <false/>
+ //    [[UIApplication sharedApplication] setStatusBarHidden:YES
+ //                                            withAnimation:UIStatusBarAnimationFade];
+ 
+ //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
+ */
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
+-(void) hideTopStatusBar
+{
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+}
+-(void) showTopStatusBar
+{
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+}
+-(void) hideTopBar
+{
+    [[self navigationController] setNavigationBarHidden:YES animated:NO];
+}
+-(void) showTopBar
+{
+    [[self navigationController] setNavigationBarHidden:NO animated:NO];
+}
+
 -(void) restoreTopBarStatus
 {
     JSO *param =self.uiData;
     JSO *topbarmode=[param getChild:@"topbar"];
     NSString *topbarmode_s=[JSO o2s:topbarmode];
     [self CustomTopBar :topbarmode_s];
-}
-// viewWillAppear() is called before it's display.  some effect can be configurated here
-- (void)viewWillAppear:(BOOL)animated{
-    //self.view.backgroundColor = [UIColor grayColor];
-    
-    [self CustomTopBarBtn];
-    
-    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
-    
-    [super viewWillAppear:animated];
 }
 -(void) CustomTopBar :(NSString *)mode
 {
@@ -131,37 +171,16 @@
 }
 //////////////////////////////
 
-/* About FullScreen (hide top status bar)
- // Plan A, It works for iOS 5 and iOS 6 , but not in iOS 7.
- // [UIApplication sharedApplication].statusBarHidden = YES;
- // Info.plist need add:
- //    <key>UIStatusBarHidden</key>
- //    <true/>
- // Plan B: Info.plist
- //    <key>UIViewControllerBasedStatusBarAppearance</key>
- //    <false/>
- //    [[UIApplication sharedApplication] setStatusBarHidden:YES
- //                                            withAnimation:UIStatusBarAnimationFade];
- 
- //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
- */
-- (BOOL)prefersStatusBarHidden {
-    return YES;
-}
--(void) hideTopStatusBar
+//------------ self -----------------
+
+// viewWillAppear() is called before it's display.  some effect can be configurated here
+- (void)initUi
 {
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    //self.view.backgroundColor = [UIColor grayColor];
+    
+    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    [self CustomTopBarBtn];
+    
 }
--(void) showTopStatusBar
-{
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
-}
--(void) hideTopBar
-{
-    [[self navigationController] setNavigationBarHidden:YES animated:NO];
-}
--(void) showTopBar
-{
-    [[self navigationController] setNavigationBarHidden:NO animated:NO];
-}
+
 @end

@@ -11,36 +11,6 @@
 
 //------------  UIViewController ------------
 
-//@overrided
-- (void) CustomTopBarBtn
-{
-    //    UIBarButtonItem *leftBar
-    //    = [[UIBarButtonItem alloc]
-    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-    //       style:UIBarButtonItemStylePlain
-    //       target:self
-    //       action:@selector(closeUi) //on('click')=>close()
-    //       ];
-    //    leftBar.tintColor = [UIColor blueColor];
-    
-    self.navigationItem.leftBarButtonItem
-    = [[UIBarButtonItem alloc]
-       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-       target:self
-       action:@selector(closeUi)];
-    //
-    //    UIBarButtonItem *rightBtn
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    //    self.navigationItem.rightBarButtonItem = rightBtn;
-}
-
-- (void)viewDidLoad {
-    
-    [super viewDidLoad];
-    
-    [self initUi];
-}
 
 //------------  prototol UIWebViewDelegate ------------
 
@@ -250,18 +220,21 @@
     [self.myWebView loadRequest:request];
 }
 
--(id)init {
-    self = [super init];
-    NSLog(@"TODO HybridWebViewUi.init()");
-    return(self);
-}
+//-(id)init {
+//    self = [super init];
+//    NSLog(@"TODO HybridWebViewUi.init()");
+//    return(self);
+//}
 
-- (void)dealloc {
-    NSLog(@"TODO HybridWebViewUi.dealloc()");
-}
+//- (void)dealloc {
+//    NSLog(@"TODO HybridWebViewUi.dealloc()");
+//}
 
 -(void) initUi
 {
+    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    [self CustomTopBarBtn];
+    
     // initial the webView and add webview in window：
     CGRect rect = [UIScreen mainScreen].bounds;
     //NSLog(@"rect %@", rect);
@@ -295,4 +268,34 @@
     }
 }
 
+//@overrided
+- (void) CustomTopBarBtn
+{
+    //    UIBarButtonItem *leftBar
+    //    = [[UIBarButtonItem alloc]
+    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+    //       style:UIBarButtonItemStylePlain
+    //       target:self
+    //       action:@selector(closeUi) //on('click')=>close()
+    //       ];
+    //    leftBar.tintColor = [UIColor blueColor];
+    
+    self.navigationItem.leftBarButtonItem
+    = [[UIBarButtonItem alloc]
+       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+       target:self
+       action:@selector(closeUi)];
+    //
+    //    UIBarButtonItem *rightBtn
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+    //    self.navigationItem.rightBarButtonItem = rightBtn;
+}
+//
+//- (void)viewDidLoad {
+//
+//    [super viewDidLoad];
+//
+//    [self initUi];
+//}
 @end

@@ -26,4 +26,9 @@
        initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
     self.navigationItem.rightBarButtonItem = rightBtn;
 }
+
+- (JSValue *) evalJs :(NSString *)js_s
+{
+    return nil;
+}
 @end
