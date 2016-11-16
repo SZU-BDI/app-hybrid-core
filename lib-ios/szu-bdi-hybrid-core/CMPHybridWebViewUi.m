@@ -11,26 +11,30 @@
 
 //------------  UIViewController ------------
 
-
-//NOTES:
-//viewDidLoad: Whatever processing you have that needs to be done once.
-//viewWillAppear: Whatever processing that needs to change every time the page is loaded.
-
--(void) viewWillAppear:(BOOL)animated
+//@overrided
+- (void) CustomTopBarBtn
 {
-    [self CustomTopBarBtn];
+    //    UIBarButtonItem *leftBar
+    //    = [[UIBarButtonItem alloc]
+    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+    //       style:UIBarButtonItemStylePlain
+    //       target:self
+    //       action:@selector(closeUi) //on('click')=>close()
+    //       ];
+    //    leftBar.tintColor = [UIColor blueColor];
     
-    NSString *mode = [[self.uiData getChild:@"topbar"] toString];
-    [self CustomTopBar:mode];
-    
-    [super viewWillAppear:animated];
+    self.navigationItem.leftBarButtonItem
+    = [[UIBarButtonItem alloc]
+       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+       target:self
+       action:@selector(closeUi)];
+    //
+    //    UIBarButtonItem *rightBtn
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+    //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-//-(void)viewDidUnload
-//{
-//    NSLog(@"TODO viewDidUnload() 要不要在这里呼叫callback....");
-//    [super viewDidLoad];
-//}
 - (void)viewDidLoad {
     
     [super viewDidLoad];

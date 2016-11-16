@@ -17,6 +17,16 @@
     NSString *topbarmode_s=[JSO o2s:topbarmode];
     [self CustomTopBar :topbarmode_s];
 }
+// viewWillAppear() is called before it's display.  some effect can be configurated here
+- (void)viewWillAppear:(BOOL)animated{
+    //self.view.backgroundColor = [UIColor grayColor];
+    
+    [self CustomTopBarBtn];
+    
+    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    
+    [super viewWillAppear:animated];
+}
 -(void) CustomTopBar :(NSString *)mode
 {
     if ([CMPHybridTools isEmptyString:mode])
@@ -42,7 +52,6 @@
 //NOTES: can be overrided!
 - (void) CustomTopBarBtn
 {
-    //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
     //    UIBarButtonItem *leftBar
     //    = [[UIBarButtonItem alloc]
     //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
@@ -51,13 +60,12 @@
     //       action:@selector(closeUi) //on('click')=>close()
     //       ];
     //    leftBar.tintColor = [UIColor blueColor];
-    
+    //
     self.navigationItem.leftBarButtonItem
     = [[UIBarButtonItem alloc]
        initWithBarButtonSystemItem:UIBarButtonSystemItemReply
        target:self
        action:@selector(closeUi)];
-    
     //    UIBarButtonItem *rightBtn
     //    = [[UIBarButtonItem alloc]
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
@@ -79,12 +87,12 @@
             }
         }
         if(flagIsLast==YES){
-            NSLog(@" TODO for flagIsLast==YES");
+            NSLog(@" flagIsLast==YES");
         }
     }else{
         UIViewController *rootUi  =ddd.window.rootViewController;
         if (rootUi == self){
-            NSLog(@" TODO !!! root = self");
+            NSLog(@" root = self");
             flagIsLast=YES;
         }else{
             [self dismissViewControllerAnimated:YES completion:nil];
