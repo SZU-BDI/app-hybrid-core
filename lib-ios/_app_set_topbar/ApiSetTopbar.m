@@ -17,18 +17,20 @@
         {
             save_s=@"Y";
         }
-        if([@"Y" isEqualToString:save_s])
-        {
-            //save
-            JSO *uidata =caller.uiData;
-            [uidata setChild:@"topbar" JSO:topbarmode];
-            [caller restoreTopBarStatus];
-        }else{
-            NSString *topbarmode_s=[JSO o2s:topbarmode];
-            [caller CustomTopBar :topbarmode_s];
-        }
-        //responseCallback([JSO s2o:[JSO id2s:@{@"STS":@"OK"} :YES]]);
-        responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if([@"Y" isEqualToString:save_s])
+            {
+                //save
+                JSO *uidata =caller.uiData;
+                [uidata setChild:@"topbar" JSO:topbarmode];
+                [caller restoreTopBarStatus];
+            }else{
+                NSString *topbarmode_s=[JSO o2s:topbarmode];
+                [caller CustomTopBar :topbarmode_s];
+            }
+            //responseCallback([JSO s2o:[JSO id2s:@{@"STS":@"OK"} :YES]]);
+            responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+        });
     };
 }
 

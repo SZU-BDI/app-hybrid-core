@@ -16,18 +16,22 @@
             name_s=@"UiRoot";//TMP !!! need UiError...
         }
         
-        CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
-        if(ui!=nil){
-            [ui on:@"initdone" :^(NSString *eventName, id extraData){
-                //responseCallback(extraData);
-                NSLog(@" init done!!!");
-                
-            }];
-            [ui on:@"close" :^(NSString *eventName, id extraData){
-                [caller restoreTopBarStatus];
-                responseCallback([JSO id2o:@{@"STS":@"OK"}]);
-            }];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
+            if(ui!=nil){
+                [ui on:@"initdone" :^(NSString *eventName, id extraData){
+                    //responseCallback(extraData);
+                    NSLog(@" init done!!!");
+                    
+                }];
+                [ui on:@"close" :^(NSString *eventName, id extraData){
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [caller restoreTopBarStatus];
+                    });
+                    responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+                }];
+            }
+        });
     };
 }
 

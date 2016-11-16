@@ -5,8 +5,11 @@
 
 - (HybridHandler) getHandler{
     return ^(JSO *ddd, HybridCallback responseCallback) {
-        [self.currentUi closeUi];
-        responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [self.currentUi closeUi];
+            responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+        });
     };
 }
 

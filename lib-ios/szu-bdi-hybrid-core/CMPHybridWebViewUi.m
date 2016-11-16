@@ -85,24 +85,47 @@
             NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
             
             NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", rt_s];
+            [caller evalJs:javascriptCommand];
             
-            //do the callback a little later
-            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-            double delay = 0.01;//1=1 second
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
-                [caller evalJs:javascriptCommand];
-            });
+            //            //do the callback a little later
+            //            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            //            double delay = 0.01;//1=1 second
+            //
+            //            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
+            //                @try {
+            //                    [caller evalJs:javascriptCommand];
+            //                } @catch (NSException *exception) {
+            //                    callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+            //                }
+            //            });
+            //            dispatch_async(dispatch_get_main_queue(), ^{
+            //                @try {
+            //                    [caller evalJs:javascriptCommand];
+            //                } @catch (NSException *exception) {
+            //                    callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+            //                }
+            //            });
         };
+        //do the callback a little later
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        double delay = 0.01;//1=1 second
         
-        NSString *param_s=[param toString];
-        @try {
-            handler([JSO s2o:param_s], callback);
-        } @catch (NSException *exception) {
-            callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
-        } @finally {
-            
-        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
+            NSString *param_s=[param toString];
+            @try {
+                handler([JSO s2o:param_s], callback);
+            } @catch (NSException *exception) {
+                callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+            }
+        });
+        //        dispatch_async(dispatch_get_main_queue(), ^{
+        //            NSString *param_s=[param toString];
+        //            @try {
+        //                handler([JSO s2o:param_s], callback);
+        //            } @catch (NSException *exception) {
+        //                callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+        //            }
+        //        });
         //        //to the handler a little later (failed for some ui need the main thread now... to optimize later!
         //        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         //        double delay = 0.01;//1=1 second
@@ -129,15 +152,20 @@
 
 - (JSValue *) evalJs:(NSString *)js_s
 {
-    if ([[NSThread currentThread] isMainThread]) {
-        //NSLog(@" debug HybridWebView %@",js_s);
-        return [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
-    } else {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            //NSLog(@" dispatch_sync to dispatch_get_main_queue %@",js_s);
-            [self evalJs:js_s];
-        });
-    }
+    //    if ([[NSThread currentThread] isMainThread]) {
+    //        //NSLog(@" debug HybridWebView %@",js_s);
+    //        return [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    //    } else {
+    //        dispatch_sync(dispatch_get_main_queue(), ^{
+    //            //NSLog(@" dispatch_sync to dispatch_get_main_queue %@",js_s);
+    ////            [self evalJs:js_s];
+    //            //return
+    //            [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    //        });
+    //    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    });
     return nil;
 }
 
