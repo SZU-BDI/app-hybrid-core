@@ -48,32 +48,32 @@ import java.util.Objects;
 
 //NOTES: 长期运行或者大功率运作似乎 responseCallbacks 会因为清理不及时内存泄漏。
 
-@SuppressLint("AddJavascriptInterface")
-class MyJsCallbackObject extends Object {
-
-    private String _callbackId = "";
-
-    private int _status = 0;
-
-    public MyJsCallbackObject(String cbId) {
-        _callbackId = cbId;
-    }
-
-    @JavascriptInterface
-    public String getCallbackId() {
-        return _callbackId;
-    }
-
-    public void setStatus(int sts) {
-        _status = sts;
-    }
-
-    @JavascriptInterface
-    public int getStatus() {
-        return _status;
-    }
-
-}
+//@SuppressLint("AddJavascriptInterface")
+//class MyJsCallbackObject extends Object {
+//
+//    private String _callbackId = "";
+//
+//    private int _status = 0;
+//
+//    public MyJsCallbackObject(String cbId) {
+//        _callbackId = cbId;
+//    }
+//
+//    @JavascriptInterface
+//    public String getCallbackId() {
+//        return _callbackId;
+//    }
+//
+//    public void setStatus(int sts) {
+//        _status = sts;
+//    }
+//
+//    @JavascriptInterface
+//    public int getStatus() {
+//        return _status;
+//    }
+//
+//}
 
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -371,9 +371,13 @@ public class JsBridgeWebView extends WebView {
 
             this.addJavascriptInterface(new Object() {
                 @JavascriptInterface
-                public Object js2app(final String callBackId, String handlerName, final String param_s) {
+                public String js2app(final String callBackId, String handlerName, final String param_s) {
 
-                    final MyJsCallbackObject rtObj=new MyJsCallbackObject(callBackId);
+
+                    //TODO 这里要有个 auth-mapping (whitelist) check!!!!
+
+
+                    //final MyJsCallbackObject rtObj=new MyJsCallbackObject(callBackId);
 
                     final HybridCallback responseFunction = new HybridCallback() {
                         @Override
@@ -389,7 +393,7 @@ public class JsBridgeWebView extends WebView {
                                     if ("".equals(s) || s == null) s = "null";
                                     Log.v(LOGTAG, "js2app s ==> " + s);
                                     //暂时找了一大圈，看完了 JNI/CPP 层的代码，都没有什么好的方法。这个已经是暂时。。。最好的了。。。
-                                    rtObj.setStatus(1);//research only..don't use
+                                    //rtObj.setStatus(1);//research only..don't use
                                     //rtObj.setResultJsonStr(s);//not good...the js side need to decode it... give up..
                                     loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
 
@@ -401,7 +405,7 @@ public class JsBridgeWebView extends WebView {
                     };
                     final HybridHandler handler = messageHandlers.get(handlerName);
 
-                    //TODO 这里要有个 auth-mapping (whitelist) check?
+
                     if (handler != null) {
                         (new Thread(new Runnable() {
                             @Override
@@ -410,7 +414,8 @@ public class JsBridgeWebView extends WebView {
                             }
                         })).start();
                     }
-                    return rtObj;
+                    //return rtObj;
+                    return "OK";
                 }
             }, "nativejsb");
         }

@@ -6,29 +6,28 @@
 
 - (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {
+        CMPHybridUi *caller=self.currentUi;
+        
         NSLog(@"ApiActivityOpen()");
         
-        // JSON String -> JSO
-        NSString *dataString = [JSO id2s:data];
-        JSO *jso = [JSO s2o:dataString];
-        
-        // start UiContent
-        CMPHybridUi *rt=[CMPHybridTools startUi:@"UiContent" initData:jso objCaller:self.currentUi
-                         //callback:responseCallback
-                         ];
-        if(rt!=nil){
-            if(nil!=responseCallback){
-                [rt on:@"close" :^(NSString *eventName, id extraData){
-                    responseCallback(extraData);
-                }];
-            }else{
-                [rt on:@"close" :^(NSString *eventName, id extraData){
-                    //responseCallback(extraData);
-                    NSLog(@" ui trigger close but no responseCallback here...");
-                }];
-            }
+        JSO *name=[data getChild:@"name"];
+        NSString *name_s= [name toString];
+        if([CMPHybridTools isEmptyString:name_s]){
+            name_s=@"UiRoot";//TMP !!! need UiError...
         }
         
+        CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
+        if(ui!=nil){
+            [ui on:@"initdone" :^(NSString *eventName, id extraData){
+                //responseCallback(extraData);
+                NSLog(@" init done!!!");
+                
+            }];
+            [ui on:@"close" :^(NSString *eventName, id extraData){
+                [caller restoreTopBarStatus];
+                responseCallback([JSO id2o:@{@"STS":@"OK"}]);
+            }];
+        }
     };
 }
 

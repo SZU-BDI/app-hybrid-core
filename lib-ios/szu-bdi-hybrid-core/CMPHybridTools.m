@@ -214,9 +214,10 @@ SINGLETON_shareInstance(CMPHybridTools);
              @".javaScriptContext")];
 }
 
+//warning! caller need to handler the thread like:
+
 + (JSValue *) callWebViewDoJs:(UIWebView *) _webview :(NSString *)js_s
 {
-    
     @try {
         return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
     } @catch (NSException *exception) {

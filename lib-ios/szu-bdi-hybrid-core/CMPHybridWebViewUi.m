@@ -8,62 +8,46 @@
 
 @implementation CMPHybridWebViewUi
 
+//NSMutableDictionary* myMessageHandlers;
 
 //------------  UIViewController ------------
 
 
 //------------  prototol UIWebViewDelegate ------------
 
-
--(BOOL)isCorrectProcotocolScheme:(NSURL*)url {
-    if([[url scheme] isEqualToString:@"jsb1"]){
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
-//- (void)_dispatchMessage:(NSDictionary*)message {
-//    NSString *json_string = [self _serializeMessage:message pretty:NO];
 //
-//    //TODO if "" or null change to "null"...
-//
-//    NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", json_string];
-//
-//    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
-//    if ([[NSThread currentThread] isMainThread]) {
-//        [self evalJs:javascriptCommand];
-//
+//-(BOOL)isCorrectProcotocolScheme:(NSURL*)url {
+//    if([[url scheme] isEqualToString:@"jsb1"]){
+//        return YES;
 //    } else {
-//        dispatch_sync(dispatch_get_main_queue(), ^{
-//            [self evalJs:javascriptCommand];
-//        });
+//        return NO;
 //    }
 //}
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    NSURL *url = [request URL];
-    NSLog(@" shouldStartLoadWithRequest() %@ ",url);
-    
-    //have to ??
-    if (webView != self.myWebView) {
-        NSLog(@" TODO why the requested webview is not the one private ??? ");
-        return YES;
-    }
-    
-    if ([self isCorrectProcotocolScheme:url]) {
-        NSLog(@" ignore the old jsb1 scheme....no need any more");
-        return NO;
-    } else {
-        return YES;
-    }
-}
+//- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+//
+//    NSURL *url = [request URL];
+//    NSLog(@" shouldStartLoadWithRequest() %@ ",url);
+//
+//    if (webView != self.myWebView) {
+//        NSLog(@" TODO why the requested webview is not the one private ??? ");
+//        return YES;
+//    }
+////
+////    if ([self isCorrectProcotocolScheme:url]) {
+////        NSLog(@" ignore the old jsb1 scheme....no need any more");
+////        return NO;
+////    } else {
+////        return YES;
+////    }
+//    return YES;
+//}
+
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     
     CMPHybridUi *caller=self;
     
-    NSLog(@" TODO webViewDidFinishLoad() ");
     if (webView != self.myWebView) {
         NSLog(@" skip: not the same webview?? ");
         return;
@@ -71,85 +55,61 @@
     
     NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
     
-    //    JSContext *ctx = [webView valueForKeyPath:(@"documentView" @".webView" @".mainFrame" @".javaScriptContext")];
-    
-    JSContext *ctx = [CMPHybridTools getWebViewJsCtx:webView];
+    //    JSContext *ctx = [CMPHybridTools getWebViewJsCtx:webView];
+    JSContext *ctx = [CMPHybridTools getWebViewJsCtx :self.myWebView];
     
     //inject nativejsb
-    [ctx evaluateScript:@"nativejsb={};"];
+    [ctx evaluateScript:@"nativejsb={version:20161116};"];
     
     //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
-        //,JSValue *handlerName,JSStringRef param_s
-        NSLog(@"JavaScript %@ callBackId: %@ handlerName %@ param_s %@", [JSContext currentContext], callBackId, handlerName, param);
         
-#warning TODO find api config..
-        if( [@"_app_activity_close" isEqualToString:[handlerName toString]] ){
-            [self closeUi];
+#warning TODO to check the handlerName is auth by api_auth in config.json for current url !!
+        
+        HybridHandler handler = self.myApiHandlers[[handlerName toString]];
+        
+        if (nil==handler) {
+            NSLog(@" !!! found no handler for %@", handlerName);
+            //return nil;
+            return;
         }
+        NSString *callBackId_s=[callBackId toString];
+        HybridCallback callback=^(JSO *responseData){
+            NSLog(@" callback(%@) return %@",callBackId_s, [responseData toString]);
+            
+            //            JSO *rt=[JSO s2o:@"{}"];
+            //            [rt setChild:@"responseId" JSO:[JSO s2o:callBackId_s]];
+            //            [rt setChild:@"responseData" JSO:responseData];
+            //            id dd=@{@"responseId":callBackId_s,@"responseData":[responseData toId]};
+            
+            NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
+            
+            NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", rt_s];
+            
+            //do the callback a little later
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            double delay = 0.01;//1=1 second
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
+                [caller evalJs:javascriptCommand];
+            });
+        };
         
         NSString *param_s=[param toString];
-        if( [@"_app_activity_open" isEqualToString:[handlerName toString]] ){
-            JSO *param =[JSO s2o:param_s];
-            JSO *name=[param getChild:@"name"];
-            NSString *name_s= [name toString];
-            if([CMPHybridTools isEmptyString:name_s]){
-                name_s=@"UiRoot";//TMP !!! need UiError...
-            }
-            //[self backupTopBarStatus];
-            CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:param objCaller:self];
-            if(ui!=nil){
-                [ui on:@"initdone" :^(NSString *eventName, id extraData){
-                    //responseCallback(extraData);
-                    NSLog(@" init done!!!");
-                    
-                }];
-                [ui on:@"close" :^(NSString *eventName, id extraData){
-                    //responseCallback(extraData);
-                    NSLog(@" TODO close callback!!!");
-                    [caller restoreTopBarStatus];
-                    
-                }];
-                //直接运行无效，因为这里还没有 webview初始化完 [ui evalJs:@"alert('test'+111)"];
-            }
+        @try {
+            handler([JSO s2o:param_s], callback);
+        } @catch (NSException *exception) {
+            callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+        } @finally {
+            
         }
-        if( [@"app_set_topbar" isEqualToString:[handlerName toString]] ){
-            JSO *param =[JSO s2o:param_s];
-            JSO *topbarmode=[param getChild:@"mode"];
-            NSString *topbarmode_s=[JSO o2s:topbarmode];
-            [self CustomTopBar :topbarmode_s];
-            //[self evalJs:@"setTimeout(function(){alert(119);},1000);"];TEST PASS
-            [self evalJs:@"alert(120);"];
-        }
-        
-        //                HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
+        //        //to the handler a little later (failed for some ui need the main thread now... to optimize later!
+        //        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        //        double delay = 0.01;//1=1 second
         //
-        //                if (!handler) {
-        //                    NSLog(@"WVJBNoHandlerException, No handler for message from JS: %@", message);
-        //                    continue;
-        //                }
-        //
-        //                handler(message[@"data"], responseCallback);
-        
-        //find the api and call...
-        //                responseCallback = ^(id responseData) {
-        //                    if (responseData == nil) {
-        //                        responseData = [NSNull null];
-        //                    }
-        //
-        //                    WVJBMessage* msg = @{ @"responseId":callbackId, @"responseData":responseData };
-        //                    [self _queueMessage:msg];
-        //                };
-        //        HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
-        //
-        //        if (!handler) {
-        //            NSLog(@"WVJBNoHandlerException, No handler for message from JS: %@", message);
-        //            continue;
-        //        }
-        //
-        //        handler(message[@"data"], responseCallback);
-        
-        return @"OK";
+        //        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
+        //            handler([JSO s2o:param_s], callback);
+        //        });
     };
     
     //STUB
@@ -167,50 +127,41 @@
 
 //------------   <HybridUi> ------------
 
-//- (void)callWebViewDoJs:(UIWebView *)webview :(NSString *)js_s
-//{
-//    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
-//    if ([[NSThread currentThread] isMainThread]) {
-//        [CMPHybridTools callWebViewDoJs:webview :js_s];
-//    } else {
-//        dispatch_sync(dispatch_get_main_queue(), ^{
-//            [self callWebViewDoJs:webview :js_s];
-//        });
-//    }
-//}
-
 - (JSValue *) evalJs:(NSString *)js_s
 {
-    NSLog(@" debug HybridWebView %@",js_s);
-    return [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    if ([[NSThread currentThread] isMainThread]) {
+        //NSLog(@" debug HybridWebView %@",js_s);
+        return [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            //NSLog(@" dispatch_sync to dispatch_get_main_queue %@",js_s);
+            [self evalJs:js_s];
+        });
+    }
+    return nil;
 }
 
 //------------ self -----------------
 
-//- (void)registerHandlerApi{
-//
-//    // get the appConfig:
-//    JSO *jsonO = [CMPHybridTools wholeAppConfig];
-//
-//    // 获取 Api 映射数据
-//    JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
-//    NSString *jso_string_value = [JSO o2s:jso_api_mapping];
-//
-//    JSO *jso = [JSO s2o:jso_string_value];
-//    NSLog(@"TODO registerHandlerApi %@", [jso getChildKeys]);
-//
-//    for (NSString *key in [jso getChildKeys]) {
-//
-//        // Get the value through the key:
-//
-//        NSString *apiname = [[jso getChild:key] toString] ;
-//        CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
-//
-//        // 把当前控制器（ui）赋值给 api的成员变量
-//        api.currentUi = self;
-//        // NSLog(@"注册方法 %@" , key);
-//    }
-//}
+- (void)registerHandlerApi{
+    
+    self.myApiHandlers = [NSMutableDictionary dictionary];
+    
+    // get the appConfig:
+    JSO *appConfig = [CMPHybridTools wholeAppConfig];
+    
+    JSO *api_mapping = [appConfig getChild:@"api_mapping"];
+    
+    for (NSString *kkk in [api_mapping getChildKeys]) {
+        
+        // Get the value through the key:
+        
+        NSString *apiname = [[api_mapping getChild:kkk] toString] ;
+        CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
+        api.currentUi = self;
+        self.myApiHandlers[kkk] = [[api getHandler] copy];
+    }
+}
 
 - (void) loadUrl:(NSString *)url{
     NSURL *requesturl = [NSURL URLWithString:url];
@@ -220,18 +171,14 @@
 
 -(void) initUi
 {
-    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    [self registerHandlerApi];
+    
     [self CustomTopBarBtn];
     
     // initial the webView and add webview in window：
     CGRect rect = [UIScreen mainScreen].bounds;
-    //NSLog(@"rect %@", rect);
-    //    CGRect rect = [UIScreen mainScreen].nativeBounds;
     
     self.myWebView = [[UIWebView alloc]initWithFrame:rect];
-    
-    //UIWebView *_webView = self.myWebView;
-    //_webView.frame=CGRectMake(-100,0,_webView.frame.size.width,_webView.frame.size.height+100);
     
     self.myWebView.backgroundColor = [UIColor whiteColor];
     self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...

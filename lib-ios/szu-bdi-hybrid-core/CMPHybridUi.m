@@ -7,16 +7,31 @@
 //------------  UIViewController ------------
 
 
--(void) viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    [self trigger:@"close" :@{@"debug":@"closeUi"}];
-}
-
+//-(void) viewDidDisappear:(BOOL)animated
+//{
+//    [super viewDidDisappear:animated];
+//    NSLog(@"debug viewDidDisappear() %@", [self.uiData toString]);
+//    //[self trigger:@"close" :@{@"debug":@"closeUi"}];
+//}
+//-(void) dealloc
+//{
+//    NSLog(@"debug dealloc !!!");
+////    [super dealloc];
+//}
+//-(void) viewWillUnload
+//{
+//    NSLog(@"debug viewWillUnload !!! %@",[self.uiData toString]);
+//}
+//-(void)
 -(void) viewWillAppear:(BOOL)animated
 {
-    [self initUi];
+    //[self initUi];
     [super viewWillAppear:animated];
+    [self restoreTopBarStatus];
+}
+-(void) viewDidLoad
+{
+    [self initUi];
 }
 
 //------------   <HybridUi> ------------
@@ -141,21 +156,23 @@
     return nil;
 }
 //////////////////////////////  on/trigger mechanism
+
+#warning on/trigger TODO need support multi-listeners,currently using tmp solu.
+
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
     [self on:eventName :handler :nil];
 }
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
 {
-    self.tmpHandler=handler;
+    self.myEventHandlers[eventName]=handler;
 }
 -(void) trigger :(NSString *)eventName :(id)extraData
 {
-    HybridEventHandler hdl=self.tmpHandler;
+    HybridEventHandler hdl=self.myEventHandlers[eventName];
     if(nil!=hdl){
         hdl(eventName, extraData);
     }
-    NSLog(@"TODO trigger event %@", eventName);
 }
 //////////////////////////////
 
@@ -164,7 +181,8 @@
 //NOTES: can be overrided
 - (void)initUi
 {
-    [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    //[self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
+    //    [self restoreTopBarStatus];
     [self CustomTopBarBtn];
 }
 
