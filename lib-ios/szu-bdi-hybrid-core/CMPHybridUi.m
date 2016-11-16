@@ -4,6 +4,12 @@
 
 @implementation CMPHybridUi
 
+
+-(void) viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [self trigger:@"close" :@{@"debug":@"closeUi"}];
+}
 -(void) restoreTopBarStatus
 {
     JSO *param =self.uiData;
@@ -69,7 +75,6 @@
         if(vvv!=nil){
             if(vvv.count>1){
                 [self.navigationController popViewControllerAnimated:YES];
-                //                [self trigger:@"close" :@{@"debug":@"popViewControllerAnimated"}];
                 flagIsLast=NO;
             }
         }
@@ -83,7 +88,6 @@
             flagIsLast=YES;
         }else{
             [self dismissViewControllerAnimated:YES completion:nil];
-            //            [self trigger:@"close" :@{@"debug":@"dismissViewControllerAnimated"}];
         }
     }
     
@@ -91,30 +95,22 @@
         //quit app if prompted yes
         [CMPHybridTools
          quickConfirmMsgMain:@"Sure to Quit?"
-         //         handlerYes:^(UIAlertAction *action)
-         handlerYes:^(UIAlertAction *action){
+         //handlerYes:^(UIAlertAction *action)
+         handlerYes:(HybridDialogCallback) ^{
              [self dismissViewControllerAnimated:YES completion:nil];
-             
-             //home button press programmatically
-             UIApplication *app = [UIApplication sharedApplication];
-             NSLog(@"Hide...");
-             [app performSelector:@selector(suspend)];
-             sleep(1);
-             NSLog(@"Really Quit...");
-             exit(EXIT_SUCCESS);
+             [CMPHybridTools quitGracefully];
          }
          handlerNo:nil];
     }
-    [self trigger:@"close" :@{@"debug":@"closeUi"}];
 }
 
+//////////////////////////////  on/trigger mechanism
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
     [self on:eventName :handler :nil];
 }
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData
 {
-#warning TODO make mapper here...
     self.tmpHandler=handler;
 }
 -(void) trigger :(NSString *)eventName :(id)extraData
@@ -125,69 +121,18 @@
     }
     NSLog(@"TODO trigger event %@", eventName);
 }
-//    - (void)toggleFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {
-//        if (_fullscreenToggled) {
-//            [self exitFullscreen:complete withDuration:duration];
-//        } else {
-//            [self enterFullscreen:complete withDuration:duration];
-//        }
-//    }
-//- (void)enterFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {
-//    CGRect topFrame = _topToolbar.frame;
-//    CGRect bottomFrame = _bottomToolbar.frame;
-//
-//    [UIView animateWithDuration:duration animations:^{
-//        _topToolbar.frame = CGRectMake(topFrame.origin.x, topFrame.origin.y-topFrame.size.height, topFrame.size.width, topFrame.size.height);
-//        _bottomToolbar.frame = CGRectMake(bottomFrame.origin.x, bottomFrame.origin.y+bottomFrame.size.height, bottomFrame.size.width, bottomFrame.size.height);
-//
-//        _webView.frame = CGRectMake(0,0,_webView.frame.size.width,_webView.frame.size.height+topFrame.size.height+bottomFrame.size.height);
-//    } completion:^(BOOL finished) {
-//        if (complete != nil) {
-//            complete();
-//        }
-//    }];
-//
-//    _fullscreenToggled = YES;
-//}
-//
-//- (void)exitFullscreen:(void(^)())complete withDuration:(NSTimeInterval)duration {
-//    CGRect topFrame = _topToolbar.frame;
-//    CGRect bottomFrame = _bottomToolbar.frame;
-//
-//    [UIView animateWithDuration:duration animations:^{
-//        _topToolbar.frame = CGRectMake(topFrame.origin.x, topFrame.origin.y+topFrame.size.height, topFrame.size.width, topFrame.size.height);
-//        _bottomToolbar.frame = CGRectMake(bottomFrame.origin.x, bottomFrame.origin.y-bottomFrame.size.height, bottomFrame.size.width, bottomFrame.size.height);
-//
-//        _webView.frame = CGRectMake(0,topFrame.size.height,_webView.frame.size.width,_webView.frame.size.height);
-//    } completion:^(BOOL finished) {
-//        // Clip off the extra bottom. It wasn't in the animation
-//        // because the bottom portion of the web view would blink.
-//        _webView.frame = CGRectMake(
-//                                    _webView.frame.origin.x,
-//                                    _webView.frame.origin.y,
-//                                    _webView.frame.size.width,
-//                                    _webView.frame.size.height-topFrame.size.height-bottomFrame.size.height
-//                                    );
-//        if (complete != nil) {
-//            complete();
-//        }
-//    }];
-//
-//    _fullscreenToggled = NO;
-//}
+//////////////////////////////
 
 /* About FullScreen (hide top status bar)
- //It works for iOS 5 and iOS 6 , but not in iOS 7.
- //[UIApplication sharedApplication].statusBarHidden = YES;//NOTES: Info.plist need add:
+ // Plan A, It works for iOS 5 and iOS 6 , but not in iOS 7.
+ // [UIApplication sharedApplication].statusBarHidden = YES;
+ // Info.plist need add:
  //    <key>UIStatusBarHidden</key>
  //    <true/>
- //
+ // Plan B: Info.plist
  //    <key>UIViewControllerBasedStatusBarAppearance</key>
  //    <false/>
- 
  //    [[UIApplication sharedApplication] setStatusBarHidden:YES
- //                                            withAnimation:UIStatusBarAnimationFade];
- //    [[UIApplication sharedApplication] setStatusBarHidden:NO
  //                                            withAnimation:UIStatusBarAnimationFade];
  
  //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar

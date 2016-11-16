@@ -95,7 +95,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         if (((UIViewController *)objCaller).navigationController != nil) {
             // push
             theHybridUi.view.backgroundColor = [UIColor whiteColor];//important for speed !
-
+            
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{
@@ -133,39 +133,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 + (JSO *)getAppConfig:(NSString *)key{
     
     return [[self wholeAppConfig] getChild:key];
-    //    JSO *jso_value;
-    //
-    //    JSO *jsonJso = [self wholeAppConfig];
-    //    if (jsonJso!=nil) {
-    //        jso_value = [jsonJso getChild:key];
-    //    }
-    //    else{
-    //        [self quickShowMsgMain:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
-    //        jso_value = nil;
-    //    }
-    //
-    //    return jso_value;
 }
-
-//+ (NSString *)fastO2S:(JSO *)jso forKey:(NSString *)key{
-//
-//    JSO *jsoValue = [jso getChild:key];
-//    NSString *jsonString = [JSO o2s:jsoValue];
-//
-//    if ([jsonString isEqualToString:@"null"]){
-//        return @"";
-//    }
-//
-//    return jsonString;
-//}
-
-//deprecated, see quickShowMsgMain()
-//+ (void)showAlertMessage:(NSString *)message{
-//
-//    //deprecated UIAlertView and UIAlertViewDelegate
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
-//        [alert show];
-//}
 
 //IOS 8+
 + (void)quickShowMsgMain:(NSString *)msg{
@@ -175,23 +143,13 @@ SINGLETON_shareInstance(CMPHybridTools);
     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
     [alertController addAction:ok];
     
-    //[self presentViewController:alertController animated:YES completion:nil];
-    
-    //    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    //    while (topRootViewController.presentedViewController)
-    //    {
-    //        topRootViewController = topRootViewController.presentedViewController;
-    //    }
-    //
-    //    [topRootViewController presentViewController:alertController animated:NO completion:nil];
-    
-    [[self findTopRootView] presentViewController:alertController animated:NO completion:nil];
-    
-    //NOTES: the alert above will not block the whole application,
-    //that's why need to find the top view to show?
-    NSLog(@"After show alert %@",msg);
+    //modal
+    [[self findTopRootView] presentViewController:alertController animated:NO completion:^(){
+        NSLog(@" completion after quickShowMsgMain()");
+    }];
 }
 
+//Mostly use in main.m to alert iOS version if too low (because quickShowMsgMain is not working <iOS8
 + (void)quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
 {
     [[[CmpUIAlertView alloc] initWithMsg:msg callback:callback] show];
@@ -290,27 +248,18 @@ SINGLETON_shareInstance(CMPHybridTools);
     return (nil==s || [@"" isEqualToString:s]);
 }
 
-+(void) promptUserQuit
-{
-    [CMPHybridTools
-     quickConfirmMsgMain:@"Sure to Quit?"
-     //         handlerYes:^(UIAlertAction *action)
-     handlerYes:^(UIAlertAction *action){
-         //         [self dismissViewControllerAnimated:YES completion:nil];
-         
-         //home button press programmatically
-         UIApplication *app = [UIApplication sharedApplication];
-         NSLog(@"Hide...");
-         [app performSelector:@selector(suspend)];
-         sleep(1);
-         NSLog(@"Really Quit...");
-         exit(EXIT_SUCCESS);
-     }
-     handlerNo:nil];
-}
+//+(void) promptUserQuit
+//{
+//    [CMPHybridTools
+//     quickConfirmMsgMain:@"Sure to Quit?"
+//     //         handlerYes:^(UIAlertAction *action)
+//     handlerYes:^(UIAlertAction *action){
+//         [self quitGracefully];
+//     }
+//     handlerNo:nil];
+//}
 
-
-/******************************备用*********************************/
+/****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{
     
     CMPHybridTools *hybridManager = [self shareInstance];
@@ -337,6 +286,6 @@ SINGLETON_shareInstance(CMPHybridTools);
 + (void)loadUserConfig{
     
 }
-/******************************备用*********************************/
+/****************************** STUB FOR LATER *********************************/
 
 @end

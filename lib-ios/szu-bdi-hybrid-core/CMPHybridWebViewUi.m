@@ -26,11 +26,11 @@
     [super viewWillAppear:animated];
 }
 
--(void)viewDidUnload
-{
-    NSLog(@"TODO viewDidUnload() 要不要在这里呼叫callback....");
-    [super viewDidLoad];
-}
+//-(void)viewDidUnload
+//{
+//    NSLog(@"TODO viewDidUnload() 要不要在这里呼叫callback....");
+//    [super viewDidLoad];
+//}
 - (void)viewDidLoad {
     
     [super viewDidLoad];
