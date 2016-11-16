@@ -6,8 +6,7 @@
 @import JavaScriptCore;
 
 /////////////////////////////////////////////////////////////
-//internal class(CmpUIAlertView) to handle the callback
-//quickAlertMsg()
+//internal class(CmpUIAlertView) to handle the callback for quickAlertMsg()
 @interface CmpUIAlertView : UIAlertView
 
 @property () void (^callback)();
@@ -18,10 +17,9 @@
 
 @implementation CmpUIAlertView
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+-(void) alertView :(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if(self.callback)
-        self.callback();
+    if(self.callback) self.callback();
 }
 
 -(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback
@@ -52,7 +50,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 
 + (CMPHybridUi *) startUi :(NSString *)strUiName
-              initData:(JSO *) initData
+                  initData:(JSO *) initData
                  objCaller:(CMPHybridUi *)objCaller
 {
     
@@ -60,10 +58,9 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
-    JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one!!
+    JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one otherwise the real one will be poluted
     
-    JSO *jso_className = [uiConfig getChild:@"class"];
-    NSString *className = [JSO o2s:jso_className];
+    NSString *className = [JSO o2s:[uiConfig getChild:@"class"]];
     
     if ( [self isEmptyString :className]) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
@@ -73,22 +70,14 @@ SINGLETON_shareInstance(CMPHybridTools);
     Class uiClass = NSClassFromString(className);
     CMPHybridUi * theHybridUi = [[uiClass alloc] init];
     
-    if (!theHybridUi) {
+    if (nil==theHybridUi) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return nil;
     }
     [uiConfig basicMerge:initData];
     theHybridUi.uiData=uiConfig;
-//    [theHybridUi.uiData basicMerge:initData];
-
     
-//    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
-//    UINavigationController *nav = [[UINavigationController alloc]
-//                                   initWithRootViewController:(UIViewController *)theHybridUi];
-//    ddd.window.rootViewController = nav;
-//    [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
-
-//    //TODO need to release the name_s??
+    /////////////////////////////////////// Display It {
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
     if (ddd.window.rootViewController==nil){
         if ([theHybridUi isKindOfClass:[UITabBarController class]]) {
@@ -105,8 +94,8 @@ SINGLETON_shareInstance(CMPHybridTools);
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
             // push
-            theHybridUi.view.backgroundColor = [UIColor whiteColor];//important for speed
-            //http://stackoverflow.com/questions/19917928/uinavigationcontroller-pushviewcontroller-pauses-freezes-midway-through/19919081#19919081
+            theHybridUi.view.backgroundColor = [UIColor whiteColor];//important for speed !
+
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{
@@ -114,9 +103,7 @@ SINGLETON_shareInstance(CMPHybridTools);
             [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
         }
     }
-    //    });
-    //            [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(run:) userInfo:@"abc" repeats:NO];
-
+    /////////////////////////////////////// Display It }
     return theHybridUi;
 }
 
@@ -145,30 +132,30 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (JSO *)getAppConfig:(NSString *)key{
     
-    JSO *jso_value;
-    
-    JSO *jsonJso = [self wholeAppConfig];
-    if (jsonJso) {
-        
-        jso_value = [jsonJso getChild:key];
-    }
-    else{
-        [self quickShowMsgMain:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
-        jso_value = nil;
-    }
-    
-    return jso_value;
+    return [[self wholeAppConfig] getChild:key];
+    //    JSO *jso_value;
+    //
+    //    JSO *jsonJso = [self wholeAppConfig];
+    //    if (jsonJso!=nil) {
+    //        jso_value = [jsonJso getChild:key];
+    //    }
+    //    else{
+    //        [self quickShowMsgMain:[NSString stringWithFormat:@"appConfig (%@) not found", key]];
+    //        jso_value = nil;
+    //    }
+    //
+    //    return jso_value;
 }
 
 //+ (NSString *)fastO2S:(JSO *)jso forKey:(NSString *)key{
-//    
+//
 //    JSO *jsoValue = [jso getChild:key];
 //    NSString *jsonString = [JSO o2s:jsoValue];
-//    
+//
 //    if ([jsonString isEqualToString:@"null"]){
 //        return @"";
 //    }
-//    
+//
 //    return jsonString;
 //}
 

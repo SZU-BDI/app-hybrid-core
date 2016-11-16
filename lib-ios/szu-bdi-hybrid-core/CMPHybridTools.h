@@ -10,7 +10,6 @@
 #import "CMPHybridApi.h"
 #import "CMPHybridTools.h"
 
-
 @import JavaScriptCore;
 
 @interface CMPHybridTools : NSObject
@@ -28,11 +27,6 @@
 + (CMPHybridUi *) startUi :(NSString *)strUiName
                   initData:(JSO *)initData
                  objCaller:(CMPHybridUi *)objCaller;
-
-//+ (CMPHybridUi *)startUi :(NSString *)strUiName
-//             strInitParam:(JSO *)strInitParam
-//                objCaller:(CMPHybridUi *)objCaller
-//                 callback:(HybridCallback)callback;
 
 + (JSO *) wholeAppConfig;
 
