@@ -75,6 +75,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         return nil;
     }
     [uiConfig basicMerge:initData];
+    theHybridUi.uiName=strUiName;
     theHybridUi.uiData=uiConfig;
     
     /////////////////////////////////////// Display It {
@@ -130,8 +131,8 @@ SINGLETON_shareInstance(CMPHybridTools);
     return hybridManager.jso;
 }
 
-+ (JSO *)getAppConfig:(NSString *)key{
-    
++ (JSO *) getAppConfig :(NSString *)key
+{
     return [[self wholeAppConfig] getChild:key];
 }
 
@@ -260,6 +261,17 @@ SINGLETON_shareInstance(CMPHybridTools);
 //     }
 //     handlerNo:nil];
 //}
+
++(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt
+{
+    NSError *error = NULL;
+    NSRange range = NSMakeRange(0, [txt length]);
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regex_s options:0 error:&error];
+    if(nil!=error){
+        NSLog(@"error when quickRegExpMatch %@",error);
+    }
+    return [regex matchesInString:txt options:0 range:range];
+}
 
 /****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{

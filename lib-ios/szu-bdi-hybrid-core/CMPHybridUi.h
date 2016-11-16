@@ -37,6 +37,7 @@ return _sharedInstance;\
 @interface CMPHybridUi : UIViewController
 
 @property (strong) JSO *uiData;
+@property (strong) NSString *uiName;
 
 @property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
 

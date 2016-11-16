@@ -29,7 +29,7 @@
                  objCaller:(CMPHybridUi *)objCaller;
 
 + (JSO *) wholeAppConfig;
-
++ (JSO *) getAppConfig :(NSString *)key;
 + (UIViewController *) findTopRootView;
 
 + (NSString *) fullPathOfAsset :(NSString *)filename;
@@ -52,6 +52,7 @@
 + (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
 + (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
 
++(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
 
 @end
 

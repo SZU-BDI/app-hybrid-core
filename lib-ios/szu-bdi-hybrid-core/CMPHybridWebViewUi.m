@@ -24,10 +24,13 @@
         return;
     }
     
-    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
-    
-    //    JSContext *ctx = [CMPHybridTools getWebViewJsCtx:webView];
     JSContext *ctx = [CMPHybridTools getWebViewJsCtx :self.myWebView];
+    NSURL *url =[[self.myWebView request] URL];
+    NSString *scheme = [url scheme];
+    NSString *currenturl =[url absoluteString];
+    if( [@"file" isEqualToString:scheme]){
+        currenturl=[url lastPathComponent];
+    }
     
     //inject nativejsb
     [ctx evaluateScript:@"nativejsb={version:20161116};"];
@@ -35,10 +38,65 @@
     //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
         
-#warning TODO to check the handlerName is auth by api_auth in config.json for current url !!
+        //to check the handlerName is auth by api_auth in config.json for current url !!
         
+        JSO * api_auth = [CMPHybridTools getAppConfig:@"api_auth"];
+        NSString * uiname = caller.uiName;
+        JSO * api_auth_a = [api_auth getChild:uiname];
+        if(nil==api_auth_a){
+            NSLog(@" !!! find no api_auth for uiname %@", uiname);
+            return;
+        }
         NSString * handlerName_s = [handlerName toString];
+        if([CMPHybridTools isEmptyString:handlerName_s]){
+            NSLog(@" empty handlerName?? %@", param);
+            return;
+        }
+        BOOL flagFoundMatch=NO;
+        //JSO *found_a=[[JSO alloc]init];//failed...
+        NSMutableArray *found_a=[[NSMutableArray alloc] init];
         
+        for (NSString *kkk in [api_auth_a getChildKeys]) {
+            if([currenturl isEqualToString:kkk]){
+                flagFoundMatch=YES;
+                //found_a= [api_auth_a getChild:kkk];
+                //break;
+                //[found_a basicMerge:[api_auth_a getChild:kkk]];
+                JSO *jj =[api_auth_a getChild:kkk];
+                id idjj = [jj toId];
+                [found_a removeObjectsInArray:idjj];
+                [found_a addObjectsFromArray:idjj];
+            }
+            NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :currenturl];
+            if ([matches count] > 0){
+                flagFoundMatch=YES;
+                //found_a= [api_auth_a getChild:kkk];
+                //break;
+                //[found_a basicMerge:[api_auth_a getChild:kkk]];
+                JSO *jj =[api_auth_a getChild:kkk];
+                id idjj = [jj toId];
+                [found_a removeObjectsInArray:idjj];
+                [found_a addObjectsFromArray:idjj];
+            }
+        }
+        if(flagFoundMatch!=YES){
+            NSLog(@" !!! find no auth for api %@ for %@", handlerName_s, uiname);
+            return;
+        }
+        
+        BOOL flagInList=NO;
+        NSArray * keys =[found_a copy];
+        for (NSString *vvv in keys){
+            if([handlerName_s isEqualToString:vvv]){
+                flagInList=YES;
+                break;
+            }
+        }
+        
+        if (flagInList!=YES){
+            NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
+            return;
+        }
         if(nil==self.myApiHandlers) {
             NSLog(@" !!! handler at all for %@", self.uiData);
             return;
@@ -53,17 +111,17 @@
         
         NSString *callBackId_s=[callBackId toString];
         HybridCallback callback=^(JSO *responseData){
-            //            NSLog(@" callback(%@) return %@",callBackId_s, [responseData toString]);
-            
-            //            JSO *rt=[JSO s2o:@"{}"];
-            //            [rt setChild:@"responseId" JSO:[JSO s2o:callBackId_s]];
-            //            [rt setChild:@"responseData" JSO:responseData];
-            //            id dd=@{@"responseId":callBackId_s,@"responseData":[responseData toId]};
             
             NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
             
-            NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", rt_s];
-            [caller evalJs:javascriptCommand];
+            @try {
+                NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", rt_s];
+                [caller evalJs:javascriptCommand];
+            } @catch (NSException *exception) {
+                NSLog(@" !!! error when callback to js %@",exception);
+            } @finally {
+            }
+            
         };
         
         //do the callback a little later
@@ -85,12 +143,13 @@
     //        NSLog(@"%@", value);
     //    }];
     
+    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
+    
     [ctx evaluateScript:js];
 }
-
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     NSLog(@" didFailLoadWithError() %@",error);
-    //TODO design a error handler in config.json with handlerClassName...
+    [self showTopBar];
 }
 
 //------------   <HybridUi> ------------
@@ -114,8 +173,6 @@
     JSO *api_mapping = [appConfig getChild:@"api_mapping"];
     
     for (NSString *kkk in [api_mapping getChildKeys]) {
-        
-        // Get the value through the key:
         
         NSString *apiname = [[api_mapping getChild:kkk] toString] ;
         CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
