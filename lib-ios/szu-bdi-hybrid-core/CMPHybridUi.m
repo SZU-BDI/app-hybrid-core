@@ -18,11 +18,6 @@
     [self initUi];
     [super viewWillAppear:animated];
 }
-//- (void)viewDidLoad {
-//    
-//    [super viewDidLoad];
-//    
-//}
 
 //------------   <HybridUi> ------------
 
@@ -89,27 +84,15 @@
         [self hideTopBar];
     }
 }
+
 //NOTES: can be overrided!
 - (void) CustomTopBarBtn
 {
-    //    UIBarButtonItem *leftBar
-    //    = [[UIBarButtonItem alloc]
-    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-    //       style:UIBarButtonItemStylePlain
-    //       target:self
-    //       action:@selector(closeUi) //on('click')=>close()
-    //       ];
-    //    leftBar.tintColor = [UIColor blueColor];
-    //
     self.navigationItem.leftBarButtonItem
     = [[UIBarButtonItem alloc]
        initWithBarButtonSystemItem:UIBarButtonSystemItemReply
        target:self
        action:@selector(closeUi)];
-    //    UIBarButtonItem *rightBtn
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
 //NOTES: child can override the behavior...
@@ -152,6 +135,11 @@
     }
 }
 
+- (JSValue *) evalJs :(NSString *)js_s
+{
+    NSLog(@"CMPHybridUi TODO evalJs should be overrided by descendants");
+    return nil;
+}
 //////////////////////////////  on/trigger mechanism
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
@@ -173,14 +161,11 @@
 
 //------------ self -----------------
 
-// viewWillAppear() is called before it's display.  some effect can be configurated here
+//NOTES: can be overrided
 - (void)initUi
 {
-    //self.view.backgroundColor = [UIColor grayColor];
-    
     [self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
     [self CustomTopBarBtn];
-    
 }
 
 @end

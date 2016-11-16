@@ -216,8 +216,9 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (JSValue *) callWebViewDoJs:(UIWebView *) _webview :(NSString *)js_s
 {
+    
     @try {
-        return [[self getWebViewJsCtx:_webview] evaluateScript:js_s];
+        return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
     } @catch (NSException *exception) {
         NSLog(@"callWebViewDoJs error %@", exception);
     } @finally {

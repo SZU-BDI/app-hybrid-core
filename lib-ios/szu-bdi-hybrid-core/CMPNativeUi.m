@@ -3,6 +3,7 @@
 
 @implementation CMPNativeUi
 
+//------------   <HybridUi> ------------
 //@overrided
 - (void) CustomTopBarBtn
 {
@@ -29,6 +30,7 @@
 
 - (JSValue *) evalJs :(NSString *)js_s
 {
+    NSLog(@"NativeUi TODO evalJs");
     return nil;
 }
 @end

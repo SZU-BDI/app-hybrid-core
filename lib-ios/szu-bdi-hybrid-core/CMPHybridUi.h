@@ -6,7 +6,6 @@
 #ifndef Hybrid_h
 #define Hybrid_h
 
-
 typedef void (^HybridCallback)(id responseData);
 
 typedef void (^HybridHandler)(id data, HybridCallback responseCallback);
@@ -32,6 +31,7 @@ return _sharedInstance;\
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
 
+@import JavaScriptCore;
 
 @interface CMPHybridUi : UIViewController
 
@@ -54,6 +54,8 @@ return _sharedInstance;\
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(id)extraData;
 
 -(void) trigger :(NSString *)eventName :(id)extraData;
+
+- (JSValue *) evalJs :(NSString *)js_s;
 
 @end
 

@@ -60,9 +60,9 @@
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-
+    
     CMPHybridUi *caller=self;
-
+    
     NSLog(@" TODO webViewDidFinishLoad() ");
     if (webView != self.myWebView) {
         NSLog(@" skip: not the same webview?? ");
@@ -71,15 +71,23 @@
     
     NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
     
-    JSContext *ctx = [webView valueForKeyPath:(@"documentView" @".webView" @".mainFrame" @".javaScriptContext")];
+    //    JSContext *ctx = [webView valueForKeyPath:(@"documentView" @".webView" @".mainFrame" @".javaScriptContext")];
+    
+    JSContext *ctx = [CMPHybridTools getWebViewJsCtx:webView];
+    
+    //inject nativejsb
     [ctx evaluateScript:@"nativejsb={};"];
+    
+    //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
         //,JSValue *handlerName,JSStringRef param_s
         NSLog(@"JavaScript %@ callBackId: %@ handlerName %@ param_s %@", [JSContext currentContext], callBackId, handlerName, param);
+        
 #warning TODO find api config..
         if( [@"_app_activity_close" isEqualToString:[handlerName toString]] ){
             [self closeUi];
         }
+        
         NSString *param_s=[param toString];
         if( [@"_app_activity_open" isEqualToString:[handlerName toString]] ){
             JSO *param =[JSO s2o:param_s];
@@ -91,17 +99,18 @@
             //[self backupTopBarStatus];
             CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:param objCaller:self];
             if(ui!=nil){
+                [ui on:@"initdone" :^(NSString *eventName, id extraData){
+                    //responseCallback(extraData);
+                    NSLog(@" init done!!!");
+                    
+                }];
                 [ui on:@"close" :^(NSString *eventName, id extraData){
                     //responseCallback(extraData);
-                    NSLog(@" TODO !!! 转回给 API...");
+                    NSLog(@" TODO close callback!!!");
                     [caller restoreTopBarStatus];
                     
                 }];
-                //[self toggleFullscreen:nil withDuration:0.3];
-                
-                //
-                //
-                
+                //直接运行无效，因为这里还没有 webview初始化完 [ui evalJs:@"alert('test'+111)"];
             }
         }
         if( [@"app_set_topbar" isEqualToString:[handlerName toString]] ){
@@ -109,6 +118,8 @@
             JSO *topbarmode=[param getChild:@"mode"];
             NSString *topbarmode_s=[JSO o2s:topbarmode];
             [self CustomTopBar :topbarmode_s];
+            //[self evalJs:@"setTimeout(function(){alert(119);},1000);"];TEST PASS
+            [self evalJs:@"alert(120);"];
         }
         
         //                HybridHandler handler = self.messageHandlers[message[@"handlerName"]];
@@ -138,8 +149,6 @@
         //
         //        handler(message[@"data"], responseCallback);
         
-        
-        
         return @"OK";
     };
     
@@ -158,77 +167,56 @@
 
 //------------   <HybridUi> ------------
 
-- (void)callWebViewDoJs:(UIWebView *)webview :(NSString *)js_s
-{
-    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
-    if ([[NSThread currentThread] isMainThread]) {
-        [CMPHybridTools callWebViewDoJs:webview :js_s];
-    } else {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self callWebViewDoJs:webview :js_s];
-        });
-    }
-}
+//- (void)callWebViewDoJs:(UIWebView *)webview :(NSString *)js_s
+//{
+//    //if current is main thread then run, otherwise dispatch to main queue to run on the main thread:
+//    if ([[NSThread currentThread] isMainThread]) {
+//        [CMPHybridTools callWebViewDoJs:webview :js_s];
+//    } else {
+//        dispatch_sync(dispatch_get_main_queue(), ^{
+//            [self callWebViewDoJs:webview :js_s];
+//        });
+//    }
+//}
 
 - (JSValue *) evalJs:(NSString *)js_s
 {
+    NSLog(@" debug HybridWebView %@",js_s);
     return [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
 }
 
 //------------ self -----------------
 
-
-//TODO
-- (void)registerHandlerApi{
-    
-    // get the appConfig:
-    JSO *jsonO = [CMPHybridTools wholeAppConfig];
-    
-    // 获取 Api 映射数据
-    JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
-    NSString *jso_string_value = [JSO o2s:jso_api_mapping];
-    
-    JSO *jso = [JSO s2o:jso_string_value];
-    NSLog(@"TODO registerHandlerApi %@", [jso getChildKeys]);
-    
-    for (NSString *key in [jso getChildKeys]) {
-        
-        // Get the value through the key:
-        
-        NSString *apiname = [[jso getChild:key] toString] ;
-        CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
-        
-        // 把当前控制器（ui）赋值给 api的成员变量
-        api.currentUi = self;
-        // NSLog(@"注册方法 %@" , key);
-    }
-    
-    
-}
-
-//- (void)LoadLocalhtmlName:(NSString *)loadLocalhtml{
-//    NSString* htmlPath = [[NSBundle mainBundle] pathForResource:loadLocalhtml ofType:@"htm"];
-//    NSString* appHtml = [NSString stringWithContentsOfFile:htmlPath encoding:NSUTF8StringEncoding error:nil];
-//    NSURL *baseURL = [NSURL fileURLWithPath:htmlPath];
-//    [self.myWebView loadHTMLString:appHtml baseURL:baseURL];
+//- (void)registerHandlerApi{
+//
+//    // get the appConfig:
+//    JSO *jsonO = [CMPHybridTools wholeAppConfig];
+//
+//    // 获取 Api 映射数据
+//    JSO *jso_api_mapping = [jsonO getChild:@"api_mapping"];
+//    NSString *jso_string_value = [JSO o2s:jso_api_mapping];
+//
+//    JSO *jso = [JSO s2o:jso_string_value];
+//    NSLog(@"TODO registerHandlerApi %@", [jso getChildKeys]);
+//
+//    for (NSString *key in [jso getChildKeys]) {
+//
+//        // Get the value through the key:
+//
+//        NSString *apiname = [[jso getChild:key] toString] ;
+//        CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
+//
+//        // 把当前控制器（ui）赋值给 api的成员变量
+//        api.currentUi = self;
+//        // NSLog(@"注册方法 %@" , key);
+//    }
 //}
 
 - (void) loadUrl:(NSString *)url{
-    //    //TODO 要根据 地址的协议判断是否本地的，如果是本地的在前面pack上路径，然后统一 load....
     NSURL *requesturl = [NSURL URLWithString:url];
     NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
     [self.myWebView loadRequest:request];
 }
-
-//-(id)init {
-//    self = [super init];
-//    NSLog(@"TODO HybridWebViewUi.init()");
-//    return(self);
-//}
-
-//- (void)dealloc {
-//    NSLog(@"TODO HybridWebViewUi.dealloc()");
-//}
 
 -(void) initUi
 {
@@ -291,11 +279,5 @@
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
     //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
-//
-//- (void)viewDidLoad {
-//
-//    [super viewDidLoad];
-//
-//    [self initUi];
-//}
+
 @end
