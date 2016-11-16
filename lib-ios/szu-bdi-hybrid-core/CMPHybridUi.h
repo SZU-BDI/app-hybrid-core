@@ -38,14 +38,11 @@ return _sharedInstance;\
 
 @property (strong) JSO *uiData;
 
-//@property (strong) HybridEventHandler tmpHandler;
-
 @property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
 
 @property (strong, nonatomic) NSMutableDictionary* myEventHandlers;
 
-//- (void) close;//the close is taken
--(void) closeUi;
+-(void) closeUi;//the "close" is taken...
 
 -(void) restoreTopBarStatus;
 -(void) CustomTopBarBtn;
@@ -58,9 +55,9 @@ return _sharedInstance;\
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler;
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData;
 
--(void) trigger :(NSString *)eventName :(id)extraData;
+-(void) trigger :(NSString *)eventName :(JSO *)extraData;
 
-- (JSValue *) evalJs :(NSString *)js_s;
+- (void) evalJs :(NSString *)js_s;
 
 @end
 

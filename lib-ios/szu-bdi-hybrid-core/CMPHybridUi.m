@@ -7,27 +7,10 @@
 //------------  UIViewController ------------
 
 
-//-(void) viewDidDisappear:(BOOL)animated
-//{
-//    [super viewDidDisappear:animated];
-//    NSLog(@"debug viewDidDisappear() %@", [self.uiData toString]);
-//    //[self trigger:@"close" :@{@"debug":@"closeUi"}];
-//}
-//-(void) dealloc
-//{
-//    NSLog(@"debug dealloc !!!");
-////    [super dealloc];
-//}
-//-(void) viewWillUnload
-//{
-//    NSLog(@"debug viewWillUnload !!! %@",[self.uiData toString]);
-//}
-//-(void)
 -(void) viewWillAppear:(BOOL)animated
 {
-    //[self initUi];
-    [super viewWillAppear:animated];
     [self restoreTopBarStatus];
+    [super viewWillAppear:animated];
 }
 -(void) viewDidLoad
 {
@@ -148,16 +131,16 @@
          }
          handlerNo:nil];
     }
+    [self trigger:@"close" :nil];
 }
 
-- (JSValue *) evalJs :(NSString *)js_s
+- (void) evalJs :(NSString *)js_s
 {
-    NSLog(@"CMPHybridUi TODO evalJs should be overrided by descendants");
-    return nil;
+    NSLog(@"CMPHybridUi: evalJs() should be overrided by descendants");
 }
 //////////////////////////////  on/trigger mechanism
 
-#warning on/trigger TODO need support multi-listeners,currently using tmp solu.
+//TODO to upgrade for supporting multi-listeners in future.
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
@@ -165,9 +148,12 @@
 }
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
 {
+    if(nil==self.myEventHandlers){
+        self.myEventHandlers=[NSMutableDictionary dictionary];
+    }
     self.myEventHandlers[eventName]=handler;
 }
--(void) trigger :(NSString *)eventName :(id)extraData
+-(void) trigger :(NSString *)eventName :(JSO *)extraData
 {
     HybridEventHandler hdl=self.myEventHandlers[eventName];
     if(nil!=hdl){
@@ -181,8 +167,6 @@
 //NOTES: can be overrided
 - (void)initUi
 {
-    //[self CustomTopBar:[[self.uiData getChild:@"topbar"] toString]];
-    //    [self restoreTopBarStatus];
     [self CustomTopBarBtn];
 }
 

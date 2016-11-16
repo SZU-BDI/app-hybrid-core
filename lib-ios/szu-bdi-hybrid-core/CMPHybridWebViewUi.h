@@ -12,7 +12,7 @@
 -(void) loadUrl :(NSString *)url;
 
 //using default myWebView to do js...
-- (JSValue *) evalJs :(NSString *)js_s;
+//- (void) evalJs :(NSString *)js_s;
 
 @end
 

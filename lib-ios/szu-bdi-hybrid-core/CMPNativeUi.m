@@ -28,9 +28,8 @@
     self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-- (JSValue *) evalJs :(NSString *)js_s
+- (void) evalJs :(NSString *)js_s
 {
-    NSLog(@"NativeUi TODO evalJs");
-    return nil;
+    NSLog(@"NativeUi: TODO evalJs()");
 }
 @end
