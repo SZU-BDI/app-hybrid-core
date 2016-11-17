@@ -40,6 +40,11 @@ public class ApiUiOpen extends HybridApi {
                 Looper.prepare();
                 HybridTools.startUi(uiName, dataStr, callerAct, cb);
             }
+
+            @Override
+            public void handler(JSO jso, HybridCallback cbFunc) {
+                handler(JSO.o2s(jso), cbFunc);
+            }
         };
     }
 }

@@ -1,7 +1,12 @@
 package szu.bdi.hybrid.core;
 
-
-import android.util.Log;
+/**
+ * Purpose:
+ * a practical helper class to JSON
+ * dependency:
+ * https://github.com/ralfstx/minimal-json/
+ * com.eclipsesource.json.*
+ */
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -9,19 +14,34 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.ParseException;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public final class JSO {
-    private JsonValue _value = Json.NULL;
+
+    private JsonValue _jv = Json.NULL;
+
+    //@warning: the key is not in standard.
+    protected static JsonObject ja2jo(JsonArray ja) {
+        JsonObject rt = new JsonObject();
+        if (null != ja) {
+            int c = ja.size();
+            //for (JsonValue value : ja)
+            for (int i = 0; i < c; i++) {
+                rt.set("" + i, ja.get(i));
+            }
+        }
+        return rt;
+    }
+
+    //@warning: some meaning of the original json might changed.
+    protected static JsonArray jo2ja(JsonObject jo) {
+        JsonArray rt = new JsonArray();
+        for (JsonObject.Member jo_mb : jo) {
+            rt.add(jo_mb.getValue());
+        }
+        return rt;
+    }
 
     //shallow merge
     public static JSO basicMerge(JSO... jsos) {
@@ -32,27 +52,68 @@ public final class JSO {
         return rt;
     }
 
+    //@warning, the merge() will change the inner jv
     public void merge(JSO jso) {
-        JsonValue jv = _value;
-        if (_value == null || _value.isNull()) {
-            _value = Json.object();
-        }
-        if (_value instanceof JsonObject) {
-            JsonValue jv2 = jso.getValue();
+        JsonValue jv2 = jso.getValue();
+        if (_jv == null || _jv.isNull()) {
             if (jv2 instanceof JsonObject) {
-                ((JsonObject) _value).merge(jv2.asObject());
+                _jv = new JsonObject();
+            } else if (jv2 instanceof JsonArray) {
+                _jv = new JsonArray();
+            } else {
+                _jv = new JsonObject();
             }
+        }
+        if (_jv instanceof JsonObject) {
+            if (jv2 instanceof JsonObject) {
+                //JO<=JO
+                JsonObject _jv2 = jv2.asObject();
+                ((JsonObject) _jv).merge(_jv2);
+            } else if (jv2 instanceof JsonArray) {
+                //JO<= ja2jo(JA)
+                ((JsonObject) _jv).merge(ja2jo((JsonArray) jv2));
+            } else {
+                //SKIP
+            }
+        } else if (_jv instanceof JsonArray) {
+            if (jv2 instanceof JsonObject) {
+                //JA<= jo2ja(JO)
+                JsonArray _jv2 = jo2ja(jv2.asObject());
+                int c = _jv2.size();
+                for (int i = 0; i < c; i++) {
+                    ((JsonArray) _jv).add(_jv2.get(i));
+                }
+            } else if (jv2 instanceof JsonArray) {
+                JsonArray _jv2 = jv2.asArray();
+                int c = _jv2.size();
+                for (int i = 0; i < c; i++) {
+                    ((JsonArray) _jv).add(_jv2.get(i));
+                }
+            } else {
+                //SKIP
+            }
+        } else {
+            //SKIP
         }
     }
 
     private void setValue(Object v) {
-        if (v instanceof JsonValue) _value = (JsonValue) v;
-        else
-            _value = (v == null) ? Json.NULL : Json.parse(v.toString());
+        if (v instanceof JsonValue) _jv = (JsonValue) v;
+        else {
+            if (v == null) _jv = Json.NULL;
+            else {
+                try {
+                    _jv = Json.parse(v.toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                if (null == _jv) _jv = Json.NULL;
+            }
+        }
     }
 
-    public JsonValue getValue() {
-        return _value;
+    protected JsonValue getValue() {
+        return _jv;
     }
 
     public String toString() {
@@ -60,9 +121,9 @@ public final class JSO {
     }
 
     public String asString() {
-        if (_value != null) {
+        if (_jv != null) {
             try {
-                return _value.asString();
+                return _jv.asString();
             } catch (UnsupportedOperationException ex) {
                 ex.printStackTrace();
             }
@@ -70,90 +131,38 @@ public final class JSO {
         return null;
     }
 
-    public JsonArray asArray() {
-        if (_value != null && _value.isArray()) {
-            return _value.asArray();
+    public ArrayList<JSO> asArrayList() {
+        ArrayList<JSO> rt = new ArrayList<JSO>();
+        if (_jv instanceof JsonArray) {
+            JsonArray _jva = (JsonArray) _jv;
+            int c = _jva.size();
+            for (int i = 0; i < c; i++) {
+                JSO jso = new JSO();
+                jso.setValue(_jva.get(i));
+                rt.add(jso);
+            }
         }
-        return Json.array();
+        return rt;
     }
 
     public String toString(boolean quote) {
-        if (_value == null) return null;
-        if (_value.isNull()) {
+        if (_jv == null) return null;
+        if (_jv.isNull()) {
             if (quote) {
-                return _value.toString();
+                return _jv.toString();
             } else {
                 return null;
             }
         }
-        if (_value.isString()) {
+        if (_jv.isString()) {
             if (quote) {
-                return _value.toString();
+                return _jv.toString();
             } else {
-                return _value.asString();
+                return _jv.asString();
             }
         } else {
-            return _value.toString();
+            return _jv.toString();
         }
-    }
-
-    protected static JSONArray toJSONArray(Object array) throws JSONException {
-        JSONArray result = new JSONArray();
-        if (!array.getClass().isArray()) {
-            throw new JSONException("Not a primitive array: " + array.getClass());
-        }
-        final int length = Array.getLength(array);
-        for (int i = 0; i < length; ++i) {
-            result.put(_wrap(Array.get(array, i)));
-        }
-        return result;
-    }
-
-    //TMP borrow from JSONObject
-    //@ref http://stackoverflow.com/questions/21858528/convert-a-bundle-to-json
-    //@ref https://android.googlesource.com/platform/libcore/+/master/json/src/main/java/org/json/JSONObject.java
-    protected static Object _wrap(Object o) {
-        if (o == null) {
-            return JSONObject.NULL;
-        }
-        if (o instanceof JSONArray || o instanceof JSONObject) {
-            return o;
-        }
-        if (o.equals(JSONObject.NULL)) {
-            return o;
-        }
-        try {
-            if (o instanceof Collection) {
-                return new JSONArray((Collection) o);
-            } else if (o.getClass().isArray()) {
-                return toJSONArray(o);
-            }
-            if (o instanceof Map) {
-                return new JSONObject((Map) o);
-            }
-            if (o instanceof Boolean ||
-                    o instanceof Byte ||
-                    o instanceof Character ||
-                    o instanceof Double ||
-                    o instanceof Float ||
-                    o instanceof Integer ||
-                    o instanceof Long ||
-                    o instanceof Short ||
-                    o instanceof String) {
-                return o;
-            }
-            if (o.getClass().getPackage().getName().startsWith("java.")) {
-                return o.toString();
-            }
-            Log.v("JSO ??? ", o.toString());
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-        return null;
-    }
-
-    static public String o2s(Object o) {
-        return (o == null) ? null : _wrap(o).toString();
     }
 
     static public String o2s(JSO o) {
@@ -179,36 +188,48 @@ public final class JSO {
     }
 
     public void setChild(String k, JSO chd) {
-        if (_value == null || _value.isNull()) {
-            _value = Json.object();
+        if (_jv == null || _jv.isNull()) {
+            _jv = Json.object();
         }
-        if (_value instanceof JsonObject) {
-            ((JsonObject) _value).set(k, chd.getValue());
+        if (null == chd) return;
+        if (null == k) return;
+        if (_jv instanceof JsonObject) {
+            ((JsonObject) _jv).set(k, chd.getValue());
         }
     }
 
+    //for JA
+//    public JSO getChild(int i) {
+//        JSO jso = new JSO();
+//        if (_jv instanceof JsonArray) {
+//            try {
+//                JsonValue jv = _jv.asArray().get(i);
+//                jso.setValue(jv);
+//            } catch (IndexOutOfBoundsException ex) {
+//            }
+//        }
+//        return jso;
+//    }
+
+    //for JO
     public JSO getChild(String k) {
-        if (_value == null) return null;
         JSO jso = new JSO();
-        if (_value instanceof JsonObject) {
-            JsonValue jv = _value.asObject().get(k);
+        if (_jv instanceof JsonObject) {
+            JsonValue jv = _jv.asObject().get(k);
             jso.setValue(jv);
         }
         return jso;
     }
 
-    public boolean isNull() {
-        if (_value == null) {
-            return true;
-        }
-        return _value.isNull();
-    }
-
     public List<String> getChildKeys() {
-        if (_value instanceof JsonObject) {
-            return ((JsonObject) _value).names();
+        if (_jv instanceof JsonObject) {
+            return ((JsonObject) _jv).names();
         }
         return new ArrayList<String>();
+    }
+
+    public boolean isNull() {
+        return _jv.isNull();
     }
 
 }

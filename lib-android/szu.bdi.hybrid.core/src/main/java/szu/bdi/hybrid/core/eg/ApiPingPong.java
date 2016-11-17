@@ -21,6 +21,11 @@ public class ApiPingPong extends HybridApi {
                 data_o.setChild("pong", JSO.s2o("" + (new Date()).getTime()));
                 cb.onCallBack(data_o.toString());
             }
+
+            @Override
+            public void handler(JSO jso, HybridCallback cbFunc) {
+                handler(JSO.o2s(jso), cbFunc);
+            }
         };
     }
 }

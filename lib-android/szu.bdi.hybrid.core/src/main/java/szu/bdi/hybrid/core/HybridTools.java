@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.eclipsesource.json.JsonArray;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -24,11 +22,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 
 public class HybridTools {
     final private static String LOGTAG = "HybridTools";
@@ -395,7 +393,7 @@ public class HybridTools {
             return;
         }
         Log.v(LOGTAG, " foundAuth=" + foundAuth);
-        JsonArray ja = foundAuth.asArray();//tmp...
+        ArrayList<JSO> ja = foundAuth.asArrayList();
         for (int i = 0; i < ja.size(); i++) {
             String v = ja.get(i).asString();
             if (!isEmptyString(v)) {

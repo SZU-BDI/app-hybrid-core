@@ -33,6 +33,11 @@ public class ApiWebRequest extends HybridApi {
                     cb.onCallBack("{\"STS\":\"KO\"}");
                 }
             }
+
+            @Override
+            public void handler(JSO jso, HybridCallback cbFunc) {
+                handler(JSO.o2s(jso), cbFunc);
+            }
         };
     }
 }
