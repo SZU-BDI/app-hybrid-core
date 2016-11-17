@@ -12,29 +12,59 @@
 
 //------------  UIViewController ------------
 
+- (void) webViewDidStartLoad:(UIWebView *)webView
+{
+    NSLog(@"webViewDidStartLoad()");
+    [self injectJSB :webView];
+    NSLog(@"done injectJSB");
+}
 
 //------------  prototol UIWebViewDelegate ------------
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView {
+- (void) webViewDidFinishLoad :(UIWebView *)webView {
+    NSLog(@"webViewDidFinishLoad()");
+    //[CMPHybridTools callWebViewDoJs:webView :@"alert("" + (typeof window) + (typeof nativejsb));"];
+    //[self evalJs:@"setTimeout(function(){alert(typeof window +' '+(typeof nativejsb));},1);"];
+    NSLog(@"done webViewDidFinishLoad");
+    
+}
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    NSLog(@" didFailLoadWithError() %@",error);
+    [self showTopBar];
+}
+
+//------------   <HybridUi> ------------
+
+- (void) evalJs:(NSString *)js_s
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
+    });
+}
+
+//------------ self -----------------
+
+- (void) injectJSB :(UIWebView *)webView
+{
     
     CMPHybridUi *caller=self;
+    //JSO *uiData = caller.uiData;
+    NSString * uiname = caller.uiName;
+    NSLog(@"injecting JSB to %@", uiname);
     
     if (webView != self.myWebView) {
         NSLog(@" skip: not the same webview?? ");
         return;
     }
     
-    JSContext *ctx = [CMPHybridTools getWebViewJsCtx :self.myWebView];
-    NSURL *url =[[self.myWebView request] URL];
-    NSString *scheme = [url scheme];
-    NSString *currenturl =[url absoluteString];
-    if( [@"file" isEqualToString:scheme]){
-        currenturl=[url lastPathComponent];
-    }
+    JSContext *ctx = [CMPHybridTools getWebViewJsCtx :webView];
     
     //inject nativejsb
     [ctx evaluateScript:@"nativejsb={version:20161116};"];
-    
+    ctx[@"nativejsb"][@"getVersion"] = ^() {
+        return @"20161116";
+    };
+
     //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
         
@@ -56,6 +86,12 @@
         //JSO *found_a=[[JSO alloc]init];//failed...
         NSMutableArray *found_a=[[NSMutableArray alloc] init];
         
+        NSURL *url =[[webView request] URL];
+        NSString *scheme = [url scheme];
+        NSString *currenturl =[url absoluteString];
+        if( [@"file" isEqualToString:scheme]){
+            currenturl=[url lastPathComponent];
+        }
         for (NSString *kkk in [api_auth_a getChildKeys]) {
             if([currenturl isEqualToString:kkk]){
                 flagFoundMatch=YES;
@@ -115,7 +151,7 @@
             NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
             
             @try {
-                NSString* javascriptCommand = [NSString stringWithFormat:@"WebViewJavascriptBridge._app2js(%@);", rt_s];
+                NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
                 [caller evalJs:javascriptCommand];
             } @catch (NSException *exception) {
                 NSLog(@" !!! error when callback to js %@",exception);
@@ -126,7 +162,7 @@
         
         //do the callback a little later
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        double delay = 0.01;//1=1 second
+        double delay = 0.01;//0.01 second
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
             NSString *param_s=[param toString];
@@ -147,22 +183,6 @@
     
     [ctx evaluateScript:js];
 }
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    NSLog(@" didFailLoadWithError() %@",error);
-    [self showTopBar];
-}
-
-//------------   <HybridUi> ------------
-
-- (void) evalJs:(NSString *)js_s
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
-    });
-}
-
-//------------ self -----------------
-
 - (void)registerHandlerApi{
     
     self.myApiHandlers = [NSMutableDictionary dictionary];

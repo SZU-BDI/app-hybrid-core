@@ -56,6 +56,10 @@ public class JsBridgeWebView extends WebView {
         }
 
         @JavascriptInterface
+        public String getVersion(){
+            return "20161116";
+        }
+        @JavascriptInterface
         public String js2app(final String callBackId, String handlerName, final String param_s) {
 
 
@@ -74,7 +78,7 @@ public class JsBridgeWebView extends WebView {
                             String s = msg.toString();
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
-                            loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
+                            loadUrl("javascript:setTimeout(function(){WebViewJavascriptBridge._app2js(" + s + ");},1);");
                         }
                     });
                 }
