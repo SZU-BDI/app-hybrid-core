@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+//TODO change the behavior to on/trigger.  and let the caller to do the decision later
 public class HybridUi extends Activity {
 
     private static String LOGTAG = "HybridUi";

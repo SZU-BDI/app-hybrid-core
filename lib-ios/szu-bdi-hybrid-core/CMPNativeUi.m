@@ -32,4 +32,14 @@
 {
     NSLog(@"NativeUi: TODO evalJs()");
 }
+
+//NOTES: can be overrided
+- (void)initUi
+{
+    [self CustomTopBarBtn];
+    self.view.backgroundColor=[UIColor blackColor];
+    //self.navigationController.navigationBar.translucent=NO;
+    self.navigationController.navigationBar.backgroundColor=[UIColor blackColor];
+    self.navigationController.navigationBar.tintColor = [UIColor brownColor];
+}
 @end

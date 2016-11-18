@@ -15,19 +15,28 @@
 - (void) webViewDidStartLoad:(UIWebView *)webView
 {
     NSLog(@"webViewDidStartLoad()");
-    [self injectJSB :webView];
-    NSLog(@"done injectJSB");
+    if (webView != self.myWebView) {
+        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+        return;
+    }
+    //    [self injectJSB :webView];
+    //    NSLog(@"done injectJSB");
 }
 
 //------------  prototol UIWebViewDelegate ------------
 
 - (void) webViewDidFinishLoad :(UIWebView *)webView {
     NSLog(@"webViewDidFinishLoad()");
-    //[CMPHybridTools callWebViewDoJs:webView :@"alert("" + (typeof window) + (typeof nativejsb));"];
-    //[self evalJs:@"setTimeout(function(){alert(typeof window +' '+(typeof nativejsb));},1);"];
+    if (webView != self.myWebView) {
+        NSLog(@" webViewDidFinishLoad: not the same webview?? ");
+        return;
+    }
+
+    [self injectJSB :webView];
+    NSLog(@"done injectJSB");
     NSLog(@"done webViewDidFinishLoad");
-    
 }
+
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     NSLog(@" didFailLoadWithError() %@",error);
     [self showTopBar];
@@ -60,10 +69,7 @@
     JSContext *ctx = [CMPHybridTools getWebViewJsCtx :webView];
     
     //inject nativejsb
-    [ctx evaluateScript:@"nativejsb={version:20161116};"];
-    ctx[@"nativejsb"][@"getVersion"] = ^() {
-        return @"20161116";
-    };
+    [ctx evaluateScript:@"nativejsb={};"];
 
     //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
@@ -152,7 +158,10 @@
             
             @try {
                 NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
-                [caller evalJs:javascriptCommand];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [CMPHybridTools callWebViewDoJs:webView :javascriptCommand];
+                });
+                //[caller evalJs:javascriptCommand];
             } @catch (NSException *exception) {
                 NSLog(@" !!! error when callback to js %@",exception);
             } @finally {
@@ -172,6 +181,9 @@
                 callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
             }
         });
+    };//end nativejsb.js2app...
+    ctx[@"nativejsb"][@"getVersion"] = ^() {
+        return @"20161116";
     };
     
     //STUB
@@ -183,6 +195,7 @@
     
     [ctx evaluateScript:js];
 }
+
 - (void)registerHandlerApi{
     
     self.myApiHandlers = [NSMutableDictionary dictionary];
@@ -207,6 +220,7 @@
     [self.myWebView loadRequest:request];
 }
 
+//NOTES: can be overrided
 -(void) initUi
 {
     [self registerHandlerApi];
@@ -218,7 +232,9 @@
     
     self.myWebView = [[UIWebView alloc]initWithFrame:rect];
     
-    self.myWebView.backgroundColor = [UIColor whiteColor];
+    //self.myWebView.backgroundColor = [UIColor whiteColor];
+    self.myWebView.backgroundColor = [UIColor blackColor];
+
     self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
     
     // The page automatically zoom to fit the screen, default NO.
@@ -241,24 +257,24 @@
     }
 }
 
-//@overrided
+//NOTES: can be overrided
 - (void) CustomTopBarBtn
 {
-    //    UIBarButtonItem *leftBar
-    //    = [[UIBarButtonItem alloc]
-    //       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-    //       style:UIBarButtonItemStylePlain
-    //       target:self
-    //       action:@selector(closeUi) //on('click')=>close()
-    //       ];
-    //    leftBar.tintColor = [UIColor blueColor];
+        UIBarButtonItem *leftBar
+        = [[UIBarButtonItem alloc]
+           initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+           style:UIBarButtonItemStylePlain
+           target:self
+           action:@selector(closeUi) //on('click')=>close()
+           ];
+        leftBar.tintColor = [UIColor blueColor];
     
-    self.navigationItem.leftBarButtonItem
-    = [[UIBarButtonItem alloc]
-       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-       target:self
-       action:@selector(closeUi)];
-    //
+//    self.navigationItem.leftBarButtonItem
+//    = [[UIBarButtonItem alloc]
+//       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+//       target:self
+//       action:@selector(closeUi)];
+
     //    UIBarButtonItem *rightBtn
     //    = [[UIBarButtonItem alloc]
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];

@@ -275,23 +275,23 @@ public class HybridTools {
         b2.show();
     }
 
-    public static void startUi(String name, String overrideParam_s, HybridUi caller) {
-        startUi(name, overrideParam_s, caller, null);
+    public static HybridUi startUi(String name, String overrideParam_s, HybridUi caller) {
+        return startUi(name, overrideParam_s, caller, null);
     }
 
-    public static void startUi(String name, String overrideParam_s, HybridUi caller, HybridCallback cb) {
+    public static HybridUi startUi(String name, String overrideParam_s, HybridUi caller, HybridCallback cb) {
         checkAppConfig();
 
         JSO uia = getAppConfig(UI_MAPPING);
         if (uia == null) {
             HybridTools.quickShowMsgMain("config.json error!!!");
-            return;
+            return null;
         }
 
         JSO defaultParam = uia.getChild(name);
         if (defaultParam == null) {
             HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
-            return;
+            return null;
         }
 
         JSO overrideParam = JSO.s2o(overrideParam_s);
@@ -301,7 +301,7 @@ public class HybridTools {
         String clsName = callParam.getChild("class").toString();
         if (isEmptyString(clsName)) {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
-            return;
+            return null;
         }
         HybridUi callee = null;
         try {
@@ -310,15 +310,15 @@ public class HybridTools {
             Log.v(LOGTAG, "class " + clsName + " found for name " + name);
         } catch (ClassNotFoundException e) {
             HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
-            return;
+            return null;
         } catch (InstantiationException e) {
             e.printStackTrace();
             HybridTools.quickShowMsgMain("config.json error!!! class not HybridUi " + clsName);
-            return;
+            return null;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             HybridTools.quickShowMsgMain("config.json error!!! class failed " + clsName);
-            return;
+            return null;
         }
 
         Intent intent = new Intent(caller, callee.getClass());
@@ -335,11 +335,13 @@ public class HybridTools {
             //callee.setCallBackFunction(cb);
             caller.setCallBackFunction(cb);
         }
+        //TODO where is the callee? can I hold the ref to it?
         try {
             caller.startActivityForResult(intent, 1);//onActivityResult()
         } catch (Throwable t) {
             quickShowMsgMain("Error:" + t.getMessage());
         }
+        return null;//where is callee
     }
 
     protected static JSO findSubAuth(JSO jso, String nameOf) {

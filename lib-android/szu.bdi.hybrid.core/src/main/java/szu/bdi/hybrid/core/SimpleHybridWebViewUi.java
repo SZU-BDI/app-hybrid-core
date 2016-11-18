@@ -41,6 +41,7 @@ public class SimpleHybridWebViewUi extends HybridUi {
             }
         }
 
+        //TODO "binding" is somehow missleading, should be changed to ...preload/warmup?
         HybridTools.bindWebViewApi(_wv, this);
 
         setContentView(_wv);

@@ -87,6 +87,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         else{
             UINavigationController *nav = [[UINavigationController alloc]
                                            initWithRootViewController:(UIViewController *)theHybridUi];
+            
             ddd.window.rootViewController = nav;
         }
     }
@@ -94,9 +95,6 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
-            // push
-            theHybridUi.view.backgroundColor = [UIColor whiteColor];//important for speed !
-            
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{

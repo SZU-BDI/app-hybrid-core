@@ -7,10 +7,13 @@
 //------------  UIViewController ------------
 
 
+//NOTES: can be overrided
 -(void) viewWillAppear:(BOOL)animated
 {
-    [self restoreTopBarStatus];
     [super viewWillAppear:animated];
+    
+    //[self setNeedsStatusBarAppearanceUpdate];
+    [self restoreTopBarStatus];
 }
 -(void) viewDidLoad
 {
@@ -34,7 +37,7 @@
  //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
  */
 - (BOOL)prefersStatusBarHidden {
-    return YES;
+    return NO;
 }
 -(void) hideTopStatusBar
 {
@@ -163,6 +166,12 @@
 //////////////////////////////
 
 //------------ self -----------------
+
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
+    //return UIStatusBarStyleDefault;
+}
 
 //NOTES: can be overrided
 - (void)initUi
