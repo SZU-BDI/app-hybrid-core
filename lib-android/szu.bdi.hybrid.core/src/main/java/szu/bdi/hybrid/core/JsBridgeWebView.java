@@ -57,7 +57,7 @@ public class JsBridgeWebView extends WebView {
 
         @JavascriptInterface
         public String getVersion() {
-            return "20161116";
+            return "20161119";
         }
 
         @JavascriptInterface
@@ -71,15 +71,23 @@ public class JsBridgeWebView extends WebView {
                 @Override
                 public void onCallBack(final String data_s) {
                     ((Activity) _context).runOnUiThread(new Runnable() {
+                        @TargetApi(Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
                             JSO msg = new JSO();
                             msg.setChild(RESPONSE_ID_STR, callBackId);
                             msg.setChild(RESPONSE_DATA_STR, data_s);
-                            String s = msg.toString();
+                            String s = msg.toString(true);
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
-                            loadUrl("javascript:setTimeout(function(){WebViewJavascriptBridge._app2js(" + s + ");},1);");
+                            //loadUrl("javascript:setTimeout(function(){WebViewJavascriptBridge._app2js(" + s + ");},1);");
+                            //loadUrl("javascript:try{WebViewJavascriptBridge._app2js(" + s + ");}catch(ex){alert(ex);}");
+                            evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
+                                @Override
+                                public void onReceiveValue(String value) {
+                                    Log.v(LOGTAG, " onReceiveValue " + value);
+                                }
+                            });
                         }
                     });
                 }

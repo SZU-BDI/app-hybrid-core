@@ -2,20 +2,19 @@
 //and this file share with iOS/Android JSB
 //and this function is called by the "app" to inject a WebViewJavascriptBridge
 //(function(win,doc,PROTOCOL_SCHEME)
-(function(win,doc)
-{
+(function(win,doc){
 	if (win.WebViewJavascriptBridge) {
 		return;
 	}
-    function s2o(s){try{var myjson=null;return(new Function('return '+s))();}catch(ex){}};function o2s(o){return JSON.stringify(o);};
+	function s2o(s){try{return(new Function('return '+s))();}catch(ex){}};function o2s(o){return JSON.stringify(o);};
 	var responseCallbacks = {};
-    var msgHandlerSet={};
+	var msgHandlerSet={};
 	var msgId = 1;
 
-	//NOTES: can't remove yet, some old bridge codes might use it... will remove in further future...
+	//NOTES: can't remove yet, some very old bridge codes might use it... will remove in future...
 	function init() {console.log('deprecated WebViewJavascriptBridge.init() is called.');}
 
-    //send msg{handlerName:$n,data:$jsonObj} to app
+	//send msg{handlerName:$n,data:$jsonObj} to app
 	function _js2app(msg, cb){
 		if (cb) {
 			msgId=(msgId + 1) % 1000000;
@@ -28,21 +27,18 @@
 			msg.time=callTime;
 		}
 		if("undefined"!=typeof nativejsb){
-			var rt= nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
-			//TODO if 0==rt.getStatus() pushToObserveStack(callbackId,msg,rt,cb);
-			return rt;
-			//nativejsb.sendMsg(o2s(msg));
+			return nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
 		}else{
-            alert("ERROR nativejsb is missing");
+			alert("ERROR nativejsb is missing");
 		}
 	}
 
-    //handle msg from app
-	function _app2js(msg) {
+	//handle msg from app
+	function _app2js(msg){
 		setTimeout(function(){
 			var callback=null;
 			if (msg.responseId) {
-			    //this msg is a "Reply", so find the original callback
+				//this msg is a "Reply", so find the original callback
 				callback = responseCallbacks[msg.responseId];
 				if (!callback) { return; }
 				callback(msg.responseData);
@@ -55,27 +51,28 @@
 					if(handler==null){
 						console.log("WebViewJavascriptBridge: not found handler name="+msg.handlerName);
 					}else{
-                        try {
-                            if (msg.callbackId) {
-                                var callbackResponseId = msg.callbackId;
-                                callback = function(responseData) {
-                                    _js2app({
-                                        responseId: callbackResponseId,
-                                        responseData: responseData
-                                    });
-                                };
-                            }
-                            handler(msg.data, callback);
-                        } catch (exception) {
-                            console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
-                        }
+						try {
+							if (msg.callbackId) {
+								var callbackResponseId = msg.callbackId;
+								callback = function(responseData) {
+									_js2app({
+										responseId: callbackResponseId,
+										responseData: responseData
+									});
+								};
+							}
+							handler(msg.data, callback);
+						} catch (exception) {
+							console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
+						}
 					}
-                }else{
-                   console.log("WebViewJavascriptBridge: ERROR: unsupported msg from app!!!",msg);
-                   alert("unsupported msg from app");
+				}else{
+					console.log("WebViewJavascriptBridge: ERROR: unsupported msg from app!!!",msg);
+					alert("unsupported msg from app");
 				}
 			}
 		},1);
+		return {STS:"OK"};
 	}
 
 	function registerHandler(handlerName, handler) {
@@ -86,7 +83,12 @@
 		return _js2app({
 			handlerName: handlerName,
 			data: data
-		}, cb);
+		}, function( rt ){
+			if (typeof(rt)=='string'){
+				try{ rt=s2o(rt); } catch(ex){};
+			}
+			if (cb) cb(rt);
+		});
 	}
 
 	win.WebViewJavascriptBridge = {
