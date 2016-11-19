@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -78,7 +79,7 @@ public class HybridTools {
         return null;
     }
 
-    public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
+    //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
 
     public static void quickShowMsgMain(String msg) {
         quickShowMsg(getAppContext(), msg);
@@ -543,6 +544,28 @@ public class HybridTools {
             _localWebRoot = "/android_asset/web/";
         }
         return _localWebRoot;
+    }
+
+    //@ref http://stackoverflow.com/questions/8258725/strict-mode-in-android-2-2
+    //StrictMode.ThreadPolicy was introduced since API Level 9 and the default thread policy had been changed since API Level 11,
+    // which in short, does not allow network operation (eg: HttpClient and HttpUrlConnection)
+    // get executed on UI thread. If you do this, you get NetworkOnMainThreadException.
+    public static void uiNeedNetworkPolicyHack() {
+        int _sdk_int = android.os.Build.VERSION.SDK_INT;
+        if (_sdk_int > 8) {
+            try {
+                Log.d(LOGTAG, "setThreadPolicy for api level " + _sdk_int);
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+
+    public static void KillAppSelf() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0);
     }
 }
 
