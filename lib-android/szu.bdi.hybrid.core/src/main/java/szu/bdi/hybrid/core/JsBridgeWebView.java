@@ -56,9 +56,10 @@ public class JsBridgeWebView extends WebView {
         }
 
         @JavascriptInterface
-        public String getVersion(){
+        public String getVersion() {
             return "20161116";
         }
+
         @JavascriptInterface
         public String js2app(final String callBackId, String handlerName, final String param_s) {
 
@@ -177,6 +178,7 @@ public class JsBridgeWebView extends WebView {
         init(context);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public JsBridgeWebView(Context context) {
         super(context);
         init(context);

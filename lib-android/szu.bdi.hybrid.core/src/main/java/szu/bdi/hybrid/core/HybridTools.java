@@ -21,38 +21,61 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class HybridTools {
+    private static HybridTools _shareInstance = new HybridTools();
+
+    public static HybridTools shareInstance() {
+        return _shareInstance;
+    }
+
     final private static String LOGTAG = "HybridTools";
 
-    private static Context _appContext = null;
+    //    public Context appContext = null;
     private static String _localWebRoot = "";
+
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
 
-    public static void setAppContext(Context ctx) {
-        _appContext = ctx;
-    }
+//    public static void setAppContext(Context ctx) {
+//
+//        //_appContext = ctx;
+//        shareInstance().appContext = ctx;
+//    }
 
+    //TODO buffer later...using non static field...
     public static Context getAppContext() {
-        if (_appContext == null) {
-            try {
-                Application thisApp = (Application) Class.forName("android.app.ActivityThread")
-                        .getMethod("currentApplication").invoke(null, (Object[]) null);
-                _appContext = thisApp.getApplicationContext();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                //TODO gracefully quit?
-            }
+        try {
+            Application thisApp = (Application) Class.forName("android.app.ActivityThread")
+                    .getMethod("currentApplication").invoke(null, (Object[]) null);
+            //_appContext = thisApp.getApplicationContext();
+            return thisApp.getApplicationContext();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            //TODO gracefully quit?
         }
-        return _appContext;
+//        if (_appContext == null) {
+//            try {
+//                Application thisApp = (Application) Class.forName("android.app.ActivityThread")
+//                        .getMethod("currentApplication").invoke(null, (Object[]) null);
+//                _appContext = thisApp.getApplicationContext();
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//                //TODO gracefully quit?
+//            }
+//        }
+//        return _appContext;
+//        return shareInstance().appContext;
+        return null;
     }
 
     public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
@@ -84,7 +107,8 @@ public class HybridTools {
     public static void saveSetting(Context mContext, String whichSp, String field, String value) {
         SharedPreferences sp = (SharedPreferences) mContext.getSharedPreferences(whichSp, Context.MODE_PRIVATE);
         if (null == value) value = "";//I want to store sth not null
-        sp.edit().putString(field, value).commit();
+        //sp.edit().putString(field, value).commit();
+        sp.edit().putString(field, value).apply();
     }
 
     public static String webPost(String uu, String post_s) {
@@ -155,7 +179,9 @@ public class HybridTools {
 
 
     public static String isoDateTime() {
-        String time_s = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
+        //String time_s = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale("en_US"));
+        String time_s = df.format(new Date());
         return time_s;
     }
 
