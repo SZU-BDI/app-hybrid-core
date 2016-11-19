@@ -40,7 +40,7 @@ public class HybridTools {
 
     final private static String LOGTAG = "HybridTools";
 
-    //    public Context appContext = null;
+    //    private Context _appContext = null;
     private static String _localWebRoot = "";
 
     final static String UI_MAPPING = "ui_mapping";
@@ -186,8 +186,11 @@ public class HybridTools {
         return time_s;
     }
 
-    //copy from jsbridge, maybe improve or find more elegant version...
-    public static String readAssetInStr(Context c, String urlStr) {
+    private static String readAssetInStrWithoutComments(String s) {
+        return readAssetInStrWithoutComments(getAppContext(), s);
+    }
+
+    private static String readAssetInStrWithoutComments(Context c, String urlStr) {
         InputStream in = null;
         try {
             in = c.getAssets().open(urlStr);
@@ -219,10 +222,6 @@ public class HybridTools {
         return null;
     }
 
-    public static String readAssetInStr(String s) {
-        return readAssetInStr(getAppContext(), s);
-    }
-
     //private static JSONObject _jAppConfig = new JSONObject();
     private static JSO _jAppConfig = null;//new JSO();
 
@@ -247,7 +246,7 @@ public class HybridTools {
 
     public static void checkAppConfig() {
         if (_jAppConfig == null || _jAppConfig.isNull()) {
-            final String sJsonConf = readAssetInStr("config.json");
+            final String sJsonConf = readAssetInStrWithoutComments("config.json");
             final JSO o = JSO.s2o(sJsonConf);
             HybridTools.initAppConfig(o);
         }
@@ -365,6 +364,7 @@ public class HybridTools {
         //TODO where is the callee? can I hold the ref to it?
         try {
             caller.startActivityForResult(intent, 1);//onActivityResult()
+            //caller.startActivity()
         } catch (Throwable t) {
             quickShowMsgMain("Error:" + t.getMessage());
         }
@@ -566,6 +566,17 @@ public class HybridTools {
     public static void KillAppSelf() {
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(0);
+    }
+
+    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();
+
+    public static ArrayList<HybridUi> getHybridUis() {
+        Log.v(LOGTAG, "getHybridUis size = " + _uia.size());
+        return _uia;
+    }
+
+    public static void appendHybridUi(HybridUi ui) {
+        _uia.add(ui);
     }
 }
 

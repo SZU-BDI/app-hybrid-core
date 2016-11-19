@@ -11,9 +11,6 @@
 	var msgHandlerSet={};
 	var msgId = 1;
 
-	//NOTES: can't remove yet, some very old bridge codes might use it... will remove in future...
-	function init() {console.log('deprecated WebViewJavascriptBridge.init() is called.');}
-
 	//send msg{handlerName:$n,data:$jsonObj} to app
 	function _js2app(msg, cb){
 		if (cb) {
@@ -46,7 +43,6 @@
 			} else {
 				var handler = null;
 				if (msg.handlerName) {
-					//find the handler
 					handler = msgHandlerSet[msg.handlerName];
 					if(handler==null){
 						console.log("WebViewJavascriptBridge: not found handler name="+msg.handlerName);
@@ -84,23 +80,21 @@
 			handlerName: handlerName,
 			data: data
 		}, function( rt ){
-			if (typeof(rt)=='string'){
-				try{ rt=s2o(rt); } catch(ex){};
+			if(cb){
+				if (typeof(rt)=='string'){
+					try{ rt=s2o(rt); } catch(ex){};
+				}
+				cb(rt);
 			}
-			if (cb) cb(rt);
 		});
 	}
 
 	win.WebViewJavascriptBridge = {
-		//_fetchQueue: _fetchQueue,
-
 		//for js send app
 		_js2app: _js2app,
 
 		//for app send js:
 		_app2js: _app2js,
-
-		init: init,
 
 		registerHandler: registerHandler,
 		callHandler: callHandler

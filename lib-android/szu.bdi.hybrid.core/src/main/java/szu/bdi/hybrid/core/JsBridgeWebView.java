@@ -6,16 +6,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Looper;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -26,13 +21,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
@@ -47,6 +37,39 @@ public class JsBridgeWebView extends WebView {
     private final String LOGTAG = "JsBridgeWebView";
 
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
+
+    //copy from jsbridge, maybe improve or find more elegant version...
+    private static String readJsWithoutComments(Context c, String urlStr) {
+        InputStream in = null;
+        try {
+            in = c.getAssets().open(urlStr);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            do {
+                line = bufferedReader.readLine();
+                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
+                    sb.append(line);
+                }
+            } while (line != null);
+
+            bufferedReader.close();
+            in.close();
+
+            return sb.toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+                //in = null;
+            }
+        }
+        return null;
+    }
 
     class nativejsb {
         private Context _context;
@@ -158,7 +181,7 @@ public class JsBridgeWebView extends WebView {
         @Override
         public void onPageFinished(WebView view, String url) {
             //inject
-            String jsContent = HybridTools.readAssetInStr(view.getContext(), "WebViewJavascriptBridge.js");
+            String jsContent = readJsWithoutComments(view.getContext(), "WebViewJavascriptBridge.js");
 
             //NOTES: no need to runOnUiThread() here...
             view.loadUrl("javascript:" + jsContent);
