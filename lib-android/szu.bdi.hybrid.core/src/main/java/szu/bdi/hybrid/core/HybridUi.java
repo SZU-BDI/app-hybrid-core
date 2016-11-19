@@ -12,12 +12,21 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 //TODO change the behavior to on/trigger.  and let the caller to do the decision later
 public class HybridUi extends Activity {
+
+    //    public static HybridUi tmpUiForLink = null;
+
+    //TODO TMP UGLY SOLUTION...TO IMPROVE LATER !!!
+    public static HybridUiCallback tmpUiCallback = null;
 
     private static String LOGTAG = "HybridUi";
 
     JSO _uiData;
+
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -28,6 +37,32 @@ public class HybridUi extends Activity {
         String s_uiData = iin.getStringExtra("uiData");
 
         initUiData(JSO.s2o(s_uiData));
+
+        Log.v(LOGTAG, "HybridUi onCreate() try push ");
+
+        //Very ugly tmp solution. but it should working well, because app is very low thread conflict
+        //for the open new UI.
+        if (tmpUiCallback != null) {
+            try {
+                tmpUiCallback.onCallBack(this);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            HybridUi.tmpUiCallback = null;
+        }
+//        tmpUiForLink = this;
+
+//        Activity parent = getParent();
+////        if(parent instanceof)
+//        HybridTools.addHybridUi(this);
+//
+//        //TODO debug now...
+//        HybridTools.debugHybridUis();
+
+        //getParent().notifyChild($id)
+
+        //TODO 下面的搬去 setTopBar()
+
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
         String topbar = HybridTools.optString(getUiData("topbar"));
 
@@ -63,19 +98,41 @@ public class HybridUi extends Activity {
         }
     }
 
+
     public void close() {
         //{name: $name, address: adress}
         JSO o = new JSO();
         o.setChild("name", getUiData("name"));
         o.setChild("address", getUiData("address"));
 
-        Intent rtIntent = new Intent();
-        rtIntent.putExtra("rt", o.toString());
+        trigger("close", o);
 
-        //@ref onActivityResult()
-        setResult(1, rtIntent);
+//        Intent rtIntent = new Intent();
+//        rtIntent.putExtra("rt", o.toString());
+//
+//        //@ref onActivityResult()
+//        setResult(1, rtIntent);
+//
+////        HybridTools.closeHybridUi(this);
+//        finish();
+    }
 
-        finish();
+    Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
+
+    public void on(String eventName, HybridCallback cb) {
+        Log.v(LOGTAG, "Hybrid.on( " + eventName + ")");
+        _cba.remove(eventName);
+        _cba.put(eventName, cb);
+    }
+
+    private void trigger(String eventName, JSO o) {
+        HybridCallback cb = _cba.get(eventName);
+        if (cb == null) {
+            Log.v(LOGTAG, "trigger() found no handler for " + eventName);
+        } else {
+            Log.v(LOGTAG, "do onCallBack() with o for " + eventName);
+            cb.onCallBack(o);
+        }
     }
 
     //NOTES: when user click the left-upper button on the top bar
@@ -127,7 +184,7 @@ public class HybridUi extends Activity {
 
     public JSO getUiData(String k) {
         if (null == _uiData) return null;
-        Log.v(LOGTAG, " _uiData=" + _uiData);
+        //Log.v(LOGTAG, "getUiData()  _uiData=" + _uiData);
 //        Log.v(LOGTAG, " getUiData " + k + "=>" + _uiData.opt(k));
 //        return _uiData.opt(k);
         return _uiData.getChild(k);

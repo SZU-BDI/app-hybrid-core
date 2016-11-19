@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core.eg;
 
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
+import android.app.Activity;
 import android.os.Looper;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.HybridUi;
 import szu.bdi.hybrid.core.HybridHandler;
+import szu.bdi.hybrid.core.HybridUiCallback;
 import szu.bdi.hybrid.core.JSO;
 
 public class ApiUiOpen extends HybridApi {
@@ -38,7 +40,23 @@ public class ApiUiOpen extends HybridApi {
 //                    }
 //                }
                 Looper.prepare();
-                HybridTools.startUi(uiName, dataStr, callerAct, cb);
+                HybridTools.startUi(uiName, dataStr, (Activity) callerAct, new HybridUiCallback() {
+                    @Override
+                    public void onCallBack(final HybridUi ui) {
+                        //listen "close" event
+                        ui.on("close", new HybridCallback() {
+                            @Override
+                            public void onCallBack(String cbStr) {
+                            }
+
+                            @Override
+                            public void onCallBack(JSO jso) {
+                                //onCallBack(JSO.o2s(jso));
+                                ui.finish();
+                            }
+                        });
+                    }
+                });
             }
 
             @Override

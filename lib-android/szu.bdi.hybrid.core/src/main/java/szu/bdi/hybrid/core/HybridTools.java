@@ -1,5 +1,6 @@
 package szu.bdi.hybrid.core;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
@@ -294,30 +295,31 @@ public class HybridTools {
             AlertDialog.OnClickListener cancelListener) {
         AlertDialog.Builder b2;
         b2 = new AlertDialog.Builder(ctx);
-        b2.setMessage(msg).setPositiveButton("Close", okListener)
-                .setNegativeButton("cancel", cancelListener);
+        b2.setMessage(msg)
+                .setPositiveButton("NO", cancelListener)
+                .setNegativeButton("YES", okListener);
         b2.setCancelable(false);
         b2.create();
         b2.show();
     }
 
-    public static HybridUi startUi(String name, String overrideParam_s, HybridUi caller) {
-        return startUi(name, overrideParam_s, caller, null);
+    public static void startUi(String name, String overrideParam_s, Activity caller) {
+        startUi(name, overrideParam_s, caller, null);
     }
 
-    public static HybridUi startUi(String name, String overrideParam_s, HybridUi caller, HybridCallback cb) {
+    public static void startUi(String name, String overrideParam_s, Activity caller, HybridUiCallback cb) {
         checkAppConfig();
 
         JSO uia = getAppConfig(UI_MAPPING);
         if (uia == null) {
             HybridTools.quickShowMsgMain("config.json error!!!");
-            return null;
+            return;
         }
 
         JSO defaultParam = uia.getChild(name);
         if (defaultParam == null) {
             HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
-            return null;
+            return;
         }
 
         JSO overrideParam = JSO.s2o(overrideParam_s);
@@ -327,27 +329,21 @@ public class HybridTools {
         String clsName = callParam.getChild("class").toString();
         if (isEmptyString(clsName)) {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
-            return null;
+            return;
         }
-        HybridUi callee = null;
+        //HybridUi callee = null;
+        Intent intent = null;
         try {
             //reflection:
-            callee = (HybridUi) Class.forName(clsName).newInstance();
-            Log.v(LOGTAG, "class " + clsName + " found for name " + name);
-        } catch (ClassNotFoundException e) {
-            HybridTools.quickShowMsgMain("config.json error!!! class now found for " + clsName);
-            return null;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            HybridTools.quickShowMsgMain("config.json error!!! class not HybridUi " + clsName);
-            return null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            HybridTools.quickShowMsgMain("config.json error!!! class failed " + clsName);
-            return null;
-        }
+            //callee = (HybridUi) Class.forName(clsName).newInstance();
+            //Log.v(LOGTAG, "class " + clsName + " found for name " + name);
 
-        Intent intent = new Intent(caller, callee.getClass());
+            //intent = new Intent(caller, callee.getClass());
+            intent = new Intent(caller, Class.forName(clsName));
+        } catch (Exception ex) {
+            HybridTools.quickShowMsgMain("config.json error!!! error " + ex.getMessage());
+            return;
+        }
 
         if (!isEmptyString(name)) {
             callParam.setChild("name", JSO.s2o(name));
@@ -357,18 +353,51 @@ public class HybridTools {
 
         intent.putExtra("uiData", uiData_s);
 
-        if (cb != null) {
-            //callee.setCallBackFunction(cb);
-            caller.setCallBackFunction(cb);
-        }
-        //TODO where is the callee? can I hold the ref to it?
+//        if (cb != null) {
+//            //callee.setCallBackFunction(cb);
+//            //caller.setCallBackFunction(cb);
+//        }
         try {
-            caller.startActivityForResult(intent, 1);//onActivityResult()
+            final Intent tmpIntent = intent;
+            final Activity tmpCaller = caller;
+
+            HybridUi.tmpUiCallback = cb;
+
+            tmpCaller.startActivity(tmpIntent);
+
+            //caller.startActivityForResult(intent, 1);//onActivityResult()
+//            (new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    tmpCaller.startActivity(tmpIntent);
+//                }
+//            })).run();
+//            new Handler().postDelayed(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    tmpCaller.startActivity(tmpIntent);
+//                }
+//            }, 10);
+
+//            int i = 50;
+//            while (i > 0) {
+//                Log.v(LOGTAG, "!!! " + i);
+//                Thread.sleep(200);
+//                if (HybridUi.tmpUiForLink != null) {
+//                    HybridUi rt = HybridUi.tmpUiForLink;
+//                    //HybridUi.tmpUiForLink = null;
+//                    Log.v(LOGTAG, "try to return HybridUi.tmpUiForLink!!!!!");
+//                    return rt;
+//                }
+//                i--;
+//            }
             //caller.startActivity()
         } catch (Throwable t) {
             quickShowMsgMain("Error:" + t.getMessage());
         }
-        return null;//where is callee
+        //Log.v(LOGTAG, "startUi() try to return null...");
+        //return null;//where is callee
     }
 
     protected static JSO findSubAuth(JSO jso, String nameOf) {
@@ -568,16 +597,23 @@ public class HybridTools {
         System.exit(0);
     }
 
-    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();
+//    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();
+//
+//    public static ArrayList<HybridUi> debugHybridUis() {
+//        Log.v(LOGTAG, "debugHybridUis size = " + _uia.size());
+//        return _uia;
+//    }
+//
+//    public static void addHybridUi(HybridUi ui) {
+//        _uia.add(ui);
+//    }
+//
+//    public static void closeHybridUi(HybridUi ui) {
+//        if (_uia.contains(ui))
+//            _uia.remove(ui);
+//    }
 
-    public static ArrayList<HybridUi> getHybridUis() {
-        Log.v(LOGTAG, "getHybridUis size = " + _uia.size());
-        return _uia;
-    }
 
-    public static void appendHybridUi(HybridUi ui) {
-        _uia.add(ui);
-    }
 }
 
 
