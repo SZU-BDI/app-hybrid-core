@@ -10,11 +10,10 @@
 
 //NSMutableDictionary* myMessageHandlers;
 
-NSTimer * domCompletionListener;
+//NSTimer * domCompletionListener;
 
 UIActivityIndicatorView *IndicatorView;
-
-BOOL injectDone=NO;
+//BOOL injectDone=NO;
 
 //------------  UIViewController ------------
 
@@ -25,9 +24,9 @@ BOOL injectDone=NO;
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    injectDone=NO;
-    NSLog(@" start polling from webViewDidStartLoad...");
-    [self startDOMCompletionPolling];
+    //injectDone=NO;
+    NSLog(@" notifyPollingInject from webViewDidStartLoad...");
+    [self notifyPollingInject :webView];
     [self spinnerOn];
 }
 
@@ -36,8 +35,8 @@ BOOL injectDone=NO;
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    NSLog(@" start polling from webViewDidFinishLoad...");
-    [self startDOMCompletionPolling];
+    NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
+    [self notifyPollingInject :webView];
     [self spinnerOff];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
@@ -47,8 +46,8 @@ BOOL injectDone=NO;
         return;
     }
     [self showTopBar];
-    NSLog(@" start polling from didFailLoadWithError...");
-    [self startDOMCompletionPolling];
+    NSLog(@" notifyPollingInject from didFailLoadWithError...");
+    [self notifyPollingInject :webView];
     [self spinnerOff];
 }
 
@@ -91,49 +90,29 @@ BOOL injectDone=NO;
 
 //------------ self -----------------
 
-
-- (void)startDOMCompletionPolling {
-    if (domCompletionListener) {
-        [domCompletionListener invalidate];
-    }
-    domCompletionListener = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkDOMCompletion) userInfo:nil repeats:YES];
-}
-
-- (void)checkDOMCompletion {
-    NSString *readyState = [self.myWebView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
+- (void) notifyPollingInject :(UIWebView *)webView {
     
-    if(injectDone==YES){
+    [CMPHybridTools countDown:0.2 initTime:3 block:^BOOL(NSTimer *tm) {
+        NSString *readyState = [webView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
         
-        //'completed', 'interactive', nil, others -> hide spinner
-        [domCompletionListener invalidate];
-        return;//skip
-    }
-    
-    NSLog(@"polling ...");
-    if (readyState != nil) {
-        if (readyState.length > 0) {
-            if ([readyState isEqualToString:@"loading"]) { //keep polling
-                return;
-            }else{
-                //OK !
+        //NSLog(@"polling ... %@", readyState);
+        if (readyState != nil) {
+            if (readyState.length > 0) {
+                if ([readyState isEqualToString:@"loading"]) {
+                }else{
+                    NSString *typeof_nativejsb = [webView stringByEvaluatingJavaScriptFromString:@"(typeof nativejsb)"];
+                    //NSLog(@"typeof_nativejsb=%@",typeof_nativejsb);
+                    if([@"undefined" isEqualToString:typeof_nativejsb]){
+                        [self injectJSB :webView];
+                        NSLog(@"done injectJSB");
+                    }else{
+                        return YES;//YES means stop the timer in advance
+                    }
+                }
             }
-        }else{
-            return;
         }
-    }else{
-        return;
-    }
-    @try {
-        injectDone=YES;
-        [self injectJSB :_myWebView];
-        NSLog(@"done injectJSB");
-    } @catch (NSException *exception) {
-        injectDone=NO;
-        NSLog(@"error when inject %@", exception);
-    } @finally {
-        [self spinnerOff];
-        
-    }
+        return NO;
+    }];
 }
 
 - (void) spinnerOn

@@ -271,6 +271,28 @@ SINGLETON_shareInstance(CMPHybridTools);
     return [regex matchesInString:txt options:0 range:range];
 }
 
++ (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block
+{
+    if(initTime<=0){
+        return;
+    }
+    __block double countTime=initTime;
+    
+    __block NSTimer * test=[NSTimer scheduledTimerWithTimeInterval:interval target:[NSBlockOperation blockOperationWithBlock:^(){
+        countTime=countTime-interval;
+        if(countTime<=0){
+            [test invalidate];
+            return;
+        }
+        BOOL rt = block(test);
+        if(rt==YES){
+            NSLog(@".");
+            [test invalidate];
+            countTime=0;
+        }
+    }] selector:@selector(main) userInfo:nil repeats:YES];
+}
+
 /****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{
     

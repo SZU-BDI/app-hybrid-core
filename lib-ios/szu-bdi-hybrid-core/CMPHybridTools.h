@@ -54,6 +54,8 @@
 
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
 
++ (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block;
+
 @end
 
 
