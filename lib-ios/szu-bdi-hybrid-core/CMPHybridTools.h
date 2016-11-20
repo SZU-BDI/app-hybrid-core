@@ -50,7 +50,10 @@
 + (void) quitGracefully;
 
 + (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
++ (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s;
+
 + (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
++ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
 
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
 

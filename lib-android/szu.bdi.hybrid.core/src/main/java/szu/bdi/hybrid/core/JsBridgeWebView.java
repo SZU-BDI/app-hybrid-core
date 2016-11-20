@@ -52,6 +52,7 @@ public class JsBridgeWebView extends WebView {
     public JsBridgeWebView(Context context) {
         super(context);
         init(context);
+
         //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             this.addJavascriptInterface(new nativejsb(context), "nativejsb");
         //} else {
@@ -124,13 +125,11 @@ public class JsBridgeWebView extends WebView {
         @JavascriptInterface
         public String js2app(final String callBackId, String handlerName, final String param_s) {
 
-
             final String uiName = ((HybridUi) _context).getUiData("name").toString();
 
             Log.v(LOGTAG, "TODO js2app handlerName " + handlerName + " uiName " + uiName);
 
             //TODO 这里要有个 auth-mapping (whitelist) check!!!!
-
 
             final HybridCallback responseFunction = new HybridCallback() {
                 @Override
@@ -145,8 +144,6 @@ public class JsBridgeWebView extends WebView {
                             String s = msg.toString(true);
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
-                            //loadUrl("javascript:setTimeout(function(){WebViewJavascriptBridge._app2js(" + s + ");},1);");
-                            //loadUrl("javascript:try{WebViewJavascriptBridge._app2js(" + s + ");}catch(ex){alert(ex);}");
                             evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
                                 @Override
                                 public void onReceiveValue(String value) {
@@ -210,7 +207,6 @@ public class JsBridgeWebView extends WebView {
             });
             return true;
         }
-
     }
 
     class MyWebViewClient extends WebViewClient {
@@ -232,6 +228,8 @@ public class JsBridgeWebView extends WebView {
         }
 
         //TODO 参考 ios的逻辑优化（polling the document.readyState)
+        //TODO 小于API 19的虽然很少，不过还是要兼顾，如果判断url不在接受的范围内直接 removeJavascriptInterface("nativejsb")！！
+
         public void notifyPollingInject(WebView view, String url) {
             //inject
             String jsContent = readJsWithoutComments(view.getContext(), "WebViewJavascriptBridge.js");

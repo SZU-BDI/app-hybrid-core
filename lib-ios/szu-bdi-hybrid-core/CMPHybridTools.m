@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 #import "CMPHybridTools.h"
 
@@ -225,6 +226,28 @@ SINGLETON_shareInstance(CMPHybridTools);
 {
     @try {
         return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
+    } @catch (NSException *exception) {
+        NSLog(@"callWebViewDoJs error %@", exception);
+    } @finally {
+        
+    }
+    return nil;
+}
+
++ (JSContext *) getWKWebViewJsCtx:(WKWebView *) _webview
+{
+    return [_webview
+            valueForKeyPath:
+            (@"documentView"
+             @".webView"
+             @".mainFrame"
+             @".javaScriptContext")];
+}
+
++ (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s
+{
+    @try {
+        return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
     } @catch (NSException *exception) {
         NSLog(@"callWebViewDoJs error %@", exception);
     } @finally {

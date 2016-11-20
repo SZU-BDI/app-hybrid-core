@@ -1,6 +1,11 @@
 #import <Foundation/Foundation.h>
-//#import <UIKit/UIKit.h>
-@import UIKit;
+
+#import <WebKit/WebKit.h>
+#import <UIKit/UIKit.h>
+
+//@import WebKit;
+//@import UIKit;
+
 @class JSO;
 
 #ifndef Hybrid_h
