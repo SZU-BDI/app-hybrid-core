@@ -49,11 +49,16 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
 }
 
+//TODO using a callback to hook back the HybridUi
+//+ (void) startUi :(NSString *)strUiName
+//                  initData:(JSO *) initData
+//                 objCaller:(CMPHybridUi *)objCaller
+//                  callback:...
+
 + (CMPHybridUi *) startUi :(NSString *)strUiName
                   initData:(JSO *) initData
                  objCaller:(CMPHybridUi *)objCaller
 {
-    
     [self checkAppConfig];
     
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
@@ -74,6 +79,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return nil;
     }
+
     [uiConfig basicMerge:initData];
     theHybridUi.uiName=strUiName;
     theHybridUi.uiData=uiConfig;
@@ -249,17 +255,6 @@ SINGLETON_shareInstance(CMPHybridTools);
     return (nil==s || [@"" isEqualToString:s]);
 }
 
-//+(void) promptUserQuit
-//{
-//    [CMPHybridTools
-//     quickConfirmMsgMain:@"Sure to Quit?"
-//     //         handlerYes:^(UIAlertAction *action)
-//     handlerYes:^(UIAlertAction *action){
-//         [self quitGracefully];
-//     }
-//     handlerNo:nil];
-//}
-
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt
 {
     NSError *error = NULL;
@@ -401,18 +396,17 @@ SINGLETON_shareInstance(CMPHybridTools);
             
         };
         
-        //do the callback a little later
-        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        double delay = 0.01;//0.01 second
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, ^{
-            NSString *param_s=[param toString];
-            @try {
-                handler([JSO s2o:param_s], callback);
-            } @catch (NSException *exception) {
-                callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
-            }
-        });
+        //async delay 0.01 second
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
+                       dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+                       ^{
+                           NSString *param_s=[param toString];
+                           @try {
+                               handler([JSO s2o:param_s], callback);
+                           } @catch (NSException *exception) {
+                               callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+                           }
+                       });
     };//end nativejsb.js2app...
     
     ctx[@"nativejsb"][@"getVersion"] = ^() {

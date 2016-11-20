@@ -8,12 +8,7 @@
 
 @implementation CMPHybridWebViewUi
 
-//NSMutableDictionary* myMessageHandlers;
-
-//NSTimer * domCompletionListener;
-
 UIActivityIndicatorView *IndicatorView;
-//BOOL injectDone=NO;
 
 //------------  UIViewController ------------
 
@@ -51,13 +46,76 @@ UIActivityIndicatorView *IndicatorView;
     [self spinnerOff];
 }
 
-//------------   <HybridUi> ------------
+//----------------   <HybridUi>   -----------------
 
 - (void) evalJs:(NSString *)js_s
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
     });
+}
+
+//NOTES: can be overrided
+-(void) initUi
+{
+    [self registerHandlerApi];
+    
+    [self CustomTopBarBtn];
+    
+    // initial the webView and add webview in window：
+    CGRect rect = [UIScreen mainScreen].bounds;
+    
+    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
+    
+    //self.myWebView.backgroundColor = [UIColor whiteColor];
+    self.myWebView.backgroundColor = [UIColor blackColor];
+    
+    self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
+    
+    // The page automatically zoom to fit the screen, default NO.
+    self.myWebView.scalesPageToFit = YES;
+    
+    // Edges prohibit sliding (default YES)
+    self.myWebView.scrollView.bounces = NO;
+    
+    self.view = self.myWebView;
+    
+    NSString *address = [[self.uiData getChild:@"address"] toString];
+    NSURL *address_url = [NSURL URLWithString:address];
+    NSString *scheme_s=[address_url scheme];
+    
+    [self spinnerInit];
+    
+    if( [ CMPHybridTools isEmptyString:scheme_s ])
+    {
+        [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+    }else{
+        [self loadUrl:[address_url absoluteString]];
+    }
+    
+}
+//NOTES: can be overrided
+- (void) CustomTopBarBtn
+{
+    UIBarButtonItem *leftBar
+    = [[UIBarButtonItem alloc]
+       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+       style:UIBarButtonItemStylePlain
+       target:self
+       action:@selector(closeUi) //on('click')=>close()
+       ];
+    leftBar.tintColor = [UIColor blueColor];
+    
+    //    self.navigationItem.leftBarButtonItem
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+    //       target:self
+    //       action:@selector(closeUi)];
+    
+    //    UIBarButtonItem *rightBtn
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+    //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
 //------------ self -----------------
@@ -96,7 +154,6 @@ UIActivityIndicatorView *IndicatorView;
     [IndicatorView stopAnimating];
 }
 
-
 - (void)registerHandlerApi{
     
     self.myApiHandlers = [NSMutableDictionary dictionary];
@@ -107,11 +164,10 @@ UIActivityIndicatorView *IndicatorView;
     JSO *api_mapping = [appConfig getChild:@"api_mapping"];
     
     for (NSString *kkk in [api_mapping getChildKeys]) {
-        
         NSString *apiname = [[api_mapping getChild:kkk] toString] ;
         CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
         api.currentUi = self;
-        self.myApiHandlers[kkk] = [[api getHandler] copy];
+        self.myApiHandlers[kkk] = [api getHandler];//[[api getHandler] copy];
     }
 }
 
@@ -121,35 +177,9 @@ UIActivityIndicatorView *IndicatorView;
     [self.myWebView loadRequest:request];
 }
 
-//NOTES: can be overrided
--(void) initUi
+
+- (void) spinnerInit
 {
-    [self registerHandlerApi];
-    
-    [self CustomTopBarBtn];
-    
-    // initial the webView and add webview in window：
-    CGRect rect = [UIScreen mainScreen].bounds;
-    
-    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
-    
-    //self.myWebView.backgroundColor = [UIColor whiteColor];
-    self.myWebView.backgroundColor = [UIColor blackColor];
-    
-    self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
-    
-    // The page automatically zoom to fit the screen, default NO.
-    self.myWebView.scalesPageToFit = YES;
-    
-    // Edges prohibit sliding (default YES)
-    self.myWebView.scrollView.bounces = NO;
-    
-    self.view = self.myWebView;
-    
-    NSString *address = [[self.uiData getChild:@"address"] toString];
-    NSURL *address_url = [NSURL URLWithString:address];
-    NSString *scheme_s=[address_url scheme];
-    
     //INIT SPIN
     //UIActivityIndicatorView *
     IndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -164,37 +194,7 @@ UIActivityIndicatorView *IndicatorView;
     IndicatorView.center=self.view.center;
     [self.view addSubview:IndicatorView];
     
-    if( [ CMPHybridTools isEmptyString:scheme_s ])
-    {
-        [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
-    }else{
-        [self loadUrl:[address_url absoluteString]];
-    }
-    
 }
 
-//NOTES: can be overrided
-- (void) CustomTopBarBtn
-{
-    UIBarButtonItem *leftBar
-    = [[UIBarButtonItem alloc]
-       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-       style:UIBarButtonItemStylePlain
-       target:self
-       action:@selector(closeUi) //on('click')=>close()
-       ];
-    leftBar.tintColor = [UIColor blueColor];
-    
-    //    self.navigationItem.leftBarButtonItem
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-    //       target:self
-    //       action:@selector(closeUi)];
-    
-    //    UIBarButtonItem *rightBtn
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    //    self.navigationItem.rightBarButtonItem = rightBtn;
-}
 
 @end
