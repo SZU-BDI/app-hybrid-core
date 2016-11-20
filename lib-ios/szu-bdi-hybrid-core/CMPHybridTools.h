@@ -56,6 +56,8 @@
 
 + (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block;
 
++ (void) injectJSB :(UIWebView *)webView :(CMPHybridUi *)caller;
+
 @end
 
 
