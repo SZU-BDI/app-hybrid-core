@@ -47,6 +47,7 @@ public class ApiUiOpen extends HybridApi {
                         ui.on("close", new HybridCallback() {
                             @Override
                             public void onCallBack(String cbStr) {
+                                onCallBack(JSO.s2o(cbStr));
                             }
 
                             @Override

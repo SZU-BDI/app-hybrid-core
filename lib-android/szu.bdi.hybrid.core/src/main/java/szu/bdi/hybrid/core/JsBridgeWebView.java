@@ -38,6 +38,27 @@ public class JsBridgeWebView extends WebView {
 
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
+    public JsBridgeWebView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public JsBridgeWebView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(context);
+    }
+
+    @SuppressLint("AddJavascriptInterface")
+    public JsBridgeWebView(Context context) {
+        super(context);
+        init(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            this.addJavascriptInterface(new nativejsb(context), "nativejsb");
+        } else {
+            HybridTools.quickShowMsg(context, "Your android is too low version");
+        }
+    }
+
     //copy from jsbridge, maybe improve or find more elegant version...
     private static String readJsWithoutComments(Context c, String urlStr) {
         InputStream in = null;
@@ -71,6 +92,23 @@ public class JsBridgeWebView extends WebView {
         return null;
     }
 
+    private void init(Context context) {
+        this.setVerticalScrollBarEnabled(false);
+        this.setHorizontalScrollBarEnabled(false);
+        this.getSettings().setJavaScriptEnabled(true);
+        //  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        //  WebView.setWebContentsDebuggingEnabled(true);
+        //}
+        this.setWebViewClient(new MyWebViewClient(context));
+        this.setWebChromeClient(new MyWebChromeClient(context));
+    }
+
+    public void registerHandler(String handlerName, HybridHandler handler) {
+        if (handler != null) {
+            messageHandlers.put(handlerName, handler);
+        }
+    }
+
     class nativejsb {
         private Context _context;
 
@@ -86,6 +124,10 @@ public class JsBridgeWebView extends WebView {
         @JavascriptInterface
         public String js2app(final String callBackId, String handlerName, final String param_s) {
 
+
+            final String uiName = ((HybridUi) _context).getUiData("name").toString();
+
+            Log.v(LOGTAG, "TODO js2app handlerName " + handlerName + " uiName " + uiName);
 
             //TODO 这里要有个 auth-mapping (whitelist) check!!!!
 
@@ -180,6 +222,17 @@ public class JsBridgeWebView extends WebView {
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            notifyPollingInject(view, url);
+            super.onPageFinished(view, url);
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+        }
+
+        //TODO 参考 ios的逻辑优化（polling the document.readyState)
+        public void notifyPollingInject(WebView view, String url) {
             //inject
             String jsContent = readJsWithoutComments(view.getContext(), "WebViewJavascriptBridge.js");
 
@@ -188,53 +241,9 @@ public class JsBridgeWebView extends WebView {
 
             super.onPageFinished(view, url);
         }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);
-            //TODO keep checking if XXX is ready to inject the jsb?
-        }
         //NOTES
         //for <input type=file/> we suggest to give it up. using api to invoke activity to handle it...
         //which means the page need to call the jsb for the api by yourself ;)
-    }
-
-    public JsBridgeWebView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    public JsBridgeWebView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(context);
-    }
-
-    @SuppressLint("AddJavascriptInterface")
-    public JsBridgeWebView(Context context) {
-        super(context);
-        init(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            this.addJavascriptInterface(new nativejsb(context), "nativejsb");
-        } else {
-            HybridTools.quickShowMsg(context, "Your android is too low version");
-        }
-    }
-
-    private void init(Context context) {
-        this.setVerticalScrollBarEnabled(false);
-        this.setHorizontalScrollBarEnabled(false);
-        this.getSettings().setJavaScriptEnabled(true);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            WebView.setWebContentsDebuggingEnabled(true);
-//        }
-        this.setWebViewClient(new MyWebViewClient(context));
-        this.setWebChromeClient(new MyWebChromeClient(context));
-    }
-
-    public void registerHandler(String handlerName, HybridHandler handler) {
-        if (handler != null) {
-            messageHandlers.put(handlerName, handler);
-        }
     }
 
 }
