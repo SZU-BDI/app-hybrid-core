@@ -10,37 +10,75 @@
 
 //NSMutableDictionary* myMessageHandlers;
 
+NSTimer * domCompletionListener;
+
+UIActivityIndicatorView *IndicatorView;
+
+BOOL injectDone=NO;
+
 //------------  UIViewController ------------
 
-- (void) webViewDidStartLoad:(UIWebView *)webView
-{
-    NSLog(@"webViewDidStartLoad()");
+
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    
     if (webView != self.myWebView) {
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    //    [self injectJSB :webView];
-    //    NSLog(@"done injectJSB");
+    injectDone=NO;
+    NSLog(@" start polling from webViewDidStartLoad...");
+    [self startDOMCompletionPolling];
+    [self spinnerOn];
 }
 
-//------------  prototol UIWebViewDelegate ------------
-
-- (void) webViewDidFinishLoad :(UIWebView *)webView {
-    NSLog(@"webViewDidFinishLoad()");
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
     if (webView != self.myWebView) {
-        NSLog(@" webViewDidFinishLoad: not the same webview?? ");
+        NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-
-    [self injectJSB :webView];
-    NSLog(@"done injectJSB");
-    NSLog(@"done webViewDidFinishLoad");
+    NSLog(@" start polling from webViewDidFinishLoad...");
+    [self startDOMCompletionPolling];
+    [self spinnerOff];
 }
-
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     NSLog(@" didFailLoadWithError() %@",error);
+    if (webView != self.myWebView) {
+        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+        return;
+    }
     [self showTopBar];
+    NSLog(@" start polling from didFailLoadWithError...");
+    [self startDOMCompletionPolling];
+    [self spinnerOff];
 }
+
+//
+//- (void) webViewDidStartLoad:(UIWebView *)webView
+//{
+//    NSLog(@"webViewDidStartLoad()");
+//    if (webView != self.myWebView) {
+//        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+//        return;
+//    }
+//        [self injectJSB :webView];
+//        NSLog(@"done injectJSB");
+//}
+//
+////------------  prototol UIWebViewDelegate ------------
+//
+//- (void) webViewDidFinishLoad :(UIWebView *)webView {
+//    NSLog(@"webViewDidFinishLoad()");
+//    if (webView != self.myWebView) {
+//        NSLog(@" webViewDidFinishLoad: not the same webview?? ");
+//        return;
+//    }
+//
+//    //[self injectJSB :webView];
+//    //NSLog(@"done injectJSB");
+//    NSLog(@"done webViewDidFinishLoad");
+//}
+
+
 
 //------------   <HybridUi> ------------
 
@@ -53,6 +91,56 @@
 
 //------------ self -----------------
 
+
+- (void)startDOMCompletionPolling {
+    if (domCompletionListener) {
+        [domCompletionListener invalidate];
+    }
+    domCompletionListener = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkDOMCompletion) userInfo:nil repeats:YES];
+}
+
+- (void)checkDOMCompletion {
+    NSString *readyState = [self.myWebView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
+    
+    if (readyState != nil) {
+        if (readyState.length > 0) {
+            if ([readyState isEqualToString:@"loading"]) { //keep polling
+                return;
+            }else{
+                //OK !
+            }
+        }else{
+            return;
+        }
+    }else{
+        return;
+    }
+    if(injectDone==YES)return;//skip
+    
+    //'completed', 'interactive', nil, others -> hide spinner
+    [domCompletionListener invalidate];
+    
+    @try {
+        injectDone=YES;
+        [self injectJSB :_myWebView];
+        NSLog(@"done injectJSB");
+    } @catch (NSException *exception) {
+        injectDone=NO;
+        NSLog(@"error when inject %@", exception);
+    } @finally {
+        [self spinnerOff];
+        
+    }
+}
+
+- (void) spinnerOn
+{
+    [IndicatorView startAnimating];
+}
+- (void) spinnerOff
+{
+    [IndicatorView stopAnimating];
+}
 - (void) injectJSB :(UIWebView *)webView
 {
     
@@ -70,7 +158,7 @@
     
     //inject nativejsb
     [ctx evaluateScript:@"nativejsb={};"];
-
+    
     //inject nativejsb.js2app()
     ctx[@"nativejsb"][@"js2app"]=^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
         
@@ -234,7 +322,7 @@
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     self.myWebView.backgroundColor = [UIColor blackColor];
-
+    
     self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
     
     // The page automatically zoom to fit the screen, default NO.
@@ -249,32 +337,47 @@
     NSURL *address_url = [NSURL URLWithString:address];
     NSString *scheme_s=[address_url scheme];
     
+    //INIT SPIN
+    //UIActivityIndicatorView *
+    IndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    IndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    IndicatorView.color =[UIColor whiteColor];
+    IndicatorView.layer.cornerRadius = 5;
+    IndicatorView.layer.masksToBounds = TRUE;
+    IndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+    
+    IndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    [IndicatorView setHidesWhenStopped:YES];
+    IndicatorView.center=self.view.center;
+    [self.view addSubview:IndicatorView];
+    
     if( [ CMPHybridTools isEmptyString:scheme_s ])
     {
         [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
     }else{
         [self loadUrl:[address_url absoluteString]];
     }
+    
 }
 
 //NOTES: can be overrided
 - (void) CustomTopBarBtn
 {
-        UIBarButtonItem *leftBar
-        = [[UIBarButtonItem alloc]
-           initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-           style:UIBarButtonItemStylePlain
-           target:self
-           action:@selector(closeUi) //on('click')=>close()
-           ];
-        leftBar.tintColor = [UIColor blueColor];
+    UIBarButtonItem *leftBar
+    = [[UIBarButtonItem alloc]
+       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+       style:UIBarButtonItemStylePlain
+       target:self
+       action:@selector(closeUi) //on('click')=>close()
+       ];
+    leftBar.tintColor = [UIColor blueColor];
     
-//    self.navigationItem.leftBarButtonItem
-//    = [[UIBarButtonItem alloc]
-//       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-//       target:self
-//       action:@selector(closeUi)];
-
+    //    self.navigationItem.leftBarButtonItem
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+    //       target:self
+    //       action:@selector(closeUi)];
+    
     //    UIBarButtonItem *rightBtn
     //    = [[UIBarButtonItem alloc]
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
