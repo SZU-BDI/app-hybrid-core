@@ -102,6 +102,14 @@ BOOL injectDone=NO;
 - (void)checkDOMCompletion {
     NSString *readyState = [self.myWebView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
     
+    if(injectDone==YES){
+        
+        //'completed', 'interactive', nil, others -> hide spinner
+        [domCompletionListener invalidate];
+        return;//skip
+    }
+    
+    NSLog(@"polling ...");
     if (readyState != nil) {
         if (readyState.length > 0) {
             if ([readyState isEqualToString:@"loading"]) { //keep polling
@@ -115,11 +123,6 @@ BOOL injectDone=NO;
     }else{
         return;
     }
-    if(injectDone==YES)return;//skip
-    
-    //'completed', 'interactive', nil, others -> hide spinner
-    [domCompletionListener invalidate];
-    
     @try {
         injectDone=YES;
         [self injectJSB :_myWebView];
