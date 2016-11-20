@@ -52,11 +52,11 @@ public class JsBridgeWebView extends WebView {
     public JsBridgeWebView(Context context) {
         super(context);
         init(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             this.addJavascriptInterface(new nativejsb(context), "nativejsb");
-        } else {
-            HybridTools.quickShowMsg(context, "Your android is too low version");
-        }
+        //} else {
+        //    HybridTools.quickShowMsg(context, "Your android is too low version");
+        //}
     }
 
     //copy from jsbridge, maybe improve or find more elegant version...

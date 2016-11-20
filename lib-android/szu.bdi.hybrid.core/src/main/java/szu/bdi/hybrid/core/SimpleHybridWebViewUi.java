@@ -45,12 +45,12 @@ public class SimpleHybridWebViewUi extends HybridUi {
         HybridTools.bindWebViewApi(_wv, this);
 
         setContentView(_wv);
-        int _sdk_int = android.os.Build.VERSION.SDK_INT;
-
-        if (_sdk_int < Build.VERSION_CODES.KITKAT) {
-            HybridTools.quickShowMsgMain("WARNING: Your Phone (API=\" + _sdk_int + \") is too old !!!! ");
-        }
-        Log.v(LOGTAG, "load url=" + url);
+//        int _sdk_int = android.os.Build.VERSION.SDK_INT;
+//
+//        if (_sdk_int < Build.VERSION_CODES.KITKAT) {
+//            HybridTools.quickShowMsgMain("WARNING: Your Phone (API=" + _sdk_int + ") is too old !!!! ");
+//        }
+        //Log.v(LOGTAG, "load url=" + url);
         _wv.loadUrl(url);
     }
 }
