@@ -25,8 +25,10 @@
 		}
 		if("undefined"!=typeof nativejsb){
 			return nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
-		}else{
-			alert("ERROR nativejsb is missing");
+		}else if("undefined"!=typeof window.webkit.messageHandlers.nativejsb){
+            window.webkit.messageHandlers.nativejsb.postMessage(msg);
+        }else{
+            alert("ERROR nativejsb is missing");
 		}
 	}
 

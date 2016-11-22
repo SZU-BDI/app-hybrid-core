@@ -15,7 +15,7 @@
 
 @import JavaScriptCore;
 
-@interface CMPHybridWKWebViewUi : CMPHybridUi //<WKNavigationDelegate>
+@interface CMPHybridWKWebViewUi : CMPHybridUi <WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler>
 
 @property (nonatomic, strong) WKWebView * myWebView;
 

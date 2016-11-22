@@ -46,7 +46,9 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     CMPHybridTools *hybridManager = [self shareInstance];
     if(nil==hybridManager.jso){
-        hybridManager.jso = [JSO s2o:[self readAssetInStr:@"config.json"]];
+        //TODO [CMPHybridTools stripComment:s]
+        NSString *s =[self readAssetInStr:@"config.json"];
+        hybridManager.jso = [JSO s2o:s];
     }
 }
 
@@ -234,20 +236,14 @@ SINGLETON_shareInstance(CMPHybridTools);
     return nil;
 }
 
-+ (JSContext *) getWKWebViewJsCtx:(WKWebView *) _webview
-{
-    return [_webview
-            valueForKeyPath:
-            (@"documentView"
-             @".webView"
-             @".mainFrame"
-             @".javaScriptContext")];
-}
 
 + (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s
 {
     @try {
-        return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
+        //return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
+        [_webview evaluateJavaScript:js_s completionHandler:^(id _Nullable val, NSError * _Nullable error) {
+            //code
+        }];
     } @catch (NSException *exception) {
         NSLog(@"callWebViewDoJs error %@", exception);
     } @finally {
@@ -296,16 +292,16 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     __block double countTime=initTime;
     
-    __block NSTimer * test=[NSTimer scheduledTimerWithTimeInterval:interval target:[NSBlockOperation blockOperationWithBlock:^(){
+    __block NSTimer * ttt=[NSTimer scheduledTimerWithTimeInterval:interval target:[NSBlockOperation blockOperationWithBlock:^(){
         countTime=countTime-interval;
         if(countTime<=0){
-            [test invalidate];
+            [ttt invalidate];
             return;
         }
-        BOOL rt = block(test);
+        BOOL rt = block(ttt);
         if(rt==YES){
             NSLog(@".");
-            [test invalidate];
+            [ttt invalidate];
             countTime=0;
         }
     }] selector:@selector(main) userInfo:nil repeats:YES];
@@ -443,6 +439,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
     
+    //TODO [CMPHybridTools stripComments:js];
     [ctx evaluateScript:js];
 }
 /****************************** STUB FOR LATER *********************************/

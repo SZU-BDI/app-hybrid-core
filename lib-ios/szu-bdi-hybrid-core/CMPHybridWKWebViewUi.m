@@ -9,10 +9,14 @@
 
 UIActivityIndicatorView *myIndicatorView;
 
+//WKWebViewConfiguration *webConfig;
+
+
 //------------  UIViewController ------------
 
 
-- (void)webViewDidStartLoad:(WKWebView *)webView {
+- (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
+{
     
     if (webView != self.myWebView) {
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
@@ -24,26 +28,31 @@ UIActivityIndicatorView *myIndicatorView;
     [self spinnerOn];
 }
 
-- (void)webViewDidFinishLoad:(WKWebView *)webView {
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
+{
     if (webView != self.myWebView) {
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
     NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
     [self notifyPollingInject :webView];
+    
     [self spinnerOff];
 }
-- (void)webView:(WKWebView *)webView didFailLoadWithError:(NSError *)error {
-    NSLog(@" didFailLoadWithError() %@",error);
-    if (webView != self.myWebView) {
-        NSLog(@" webViewDidStartLoad: not the same webview?? ");
-        return;
-    }
-    [self showTopBar];
-    NSLog(@" notifyPollingInject from didFailLoadWithError...");
-    [self notifyPollingInject :webView];
-    [self spinnerOff];
-}
+
+//TODO
+
+//- (void)webView:(WKWebView *)webView didFailLoadWithError:(NSError *)error {
+//    NSLog(@" didFailLoadWithError() %@",error);
+//    if (webView != self.myWebView) {
+//        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+//        return;
+//    }
+//    [self showTopBar];
+//    NSLog(@" notifyPollingInject from didFailLoadWithError...");
+//    [self notifyPollingInject :webView];
+//    [self spinnerOff];
+//}
 
 //----------------   <HybridUi>   -----------------
 
@@ -54,22 +63,71 @@ UIActivityIndicatorView *myIndicatorView;
     });
 }
 
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
+{
+    //    [CMPHybridTools quickShowMsgMain:message];
+    
+#warning TODO
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:message
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                        style:UIAlertActionStyleCancel
+                                                      handler:^(UIAlertAction *action) {
+                                                          NSLog(@" callback when click OK at runJavaScriptAlertPanelWithMessage");
+                                                          completionHandler();
+                                                          
+                                                      }]];
+    [self presentViewController:alertController animated:YES completion:^{}];
+}
+
+
 //NOTES: can be overrided
 -(void) initUi
 {
+    
     [self registerHandlerApi];
     
     [self CustomTopBarBtn];
     
-    // initial the webView and add webview in window：
-    CGRect rect = [UIScreen mainScreen].bounds;
+/////////////
+    // Create WKWebViewConfiguration instance
+    WKWebViewConfiguration *
+    webConfig = [[WKWebViewConfiguration alloc]init];
     
-    self.myWebView = [[WKWebView alloc]initWithFrame:rect];
+    // Setup WKUserContentController instance for injecting user script
+    WKUserContentController* userController = [[WKUserContentController alloc]init];
+    
+    // Get script that's to be injected into the document
+    //NSString* js = @"alert('type of webkit.window.webkit.messageHandlers '+ typeof window.webkit.messageHandlers);";
+    //NSString* js = @"alert(location.href);";
+    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
+
+    // Specify when and where and what user script needs to be injected into the web document
+    WKUserScript* userScript = [[WKUserScript alloc] initWithSource:js
+                                                      injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                                                   forMainFrameOnly:NO];
+    
+    // Add the user script to the WKUserContentController instance
+    [userController addUserScript:userScript];
+    
+    // Configure the WKWebViewConfiguration instance with the WKUserContentController
+    webConfig.userContentController= userController;
+    
+    [webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
+    
+/////////////
+    // initial the webView and add webview in window：
+    //CGRect rect = [UIScreen mainScreen].bounds;
+    
+    //self.myWebView = [[WKWebView alloc]initWithFrame:rect];
+    self.myWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webConfig];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     self.myWebView.backgroundColor = [UIColor blackColor];
     
-    //self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
+    self.myWebView.navigationDelegate=self;
+    self.myWebView.UIDelegate=self;//about alert/confirm/prompt
     
     // The page automatically zoom to fit the screen, default NO.
     //self.myWebView.scalesPageToFit = YES;
@@ -195,6 +253,145 @@ UIActivityIndicatorView *myIndicatorView;
     [myIndicatorView setHidesWhenStopped:YES];
     myIndicatorView.center=self.view.center;
     [self.view addSubview:myIndicatorView];
+    
+}
+
+
+//- (void)userContentController
+//:(WKUserContentController *)userContentController
+//didReceiveScriptMessage:(WKScriptMessage*)message {
+//    NSLog(@" userContentController didReceiveScriptMessage = %@", message);
+//    
+//    if([message.name isEqualToString:@"nativejsb"]) {
+//        // The message.body contains the object being posted back
+//    }
+//}
+- (void)userContentController: (WKUserContentController *)userContentController
+      didReceiveScriptMessage:(WKScriptMessage *)message{
+    
+    if(message.webView!=_myWebView){
+        NSLog(@" userContentController: not the same webview?? ");
+        return;
+    }
+    CMPHybridUi *caller=self;
+    
+    NSLog(@"message.body = %@", message.body);
+    //    NSLog(@"message.name = %@", message.name);
+    //    NSLog(@"message.frameInfo = %@", message.frameInfo);
+    //    NSLog(@"message.WKWebView = %@", message.webView);
+    JSO * param=[JSO id2o:message.body];
+    NSString * handlerName_s = [[param getChild:@"handlerName"] toString];
+    NSString * callBackId_s =[[param getChild:@"callBackId"] toString];
+    WKWebView *webView=message.webView;
+    
+    //^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
+    
+    //to check the handlerName is auth by api_auth in config.json for current url !!
+    
+    JSO * api_auth = [CMPHybridTools getAppConfig:@"api_auth"];
+    NSString * uiname = caller.uiName;
+    JSO * api_auth_a = [api_auth getChild:uiname];
+    if(nil==api_auth_a){
+        NSLog(@" !!! find no api_auth for uiname %@", uiname);
+        return;
+    }
+    //NSString * handlerName_s = [handlerName toString];
+    if([CMPHybridTools isEmptyString:handlerName_s]){
+        NSLog(@" empty handlerName?? %@", param);
+        return;
+    }
+    BOOL flagFoundMatch=NO;
+    //JSO *found_a=[[JSO alloc]init];//failed...
+    NSMutableArray *found_a=[[NSMutableArray alloc] init];
+    
+    NSURL *url =[webView URL];
+    NSString *scheme = [url scheme];
+    NSString *currenturl =[url absoluteString];
+    if( [@"file" isEqualToString:scheme]){
+        currenturl=[url lastPathComponent];
+    }
+    for (NSString *kkk in [api_auth_a getChildKeys]) {
+        if([currenturl isEqualToString:kkk]){
+            flagFoundMatch=YES;
+            //found_a= [api_auth_a getChild:kkk];
+            //break;
+            //[found_a basicMerge:[api_auth_a getChild:kkk]];
+            JSO *jj =[api_auth_a getChild:kkk];
+            id idjj = [jj toId];
+            [found_a removeObjectsInArray:idjj];
+            [found_a addObjectsFromArray:idjj];
+        }
+        NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :currenturl];
+        if ([matches count] > 0){
+            flagFoundMatch=YES;
+            //found_a= [api_auth_a getChild:kkk];
+            //break;
+            //[found_a basicMerge:[api_auth_a getChild:kkk]];
+            JSO *jj =[api_auth_a getChild:kkk];
+            id idjj = [jj toId];
+            [found_a removeObjectsInArray:idjj];
+            [found_a addObjectsFromArray:idjj];
+        }
+    }
+    if(flagFoundMatch!=YES){
+        NSLog(@" !!! find no auth for api %@ for %@", handlerName_s, uiname);
+        return;
+    }
+    
+    BOOL flagInList=NO;
+    NSArray * keys =[found_a copy];
+    for (NSString *vvv in keys){
+        if([handlerName_s isEqualToString:vvv]){
+            flagInList=YES;
+            break;
+        }
+    }
+    
+    if (flagInList!=YES){
+        NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
+        return;
+    }
+    if(nil==caller.myApiHandlers) {
+        NSLog(@" !!! caller.myApiHandlers is nil !!! %@", caller.uiData);
+        return;
+    }
+    
+    HybridHandler handler = caller.myApiHandlers[handlerName_s];
+    
+    if (nil==handler) {
+        NSLog(@" !!! found no handler for %@", handlerName_s);
+        return;
+    }
+    
+    //NSString *callBackId_s=[callBackId toString];
+    HybridCallback callback=^(JSO *responseData){
+        
+        NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
+        
+        @try {
+            NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [CMPHybridTools callWKWebViewDoJs:webView :javascriptCommand];
+            });
+            //[caller evalJs:javascriptCommand];
+        } @catch (NSException *exception) {
+            NSLog(@" !!! error when callback to js %@",exception);
+        } @finally {
+        }
+        
+    };
+    
+    //async delay 0.01 second
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+                   ^{
+                       NSString *param_s=[param toString];
+                       @try {
+                           handler([JSO s2o:param_s], callback);
+                       } @catch (NSException *exception) {
+                           callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+                       }
+                   });
     
 }
 

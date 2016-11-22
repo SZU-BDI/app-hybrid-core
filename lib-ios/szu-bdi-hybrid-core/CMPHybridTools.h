@@ -53,13 +53,14 @@
 + (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s;
 
 + (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
-+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
+//+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
 
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
 
 + (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block;
 
 + (void) injectJSB :(UIWebView *)webView :(CMPHybridUi *)caller;
+//+ (void) injectJSBWK :(WKWebView *)webView :(CMPHybridUi *)caller;
 
 @end
 
