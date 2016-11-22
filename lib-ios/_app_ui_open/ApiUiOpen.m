@@ -12,6 +12,8 @@
         NSString *name_s= [name toString];
         if([CMPHybridTools isEmptyString:name_s]){
             name_s=@"UiRoot";//TMP !!! need UiError...
+            //NSLog(@" strange, no name at uiopen??");
+            //return;
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{

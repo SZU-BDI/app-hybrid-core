@@ -78,7 +78,9 @@ UIActivityIndicatorView *myIndicatorView;
                                                           completionHandler();
                                                           
                                                       }]];
-    [self presentViewController:alertController animated:YES completion:^{}];
+    [self presentViewController:alertController animated:YES completion:^{
+    completionHandler();//....
+    }];
 }
 
 
@@ -279,9 +281,10 @@ UIActivityIndicatorView *myIndicatorView;
     //    NSLog(@"message.name = %@", message.name);
     //    NSLog(@"message.frameInfo = %@", message.frameInfo);
     //    NSLog(@"message.WKWebView = %@", message.webView);
-    JSO * param=[JSO id2o:message.body];
-    NSString * handlerName_s = [[param getChild:@"handlerName"] toString];
-    NSString * callBackId_s =[[param getChild:@"callBackId"] toString];
+    JSO * msg=[JSO id2o:message.body];
+    NSString * handlerName_s = [[msg getChild:@"handlerName"] toString];
+    __block NSString * callBackId_s =[[msg getChild:@"callbackId"] toString];
+    JSO * param =[msg getChild:@"data"];
     WKWebView *webView=message.webView;
     
     //^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
