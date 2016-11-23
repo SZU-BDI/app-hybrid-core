@@ -39,8 +39,7 @@ return _sharedInstance;\
 
 @import JavaScriptCore;
 
-
-@protocol CMPHybridUi
+@interface CMPHybridUi : UIViewController
 
 @property (strong) JSO *uiData;
 @property (strong) NSString *uiName;
@@ -67,7 +66,6 @@ return _sharedInstance;\
 - (void) evalJs :(NSString *)js_s;
 
 @end
-
 
 
 

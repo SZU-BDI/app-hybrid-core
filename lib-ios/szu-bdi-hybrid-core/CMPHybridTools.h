@@ -24,10 +24,6 @@
 
 + (CMPHybridApi *) getHybridApi:(NSString *)name;
 
-+ (void) startUi :(NSString *)strUiName
-         initData:(JSO *) initData
-        objCaller:(CMPHybridUi *)objCaller
-         callback:(void (^)(CMPHybridUi * ui))callback;
 + (CMPHybridUi *) startUi :(NSString *)strUiName
                   initData:(JSO *)initData
                  objCaller:(CMPHybridUi *)objCaller;

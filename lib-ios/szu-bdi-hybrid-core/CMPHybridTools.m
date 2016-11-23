@@ -52,16 +52,12 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
 }
 
-+ (void) startUi :(NSString *)strUiName
-         initData:(JSO *) initData
-        objCaller:(CMPHybridUi *)objCaller
-         callback:(void (^)(id<CMPHybridUi> * ui))callback
-{
-    CMPHybridUi * ui = [self startUi:strUiName initData:initData objCaller:objCaller];
-    if(nil!=callback){
-        callback(ui);
-    }
-}
+//TODO using a callback to hook back the HybridUi
+//+ (void) startUi :(NSString *)strUiName
+//                  initData:(JSO *) initData
+//                 objCaller:(CMPHybridUi *)objCaller
+//                  callback:...
+
 + (CMPHybridUi *) startUi :(NSString *)strUiName
                   initData:(JSO *) initData
                  objCaller:(CMPHybridUi *)objCaller
