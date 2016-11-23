@@ -50,6 +50,23 @@
 //    [self spinnerOff];
 //}
 
+//----------------   <WKUIDelegate>   -----------------
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
+{
+    [CMPHybridTools quickShowMsgMain:message callback:^{
+        completionHandler();
+    }];
+}
+
+- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
+{
+    [CMPHybridTools quickConfirmMsgMain:message handlerYes:^(UIAlertAction *action) {
+        completionHandler(YES);
+    } handlerNo:^(UIAlertAction *action) {
+        completionHandler(NO);
+    }];
+}
+
 //----------------   <HybridUi>   -----------------
 
 - (void) evalJs:(NSString *)js_s
@@ -59,12 +76,6 @@
     });
 }
 
-- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
-{
-    [CMPHybridTools quickShowMsgMain:message callback:^{
-        completionHandler();
-    }];
-}
 
 //NOTES: can be overrided
 -(void) initUi
