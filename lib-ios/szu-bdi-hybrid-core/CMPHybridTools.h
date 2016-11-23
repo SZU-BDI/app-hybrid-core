@@ -36,10 +36,10 @@
 +(NSString *)readAssetInStr :(NSString *)filename;
 +(BOOL) isEmptyString :(NSString *)s;
 
-+ (void) quickShowMsgMain:(NSString *)message;
++ (void) quickShowMsgMain :(NSString *)msg;
++ (void) quickShowMsgMain :(NSString *)msg callback:(void (^)())callback;
 
-//- (void) someMethodThatTakesABlock:(returnType (^nullability)(parameterTypes))blockName;
-+ (void) quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
++ (void) quickAlertMsgForOldiOS :(NSString *)msg callback:(void (^)())callback;
 
 + (void) quickConfirmMsgMain:(NSString *)msg
                   handlerYes:(HybridDialogCallback) handlerYes

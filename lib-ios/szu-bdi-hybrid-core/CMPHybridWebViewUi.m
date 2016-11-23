@@ -8,7 +8,6 @@
 
 @implementation CMPHybridWebViewUi
 
-UIActivityIndicatorView *IndicatorView;
 
 //------------  UIViewController ------------
 
@@ -147,11 +146,11 @@ UIActivityIndicatorView *IndicatorView;
 
 - (void) spinnerOn
 {
-    [IndicatorView startAnimating];
+    [_myIndicatorView startAnimating];
 }
 - (void) spinnerOff
 {
-    [IndicatorView stopAnimating];
+    [_myIndicatorView stopAnimating];
 }
 
 - (void)registerHandlerApi{
@@ -181,18 +180,18 @@ UIActivityIndicatorView *IndicatorView;
 - (void) spinnerInit
 {
     //INIT SPIN
-    //UIActivityIndicatorView *
-    IndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    IndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-    IndicatorView.color =[UIColor whiteColor];
-    IndicatorView.layer.cornerRadius = 5;
-    IndicatorView.layer.masksToBounds = TRUE;
-    IndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+    //UIActivitymyIndicatorView *
+    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    _myIndicatorView.color =[UIColor whiteColor];
+    _myIndicatorView.layer.cornerRadius = 5;
+    _myIndicatorView.layer.masksToBounds = TRUE;
+    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     
-    IndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [IndicatorView setHidesWhenStopped:YES];
-    IndicatorView.center=self.view.center;
-    [self.view addSubview:IndicatorView];
+    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_myIndicatorView setHidesWhenStopped:YES];
+    _myIndicatorView.center=self.view.center;
+    [self.view addSubview:_myIndicatorView];
     
 }
 

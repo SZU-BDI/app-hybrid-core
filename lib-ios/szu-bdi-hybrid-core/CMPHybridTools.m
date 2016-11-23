@@ -146,19 +146,34 @@ SINGLETON_shareInstance(CMPHybridTools);
 //IOS 8+
 + (void)quickShowMsgMain:(NSString *)msg{
     
+    //    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
+    //
+    //    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+    //    [alertController addAction:ok];
+    //
+    //    //modal
+    //    [[self findTopRootView] presentViewController:alertController animated:NO completion:^(){
+    //        NSLog(@" completion after quickShowMsgMain()");
+    //    }];
+    [self quickShowMsgMain:msg callback:^(){
+        NSLog(@" completion after quickShowMsgMain()");
+    }];
+}
+
++ (void)quickShowMsgMain:(NSString *)msg callback:(void (^)())callback
+{    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
     [alertController addAction:ok];
     
     //modal
-    [[self findTopRootView] presentViewController:alertController animated:NO completion:^(){
-        NSLog(@" completion after quickShowMsgMain()");
-    }];
+    [[self findTopRootView] presentViewController:alertController animated:NO completion:callback];
 }
 
-//Mostly use in main.m to alert iOS version if too low (because quickShowMsgMain is not working <iOS8
-+ (void)quickAlertMsg :(NSString *)msg callback:(void (^)())callback;
+//NOTES: quickAlertMsg()
+//Mostly use in main.m to alert iOS version if too low (because quickShowMsgMain is not working <iOS8 )
++ (void)quickAlertMsgForOldiOS :(NSString *)msg callback:(void (^)())callback;
 {
     [[[CmpUIAlertView alloc] initWithMsg:msg callback:callback] show];
 }

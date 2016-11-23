@@ -1,16 +1,12 @@
 #import "CMPHybridWKWebViewUi.h"
+
 #import "CMPHybridApi.h"
 #import "CMPHybridTools.h"
 #import "JSO.h"
 
-@import JavaScriptCore;
-
 @implementation CMPHybridWKWebViewUi
 
-UIActivityIndicatorView *myIndicatorView;
-
 //WKWebViewConfiguration *webConfig;
-
 
 //------------  UIViewController ------------
 
@@ -65,24 +61,10 @@ UIActivityIndicatorView *myIndicatorView;
 
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
-    //    [CMPHybridTools quickShowMsgMain:message];
-    
-#warning TODO
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:message
-                                                                             message:nil
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                        style:UIAlertActionStyleCancel
-                                                      handler:^(UIAlertAction *action) {
-                                                          NSLog(@" callback when click OK at runJavaScriptAlertPanelWithMessage");
-                                                          completionHandler();
-                                                          
-                                                      }]];
-    [self presentViewController:alertController animated:YES completion:^{
-    completionHandler();//....
+    [CMPHybridTools quickShowMsgMain:message callback:^{
+        completionHandler();
     }];
 }
-
 
 //NOTES: can be overrided
 -(void) initUi
@@ -209,11 +191,11 @@ UIActivityIndicatorView *myIndicatorView;
 
 - (void) spinnerOn
 {
-    [myIndicatorView startAnimating];
+    [_myIndicatorView startAnimating];
 }
 - (void) spinnerOff
 {
-    [myIndicatorView stopAnimating];
+    [_myIndicatorView stopAnimating];
 }
 
 - (void)registerHandlerApi{
@@ -244,17 +226,17 @@ UIActivityIndicatorView *myIndicatorView;
 {
     //INIT SPIN
     //UIActivityIndicatorView *
-    myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-    myIndicatorView.color =[UIColor whiteColor];
-    myIndicatorView.layer.cornerRadius = 5;
-    myIndicatorView.layer.masksToBounds = TRUE;
-    myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    _myIndicatorView.color =[UIColor whiteColor];
+    _myIndicatorView.layer.cornerRadius = 5;
+    _myIndicatorView.layer.masksToBounds = TRUE;
+    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     
-    myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [myIndicatorView setHidesWhenStopped:YES];
-    myIndicatorView.center=self.view.center;
-    [self.view addSubview:myIndicatorView];
+    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_myIndicatorView setHidesWhenStopped:YES];
+    _myIndicatorView.center=self.view.center;
+    [self.view addSubview:_myIndicatorView];
     
 }
 
