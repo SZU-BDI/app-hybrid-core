@@ -70,7 +70,7 @@
 				}
 			}
 		},1);
-		return {STS:"OK"};
+		return {STS:"_app2js"};
 	}
 
 	function registerHandler(handlerName, handler) {

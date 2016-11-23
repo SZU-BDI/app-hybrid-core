@@ -19,8 +19,8 @@
         return;
     }
     //injectDone=NO;
-    NSLog(@" notifyPollingInject from webViewDidStartLoad...");
-    [self notifyPollingInject :webView];
+    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
+    //[self notifyPollingInject :webView];
     [self spinnerOn];
 }
 
@@ -30,25 +30,25 @@
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
-    [self notifyPollingInject :webView];
-    
+    //NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
+    //[self notifyPollingInject :webView];
     [self spinnerOff];
 }
 
+//Invoked when an error occurs while starting to load data for the main frame.
 //TODO
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
+{
+    [self spinnerOff];
+}
 
-//- (void)webView:(WKWebView *)webView didFailLoadWithError:(NSError *)error {
-//    NSLog(@" didFailLoadWithError() %@",error);
-//    if (webView != self.myWebView) {
-//        NSLog(@" webViewDidStartLoad: not the same webview?? ");
-//        return;
-//    }
-//    [self showTopBar];
-//    NSLog(@" notifyPollingInject from didFailLoadWithError...");
-//    [self notifyPollingInject :webView];
-//    [self spinnerOff];
-//}
+//Invoked when an error occurs during a committed main frame navigation.
+//TODO
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
+{
+    [self spinnerOff];
+}
+
 
 //----------------   <WKUIDelegate>   -----------------
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
@@ -58,6 +58,7 @@
     }];
 }
 
+//TODO need move to HybridTools to share with the UIWebView
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
 {
     [CMPHybridTools quickConfirmMsgMain:message handlerYes:^(UIAlertAction *action) {
@@ -65,6 +66,31 @@
     } handlerNo:^(UIAlertAction *action) {
         completionHandler(NO);
     }];
+}
+
+- (void)webView:(WKWebView *)webView
+runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt
+    defaultText:(NSString *)defaultText
+initiatedByFrame:(WKFrameInfo *)frame
+completionHandler:(void (^)(NSString * _Nullable))completionHandler
+{
+    //NSString *hostString = webView.URL.host;
+    //NSString *sender = [NSString stringWithFormat:@"%@ からの表示", hostString];
+    NSString *sender = @"";
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:prompt message:sender preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        //textField.placeholder = defaultText;
+        textField.text = defaultText;
+    }];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        NSString *input = ((UITextField *)alertController.textFields.firstObject).text;
+        completionHandler(input);
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(nil);
+    }]];
+    [self presentViewController:alertController animated:YES completion:^{}];
 }
 
 //----------------   <HybridUi>   -----------------
@@ -85,7 +111,7 @@
     
     [self CustomTopBarBtn];
     
-/////////////
+    /////////////
     // Create WKWebViewConfiguration instance
     WKWebViewConfiguration *
     webConfig = [[WKWebViewConfiguration alloc]init];
@@ -94,10 +120,8 @@
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     
     // Get script that's to be injected into the document
-    //NSString* js = @"alert('type of webkit.window.webkit.messageHandlers '+ typeof window.webkit.messageHandlers);";
-    //NSString* js = @"alert(location.href);";
     NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
-
+    
     // Specify when and where and what user script needs to be injected into the web document
     WKUserScript* userScript = [[WKUserScript alloc] initWithSource:js
                                                       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
@@ -111,7 +135,7 @@
     
     [webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
     
-/////////////
+    /////////////
     // initial the webView and add webview in window：
     //CGRect rect = [UIScreen mainScreen].bounds;
     
@@ -172,33 +196,33 @@
 
 //------------ self -----------------
 
-- (void) notifyPollingInject :(WKWebView *)webView {
-    
-    [CMPHybridTools countDown:0.2 initTime:3 block:^BOOL(NSTimer *tm) {
-        //NSString *readyState =
-//        [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable, NSError * _Nullable error) {
-//            //
-//        }];
-        
-//        //NSLog(@"polling ... %@", readyState);
-//        if (readyState != nil) {
-//            if (readyState.length > 0) {
-//                if ([readyState isEqualToString:@"loading"]) {
-//                }else{
-//                    NSString *typeof_nativejsb = [webView stringByEvaluatingJavaScriptFromString:@"(typeof nativejsb)"];
-//                    //NSLog(@"typeof_nativejsb=%@",typeof_nativejsb);
-//                    if([@"undefined" isEqualToString:typeof_nativejsb]){
-//                        [CMPHybridTools injectJSB :webView :self];
-//                        NSLog(@"done injectJSB");
-//                    }else{
-//                        return YES;//YES means stop the timer in advance
+//- (void) notifyPollingInject :(WKWebView *)webView {
+//
+//    [CMPHybridTools countDown:0.2 initTime:3 block:^BOOL(NSTimer *tm) {
+//        NSString *readyState =
+//                [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable, NSError * _Nullable error) {
+//                    //
+//                }];
+//
+//                //NSLog(@"polling ... %@", readyState);
+//                if (readyState != nil) {
+//                    if (readyState.length > 0) {
+//                        if ([readyState isEqualToString:@"loading"]) {
+//                        }else{
+//                            NSString *typeof_nativejsb = [webView stringByEvaluatingJavaScriptFromString:@"(typeof nativejsb)"];
+//                            //NSLog(@"typeof_nativejsb=%@",typeof_nativejsb);
+//                            if([@"undefined" isEqualToString:typeof_nativejsb]){
+//                                [CMPHybridTools injectJSB :webView :self];
+//                                NSLog(@"done injectJSB");
+//                            }else{
+//                                return YES;//YES means stop the timer in advance
+//                            }
+//                        }
 //                    }
 //                }
-//            }
-//        }
-        return NO;
-    }];
-}
+//        return NO;
+//    }];
+//}
 
 - (void) spinnerOn
 {
@@ -252,15 +276,6 @@
 }
 
 
-//- (void)userContentController
-//:(WKUserContentController *)userContentController
-//didReceiveScriptMessage:(WKScriptMessage*)message {
-//    NSLog(@" userContentController didReceiveScriptMessage = %@", message);
-//    
-//    if([message.name isEqualToString:@"nativejsb"]) {
-//        // The message.body contains the object being posted back
-//    }
-//}
 - (void)userContentController: (WKUserContentController *)userContentController
       didReceiveScriptMessage:(WKScriptMessage *)message{
     
@@ -268,6 +283,7 @@
         NSLog(@" userContentController: not the same webview?? ");
         return;
     }
+    
     CMPHybridUi *caller=self;
     
     NSLog(@"message.body = %@", message.body);
@@ -297,7 +313,6 @@
         return;
     }
     BOOL flagFoundMatch=NO;
-    //JSO *found_a=[[JSO alloc]init];//failed...
     NSMutableArray *found_a=[[NSMutableArray alloc] init];
     
     NSURL *url =[webView URL];
@@ -361,11 +376,11 @@
     
     //NSString *callBackId_s=[callBackId toString];
     HybridCallback callback=^(JSO *responseData){
-        
+        NSLog(@"HybridCallback responseData %@", [responseData toString]);
         NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
         
         @try {
-            NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
+            NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(function(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [CMPHybridTools callWKWebViewDoJs:webView :javascriptCommand];
             });

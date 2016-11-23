@@ -418,7 +418,7 @@ SINGLETON_shareInstance(CMPHybridTools);
             NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
             
             @try {
-                NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
+                NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(function(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [CMPHybridTools callWebViewDoJs:webView :javascriptCommand];
                 });
