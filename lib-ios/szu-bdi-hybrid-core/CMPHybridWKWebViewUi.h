@@ -3,9 +3,10 @@
 
 #import "CMPHybridUi.h"
 
-@interface CMPHybridWKWebViewUi : CMPHybridUi <WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+@interface CMPHybridWKWebViewUi : CMPHybridUi_UIViewController <WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 {
 @protected UIActivityIndicatorView * _myIndicatorView;
+    
     
 }
 
