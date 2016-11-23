@@ -58,6 +58,17 @@ SINGLETON_shareInstance(CMPHybridTools);
 //                 objCaller:(CMPHybridUi *)objCaller
 //                  callback:...
 
++ (void) startUi :(NSString *)strUiName
+         initData:(JSO *) initData
+        objCaller:(CMPHybridUi *)objCaller
+         callback:(void (^)(CMPHybridUi * ui))callback
+{
+    CMPHybridUi * ui = [self startUi:strUiName initData:initData objCaller:objCaller];
+    if(nil!=callback){
+        callback(ui);
+    }
+}
+
 + (CMPHybridUi *) startUi :(NSString *)strUiName
                   initData:(JSO *) initData
                  objCaller:(CMPHybridUi *)objCaller
