@@ -8,7 +8,7 @@
 {
     return ^(JSO * jso, HybridCallback responseCallback) {
         
-        CMPHybridUi *caller=self.currentUi;
+        HybridUi caller=self.currentUi;
         
         JSO *topbarmode= [jso getChild :@"mode"];
         JSO *save= [jso getChild :@"save"];

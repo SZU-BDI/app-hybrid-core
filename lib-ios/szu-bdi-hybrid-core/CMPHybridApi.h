@@ -9,7 +9,7 @@
 
 - (HybridHandler) getHandler;
 
-@property (nonatomic, weak) CMPHybridUi * currentUi;
+@property (nonatomic, weak) HybridUi currentUi;
 
 @end
 

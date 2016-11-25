@@ -1,11 +1,13 @@
 #ifndef CMPHybridWebViewUi_h
 #define CMPHybridWebViewUi_h
 
+#import "CMPHybridUi_UIViewController.h"
+
 @import JavaScriptCore;
 
 #import "CMPHybridUi.h"
 
-@interface CMPHybridWebViewUi : CMPHybridUi <UIWebViewDelegate>
+@interface CMPHybridWebViewUi :CMPHybridUi_UIViewController <UIWebViewDelegate>
 
 @property (nonatomic, strong) UIWebView * myWebView;
 

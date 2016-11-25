@@ -6,7 +6,7 @@
 
 - (HybridHandler) getHandler{
     return ^(id data, HybridCallback responseCallback) {
-        CMPHybridUi *caller=self.currentUi;
+        HybridUi caller=self.currentUi;
         
         JSO *name=[data getChild:@"name"];
         NSString *name_s= [name toString];
@@ -17,7 +17,7 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            CMPHybridUi *ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
+            HybridUi ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
             if(ui!=nil){
                 //                [ui on:@"initdone" :^(NSString *eventName, id extraData){
                 //                    //responseCallback(extraData);

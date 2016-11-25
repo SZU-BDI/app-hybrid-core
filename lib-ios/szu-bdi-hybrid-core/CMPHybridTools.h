@@ -26,12 +26,12 @@
 
 + (void) startUi :(NSString *)strUiName
          initData:(JSO *) initData
-        objCaller:(CMPHybridUi *)objCaller
-         callback:(void (^)(CMPHybridUi * ui))callback;
+        objCaller:(HybridUi )objCaller
+         callback:(void (^)(HybridUi  ui))callback;
 
-+ (CMPHybridUi *) startUi :(NSString *)strUiName
++ (HybridUi ) startUi :(NSString *)strUiName
                   initData:(JSO *)initData
-                 objCaller:(CMPHybridUi *)objCaller;
+                 objCaller:(HybridUi )objCaller;
 
 + (JSO *) wholeAppConfig;
 + (JSO *) getAppConfig :(NSString *)key;
@@ -64,8 +64,8 @@
 
 + (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block;
 
-+ (void) injectJSB :(UIWebView *)webView :(CMPHybridUi *)caller;
-//+ (void) injectJSBWK :(WKWebView *)webView :(CMPHybridUi *)caller;
++ (void) injectJSB :(UIWebView *)webView :(HybridUi )caller;
+//+ (void) injectJSBWK :(WKWebView *)webView :(HybridUi )caller;
 
 @end
 

@@ -55,23 +55,23 @@ SINGLETON_shareInstance(CMPHybridTools);
 //TODO using a callback to hook back the HybridUi
 //+ (void) startUi :(NSString *)strUiName
 //                  initData:(JSO *) initData
-//                 objCaller:(CMPHybridUi *)objCaller
+//                 objCaller:(HybridUi )objCaller
 //                  callback:...
 
 + (void) startUi :(NSString *)strUiName
          initData:(JSO *) initData
-        objCaller:(CMPHybridUi *)objCaller
-         callback:(void (^)(CMPHybridUi * ui))callback
+        objCaller:(HybridUi )objCaller
+         callback:(void (^)(HybridUi ui))callback
 {
-    CMPHybridUi * ui = [self startUi:strUiName initData:initData objCaller:objCaller];
+    HybridUi  ui = [self startUi:strUiName initData:initData objCaller:objCaller];
     if(nil!=callback){
         callback(ui);
     }
 }
 
-+ (CMPHybridUi *) startUi :(NSString *)strUiName
++ (HybridUi ) startUi :(NSString *)strUiName
                   initData:(JSO *) initData
-                 objCaller:(CMPHybridUi *)objCaller
+                 objCaller:(HybridUi)objCaller
 {
     [self checkAppConfig];
     
@@ -87,7 +87,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     
     Class uiClass = NSClassFromString(className);
-    CMPHybridUi * theHybridUi = [[uiClass alloc] init];
+    HybridUi  theHybridUi = [[uiClass alloc] init];
     
     if (nil==theHybridUi) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
@@ -101,10 +101,12 @@ SINGLETON_shareInstance(CMPHybridTools);
     /////////////////////////////////////// Display It {
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
     if (ddd.window.rootViewController==nil){
+        
         if ([theHybridUi isKindOfClass:[UITabBarController class]]) {
             ddd.window.rootViewController = (UIViewController *)theHybridUi;
         }
         else{
+            
             UINavigationController *nav = [[UINavigationController alloc]
                                            initWithRootViewController:(UIViewController *)theHybridUi];
             
@@ -333,7 +335,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }] selector:@selector(main) userInfo:nil repeats:YES];
 }
 
-+ (void) injectJSB :(UIWebView *)webView :(CMPHybridUi *)caller
++ (void) injectJSB :(UIWebView *)webView :(HybridUi )caller
 {
     NSString * uiname = caller.uiName;
     NSLog(@"injecting JSB to %@", uiname);

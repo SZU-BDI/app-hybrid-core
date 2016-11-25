@@ -284,7 +284,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         return;
     }
     
-    CMPHybridUi *caller=self;
+    HybridUi caller=self;
     
     NSLog(@"message.body = %@", message.body);
     //    NSLog(@"message.name = %@", message.name);

@@ -3,7 +3,12 @@
 
 #import "CMPHybridUi.h"
 
-@interface CMPNativeUi : CMPHybridUi
+@interface CMPNativeUi :UIViewController <CMPHybridUi>
+
+//:UIViewController <CMPHybridUiProtocol>
+
+
+
 
 @end
 

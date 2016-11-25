@@ -31,6 +31,9 @@ _sharedInstance = [[self alloc] init];\
 return _sharedInstance;\
 }
 
+#define HybridUi id<CMPHybridUi>
+//#define HybridApi id<CMPHybridApi>
+
 #endif /* Hybrid_h */
 
 
@@ -39,13 +42,12 @@ return _sharedInstance;\
 
 @import JavaScriptCore;
 
-@interface CMPHybridUi : UIViewController
+@protocol CMPHybridUi <NSObject>
 
 @property (strong) JSO *uiData;
 @property (strong) NSString *uiName;
 
 @property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
-
 @property (strong, nonatomic) NSMutableDictionary* myEventHandlers;
 
 -(void) closeUi;//the "close" is taken...
@@ -66,6 +68,22 @@ return _sharedInstance;\
 - (void) evalJs :(NSString *)js_s;
 
 @end
+
+//@interface CMPHybridUi :UIViewController <CMPHybridUi>
+//
+//@property (strong) JSO *uiData;
+//@property (strong) NSString *uiName;
+//
+//@property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
+//
+//@property (strong, nonatomic) NSMutableDictionary* myEventHandlers;
+//
+////@interface UINavigationController : UIViewController
+////@interface UITabBarController : UIViewController <UITabBarDelegate, NSCoding>
+////: UIViewController
+//
+//
+//@end
 
 
 
