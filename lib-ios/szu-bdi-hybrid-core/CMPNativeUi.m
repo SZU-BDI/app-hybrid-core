@@ -4,8 +4,8 @@
 @implementation CMPNativeUi
 
 //------------   <HybridUi> ------------
-//@overrided
-- (void) CustomTopBarBtn
+
+- (void) resetTopBarBtn
 {
     UIBarButtonItem *leftBar
     = [[UIBarButtonItem alloc]
@@ -36,10 +36,19 @@
 //NOTES: can be overrided
 - (void)initUi
 {
-    [self CustomTopBarBtn];
+    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+        
+        NSLog(@"initUi() on eventName %@ ", eventName);
+        [self resetTopBarStatus];
+        [self resetTopBarBtn];
+        [self setNeedsStatusBarAppearanceUpdate];
+    } :nil];
+    
+    //[self resetTopBarBtn];
     self.view.backgroundColor=[UIColor blackColor];
     //self.navigationController.navigationBar.translucent=NO;
     self.navigationController.navigationBar.backgroundColor=[UIColor blackColor];
     self.navigationController.navigationBar.tintColor = [UIColor brownColor];
 }
+
 @end

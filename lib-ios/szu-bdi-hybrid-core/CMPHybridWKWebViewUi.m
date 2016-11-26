@@ -50,17 +50,19 @@
 }
 
 //Invoked when an error occurs while starting to load data for the main frame.
-//TODO
+#warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
     [self spinnerOff];
+    [self closeUi];
 }
 
 //Invoked when an error occurs during a committed main frame navigation.
-//TODO
+#warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
     [self spinnerOff];
+    [self closeUi];
 }
 
 
@@ -72,7 +74,7 @@
     }];
 }
 
-//TODO need move to HybridTools to share with the UIWebView
+#warning (1) try move to HybridTools to share with the UIWebView?
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
 {
     [CMPHybridTools quickConfirmMsgMain:message handlerYes:^(UIAlertAction *action) {
@@ -254,30 +256,47 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self.myWebView loadRequest:request];
 }
 
-//TODO the height is not good...
+#warning (1) TODO the height is not good...
 - (void) spinnerInit
 {
-    //INIT SPIN
-    //UIActivityIndicatorView *
+//    //INIT SPIN
+//    //UIActivityIndicatorView *
+//    
+//    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+//    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+//    _myIndicatorView.color =[UIColor whiteColor];
+//    _myIndicatorView.layer.cornerRadius = 4;
+//    _myIndicatorView.layer.masksToBounds = TRUE;
+//    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin
+//    | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
+//    | UIViewAutoresizingFlexibleHeight;
+//    
+//    //_myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+//    
+//    //[_myIndicatorView setHidesWhenStopped:YES];
+//    
+//    _myIndicatorView.center=self.view.center;
+//    
+//    [self.view addSubview:_myIndicatorView];
     
+    //INIT SPIN
+    //UIActivitymyIndicatorView *
     _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     _myIndicatorView.color =[UIColor whiteColor];
-    _myIndicatorView.layer.cornerRadius = 4;
+    _myIndicatorView.layer.cornerRadius = 5;
     _myIndicatorView.layer.masksToBounds = TRUE;
-    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin
-    | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
-    | UIViewAutoresizingFlexibleHeight;
+    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     
-    //_myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    //[_myIndicatorView setHidesWhenStopped:YES];
-    
+    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_myIndicatorView setHidesWhenStopped:YES];
     _myIndicatorView.center=self.view.center;
-    
     [self.view addSubview:_myIndicatorView];
 }
 
+/**
+ * handle message from webview
+ */
 - (void)userContentController: (WKUserContentController *)userContentController
       didReceiveScriptMessage:(WKScriptMessage *)message{
     

@@ -1,14 +1,9 @@
 #ifndef CMPNativeUi_h
 #define CMPNativeUi_h
 
-#import "CMPHybridUi.h"
+#import "CMPHybridUi_UIViewController.h"
 
-@interface CMPNativeUi :UIViewController <CMPHybridUi>
-
-//:UIViewController <CMPHybridUiProtocol>
-
-
-
+@interface CMPNativeUi :CMPHybridUi_UIViewController
 
 @end
 

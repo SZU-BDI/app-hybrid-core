@@ -21,6 +21,45 @@
     }];
 }
 
+- (void) closeUi
+{
+    BOOL flagIsLast=YES;
+    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
+    UINavigationController *nnn=self.navigationController;
+    if (nnn!=nil){
+        NSArray *vvv = nnn.viewControllers;
+        if(vvv!=nil){
+            if(vvv.count>1){
+                [self.navigationController popViewControllerAnimated:YES];
+                flagIsLast=NO;
+            }
+        }
+        if(flagIsLast==YES){
+            NSLog(@" flagIsLast==YES");
+        }
+    }else{
+        UIViewController *rootUi  =ddd.window.rootViewController;
+        if (rootUi == self){
+            NSLog(@" root = self");
+            flagIsLast=YES;
+        }else{
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+    }
+    
+    if(flagIsLast==YES){
+        //quit app if prompted yes
+        [CMPHybridTools
+         quickConfirmMsgMain:@"Sure to Quit?"
+         //handlerYes:^(UIAlertAction *action)
+         handlerYes:(HybridDialogCallback) ^{
+             [self dismissViewControllerAnimated:YES completion:nil];
+             [CMPHybridTools quitGracefully];
+         }
+         handlerNo:nil];
+    }
+    [self trigger:@"close" :nil];
+}
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
@@ -144,47 +183,6 @@
        initWithBarButtonSystemItem:UIBarButtonSystemItemReply
        target:self
        action:@selector(closeUi)];
-}
-
-- (void)closeUi
-{
-    
-    BOOL flagIsLast=YES;
-    id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
-    UINavigationController *nnn=self.navigationController;
-    if (nnn!=nil){
-        NSArray *vvv = nnn.viewControllers;
-        if(vvv!=nil){
-            if(vvv.count>1){
-                [self.navigationController popViewControllerAnimated:YES];
-                flagIsLast=NO;
-            }
-        }
-        if(flagIsLast==YES){
-            NSLog(@" flagIsLast==YES");
-        }
-    }else{
-        UIViewController *rootUi  =ddd.window.rootViewController;
-        if (rootUi == self){
-            NSLog(@" root = self");
-            flagIsLast=YES;
-        }else{
-            [self dismissViewControllerAnimated:YES completion:nil];
-        }
-    }
-    
-    if(flagIsLast==YES){
-        //quit app if prompted yes
-        [CMPHybridTools
-         quickConfirmMsgMain:@"Sure to Quit?"
-         //handlerYes:^(UIAlertAction *action)
-         handlerYes:(HybridDialogCallback) ^{
-             [self dismissViewControllerAnimated:YES completion:nil];
-             [CMPHybridTools quitGracefully];
-         }
-         handlerNo:nil];
-    }
-    [self trigger:@"close" :nil];
 }
 
 

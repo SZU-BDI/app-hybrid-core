@@ -54,6 +54,14 @@
 //NOTES: can be overrided
 -(void) initUi
 {
+    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+        
+        NSLog(@"initUi() on eventName %@ ", eventName);
+        [self resetTopBarStatus];
+        [self resetTopBarBtn];
+        [self setNeedsStatusBarAppearanceUpdate];
+    } :nil];
+    
     [self registerHandlerApi];
     
     [self CustomTopBarBtn];
@@ -65,7 +73,7 @@
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     //self.view.backgroundColor=[UIColor whiteColor];
-    self.myWebView.backgroundColor = [UIColor blackColor];
+    //self.myWebView.backgroundColor = [UIColor blackColor];
     
     self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
     
@@ -82,6 +90,7 @@
     NSString *scheme_s=[address_url scheme];
     
     [self spinnerInit];
+    [self spinnerOn];
     
     if( [ CMPHybridTools isEmptyString:scheme_s ])
     {
