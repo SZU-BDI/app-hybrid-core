@@ -1,40 +1,16 @@
-//
-//  UIViewController+CMPHybridUi.m
-//  iosace
-//
-//  Created by wanjochan on 25/11/16.
-//  Copyright © 2016 szu.bdi+cmptech+megatech. All rights reserved.
-//
-
-//#import "UIViewController+CMPHybridUi.h"
-
+#import "UIViewController+CMPHybridUi.h"
 #import <UIKit/UIKit.h>
 #import "CMPHybridUi.h"
 #import "CMPHybridTools.h"
-
-@interface UIViewController (CMHybridUi)
-
-@end
+#import "JSO.h"
 
 @implementation UIViewController (CMHybridUi)
 
 
-
-////NOTES: can be overrided
-//-(void) viewWillAppear:(BOOL)animated
-//{
-//    [super viewWillAppear:animated];
-//
-//
-//    //[self setNeedsStatusBarAppearanceUpdate];
-//    [self restoreTopBarStatus];
-//}
--(void) viewDidLoad
+- (void) evalJs :(NSString *)js_s
 {
-    [self initUi];
+    NSLog(@"CMPHybridUi: evalJs() should be overrided by descendants");
 }
-
-//------------   <HybridUi> ------------
 
 /* About FullScreen (hide top status bar)
  // Plan A, It works for iOS 5 and iOS 6 , but not in iOS 7.
@@ -47,7 +23,7 @@
  //    <false/>
  //    [[UIApplication sharedApplication] setStatusBarHidden:YES
  //                                            withAnimation:UIStatusBarAnimationFade];
-
+ 
  //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
  */
 - (BOOL)prefersStatusBarHidden {
@@ -70,6 +46,7 @@
     [[self navigationController] setNavigationBarHidden:NO animated:NO];
 }
 
+
 -(void) restoreTopBarStatus
 {
     JSO *param =self.uiData;
@@ -77,11 +54,12 @@
     NSString *topbarmode_s=[JSO o2s:topbarmode];
     [self CustomTopBar :topbarmode_s];
 }
+
 -(void) CustomTopBar :(NSString *)mode
 {
     if ([CMPHybridTools isEmptyString:mode])
         mode=@"Y";
-
+    
     if([@"F" isEqualToString:mode]){
         [self hideTopStatusBar];
         [self hideTopBar];
@@ -100,7 +78,6 @@
     }
 }
 
-//NOTES: can be overrided!
 - (void) CustomTopBarBtn
 {
     self.navigationItem.leftBarButtonItem
@@ -110,9 +87,9 @@
        action:@selector(closeUi)];
 }
 
-//NOTES: child can override the behavior...
-- (void)closeUi{
-
+- (void)closeUi
+{
+    
     BOOL flagIsLast=YES;
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
     UINavigationController *nnn=self.navigationController;
@@ -136,7 +113,7 @@
             [self dismissViewControllerAnimated:YES completion:nil];
         }
     }
-
+    
     if(flagIsLast==YES){
         //quit app if prompted yes
         [CMPHybridTools
@@ -151,66 +128,35 @@
     [self trigger:@"close" :nil];
 }
 
-- (void) evalJs :(NSString *)js_s
-{
-    NSLog(@"CMPHybridUi: evalJs() should be overrided by descendants");
-}
-//////////////////////////////  on/trigger mechanism
-
-//TODO to upgrade for supporting multi-listeners in future.
-
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler
 {
     [self on:eventName :handler :nil];
 }
+
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
 {
-    if(nil==self.myEventHandlers){
-        self.myEventHandlers=[NSMutableDictionary dictionary];
+    if(nil==self.uiEventHandlers){
+        self.uiEventHandlers=[NSMutableDictionary dictionary];
     }
-    self.myEventHandlers[eventName]=handler;
+    self.uiEventHandlers[eventName]=handler;
 }
+
 -(void) trigger :(NSString *)eventName :(JSO *)extraData
 {
-    HybridEventHandler hdl=self.myEventHandlers[eventName];
+    HybridEventHandler hdl=self.uiEventHandlers[eventName];
     if(nil!=hdl){
         hdl(eventName, extraData);
     }
 }
-//////////////////////////////
-
-//------------ self -----------------
-
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
     return UIStatusBarStyleLightContent;
     //return UIStatusBarStyleDefault;
 }
 
-//NOTES: can be overrided
 - (void)initUi
 {
     [self CustomTopBarBtn];
 }
-
-//- (void)viewDidLoad {
-//    [self viewDidLoad];
-//    // Do any additional setup after loading the view.
-//}
-//
-//- (void)didReceiveMemoryWarning {
-//    [self didReceiveMemoryWarning];
-//    // Dispose of any resources that can be recreated.
-//}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

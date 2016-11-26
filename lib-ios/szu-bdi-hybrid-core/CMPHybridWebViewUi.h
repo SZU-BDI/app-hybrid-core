@@ -1,10 +1,8 @@
 #ifndef CMPHybridWebViewUi_h
 #define CMPHybridWebViewUi_h
 
-#import "CMPHybridUi_UIViewController.h"
-
 @import JavaScriptCore;
-
+#import "CMPHybridUi_UIViewController.h"
 #import "CMPHybridUi.h"
 
 @interface CMPHybridWebViewUi :CMPHybridUi_UIViewController <UIWebViewDelegate>
@@ -16,6 +14,5 @@
 -(void) loadUrl :(NSString *)url;
 
 @end
-
 
 #endif /* CMPHybridWebViewUi_h */

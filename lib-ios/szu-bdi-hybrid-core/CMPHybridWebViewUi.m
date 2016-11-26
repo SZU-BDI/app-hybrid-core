@@ -9,9 +9,6 @@
 @implementation CMPHybridWebViewUi
 
 
-//------------  UIViewController ------------
-
-
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     
     if (webView != self.myWebView) {
@@ -155,7 +152,7 @@
 
 - (void)registerHandlerApi{
     
-    self.myApiHandlers = [NSMutableDictionary dictionary];
+    self.uiApiHandlers = [NSMutableDictionary dictionary];
     
     // get the appConfig:
     JSO *appConfig = [CMPHybridTools wholeAppConfig];
@@ -166,7 +163,7 @@
         NSString *apiname = [[api_mapping getChild:kkk] toString] ;
         CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
         api.currentUi = self;
-        self.myApiHandlers[kkk] = [api getHandler];//[[api getHandler] copy];
+        self.uiApiHandlers[kkk] = [api getHandler];//[[api getHandler] copy];
     }
 }
 

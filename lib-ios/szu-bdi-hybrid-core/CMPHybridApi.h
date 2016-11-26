@@ -7,9 +7,9 @@
 
 @interface CMPHybridApi : NSObject
 
-- (HybridHandler) getHandler;
-
 @property (nonatomic, weak) HybridUi currentUi;
+
+- (HybridHandler) getHandler;
 
 @end
 

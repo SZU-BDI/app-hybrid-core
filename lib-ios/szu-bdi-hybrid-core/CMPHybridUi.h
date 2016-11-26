@@ -40,17 +40,30 @@ return _sharedInstance;\
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
 
+//#import "JavaScriptCore/JavaScript.h"
 @import JavaScriptCore;
 
 @protocol CMPHybridUi <NSObject>
 
 @property (strong) JSO *uiData;
+
 @property (strong) NSString *uiName;
 
-@property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
-@property (strong, nonatomic) NSMutableDictionary* myEventHandlers;
+@property (strong, nonatomic) NSMutableDictionary* uiApiHandlers;
 
--(void) closeUi;//the "close" is taken...
+@property (strong, nonatomic) NSMutableDictionary* uiEventHandlers;
+
+@required
+
+@optional
+
+-(void)initUi;
+-(void) closeUi;
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler;
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData;
+-(void) trigger :(NSString *)eventName :(JSO *)extraData;
+
 
 -(void) restoreTopBarStatus;
 -(void) CustomTopBarBtn;
@@ -60,32 +73,8 @@ return _sharedInstance;\
 -(void) hideTopBar;
 -(void) showTopBar;
 
--(void) on:(NSString *)eventName :(HybridEventHandler) handler;
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData;
-
--(void) trigger :(NSString *)eventName :(JSO *)extraData;
-
 - (void) evalJs :(NSString *)js_s;
 
 @end
-
-//@interface CMPHybridUi :UIViewController <CMPHybridUi>
-//
-//@property (strong) JSO *uiData;
-//@property (strong) NSString *uiName;
-//
-//@property (strong, nonatomic) NSMutableDictionary* myApiHandlers;
-//
-//@property (strong, nonatomic) NSMutableDictionary* myEventHandlers;
-//
-////@interface UINavigationController : UIViewController
-////@interface UITabBarController : UIViewController <UITabBarDelegate, NSCoding>
-////: UIViewController
-//
-//
-//@end
-
-
-
 
 #endif /* CMPHybridUi_h */

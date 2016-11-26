@@ -194,36 +194,6 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-//------------ self -----------------
-
-//- (void) notifyPollingInject :(WKWebView *)webView {
-//
-//    [CMPHybridTools countDown:0.2 initTime:3 block:^BOOL(NSTimer *tm) {
-//        NSString *readyState =
-//                [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable, NSError * _Nullable error) {
-//                    //
-//                }];
-//
-//                //NSLog(@"polling ... %@", readyState);
-//                if (readyState != nil) {
-//                    if (readyState.length > 0) {
-//                        if ([readyState isEqualToString:@"loading"]) {
-//                        }else{
-//                            NSString *typeof_nativejsb = [webView stringByEvaluatingJavaScriptFromString:@"(typeof nativejsb)"];
-//                            //NSLog(@"typeof_nativejsb=%@",typeof_nativejsb);
-//                            if([@"undefined" isEqualToString:typeof_nativejsb]){
-//                                [CMPHybridTools injectJSB :webView :self];
-//                                NSLog(@"done injectJSB");
-//                            }else{
-//                                return YES;//YES means stop the timer in advance
-//                            }
-//                        }
-//                    }
-//                }
-//        return NO;
-//    }];
-//}
-
 - (void) spinnerOn
 {
     [_myIndicatorView startAnimating];
@@ -235,7 +205,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 
 - (void)registerHandlerApi{
     
-    self.myApiHandlers = [NSMutableDictionary dictionary];
+    self.uiApiHandlers = [NSMutableDictionary dictionary];
     
     // get the appConfig:
     JSO *appConfig = [CMPHybridTools wholeAppConfig];
@@ -246,7 +216,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         NSString *apiname = [[api_mapping getChild:kkk] toString] ;
         CMPHybridApi *api = [CMPHybridTools getHybridApi:apiname];
         api.currentUi = self;
-        self.myApiHandlers[kkk] = [api getHandler];//[[api getHandler] copy];
+        self.uiApiHandlers[kkk] = [api getHandler];//[[api getHandler] copy];
     }
 }
 
@@ -362,12 +332,12 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
         return;
     }
-    if(nil==caller.myApiHandlers) {
+    if(nil==caller.uiApiHandlers) {
         NSLog(@" !!! caller.myApiHandlers is nil !!! %@", caller.uiData);
         return;
     }
     
-    HybridHandler handler = caller.myApiHandlers[handlerName_s];
+    HybridHandler handler = caller.uiApiHandlers[handlerName_s];
     
     if (nil==handler) {
         NSLog(@" !!! found no handler for %@", handlerName_s);

@@ -70,8 +70,8 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 
 + (HybridUi ) startUi :(NSString *)strUiName
-                  initData:(JSO *) initData
-                 objCaller:(HybridUi)objCaller
+              initData:(JSO *) initData
+             objCaller:(HybridUi)objCaller
 {
     [self checkAppConfig];
     
@@ -93,7 +93,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
         return nil;
     }
-
+    
     [uiConfig basicMerge:initData];
     theHybridUi.uiName=strUiName;
     theHybridUi.uiData=uiConfig;
@@ -174,7 +174,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 }
 
 + (void)quickShowMsgMain:(NSString *)msg callback:(void (^)())callback
-{    
+{
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
@@ -413,12 +413,12 @@ SINGLETON_shareInstance(CMPHybridTools);
             NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
             return;
         }
-        if(nil==caller.myApiHandlers) {
+        if(nil==caller.uiApiHandlers) {
             NSLog(@" !!! caller.myApiHandlers is nil !!! %@", caller.uiData);
             return;
         }
         
-        HybridHandler handler = caller.myApiHandlers[handlerName_s];
+        HybridHandler handler = caller.uiApiHandlers[handlerName_s];
         
         if (nil==handler) {
             NSLog(@" !!! found no handler for %@", handlerName);
