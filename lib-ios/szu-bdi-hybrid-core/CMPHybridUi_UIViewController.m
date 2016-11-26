@@ -20,6 +20,16 @@
     [self initUi];
 }
 
+//---------------- override ----------
+- (BOOL)prefersStatusBarHidden {
+    return NO;
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
+    //return UIStatusBarStyleDefault;
+}
+
 //-(void) initUi
 //{
 //    NSLog(@"initUi() must be overrided!!!");

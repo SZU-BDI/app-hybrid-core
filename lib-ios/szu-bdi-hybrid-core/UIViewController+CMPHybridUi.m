@@ -26,9 +26,7 @@
  
  //@ref http://stackoverflow.com/questions/18979837/how-to-hide-ios-status-bar
  */
-- (BOOL)prefersStatusBarHidden {
-    return NO;
-}
+
 -(void) hideTopStatusBar
 {
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
@@ -149,10 +147,7 @@
     }
 }
 
--(UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
-    //return UIStatusBarStyleDefault;
-}
+
 
 - (void)initUi
 {

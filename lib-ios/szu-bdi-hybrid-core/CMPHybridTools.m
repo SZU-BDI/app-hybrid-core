@@ -10,7 +10,8 @@
 //internal class(CmpUIAlertView) to handle the callback for quickAlertMsg()
 @interface CmpUIAlertView : UIAlertView
 
-@property () void (^callback)();
+//@property () void (^callback)();
+@property (strong) void (^callback)();
 
 -(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback;
 
@@ -20,7 +21,8 @@
 
 -(void) alertView :(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if(self.callback) self.callback();
+    if(self.callback)
+        self.callback();
 }
 
 -(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback
