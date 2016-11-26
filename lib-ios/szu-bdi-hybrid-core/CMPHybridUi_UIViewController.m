@@ -1,6 +1,4 @@
 #import "CMPHybridUi_UIViewController.h"
-//#import "CMPHybridTools.h"
-#import "JSO.h"
 
 @implementation CMPHybridUi_UIViewController
 
@@ -10,13 +8,12 @@
 {
     [super viewWillAppear:animated];
     
-    //[self setNeedsStatusBarAppearanceUpdate];
-    
-    [self restoreTopBarStatus];
+    [self trigger:CMPHybridEventBeforeDisplay];
 }
 
 -(void) viewDidLoad
 {
+    [super viewDidLoad];
     [self initUi];
 }
 

@@ -6,11 +6,53 @@
 
 @implementation UIViewController (CMHybridUi)
 
-
-- (void) evalJs :(NSString *)js_s
+/* remember to call initUi at viewDidLoad
+ -(void) viewDidLoad
+ {
+ [super viewDidLoad];
+ [self initUi];
+ }
+ */
+- (void)initUi
 {
-    NSLog(@"CMPHybridUi: evalJs() should be overrided by descendants");
+    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
+        NSLog(@"callback after alert");
+        [CMPHybridTools quitGracefully];
+    }];
 }
+
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler
+{
+    [self on:eventName :handler :nil];
+}
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
+{
+    if(nil==self.uiEventHandlers){
+        self.uiEventHandlers=[NSMutableDictionary dictionary];
+    }
+    self.uiEventHandlers[eventName]=handler;
+}
+
+-(void) trigger :(NSString *)eventName :(JSO *)extraData
+{
+    HybridEventHandler hdl=self.uiEventHandlers[eventName];
+    if(nil!=hdl){
+        if(nil==extraData) extraData=[JSO id2o:@{}];
+        hdl(eventName, extraData);
+    }
+}
+
+-(void) trigger :(NSString *)eventName
+{
+    [self trigger:eventName :nil];
+}
+
+//- (void) evalJs :(NSString *)js_s
+//{
+//    NSLog(@"CMPHybridUi: evalJs() should be overrided by descendants");
+//}
 
 /* About FullScreen (hide top status bar)
  // Plan A, It works for iOS 5 and iOS 6 , but not in iOS 7.
@@ -48,20 +90,20 @@
     [[self navigationController] setNavigationBarHidden:NO animated:NO];
 }
 
--(void) restoreTopBarStatus
+-(void) resetTopBarStatus
 {
     JSO *param =self.uiData;
     JSO *topbarmode=[param getChild:@"topbar"];
     NSString *topbarmode_s=[JSO o2s:topbarmode];
-    [self CustomTopBar :topbarmode_s];
+    [self resetTopBar :topbarmode_s];
     
     //self.wantsFullScreenLayout = YES;
     //[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
     
-//    @property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
-//    @property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
-//    @property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
-
+    //    @property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
+    //    @property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
+    //    @property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
+    
     NSString *topbar_color=[JSO o2s:[param getChild:@"topbar_color"]];
     if([@"B" isEqualToString:topbar_color]){
         NSLog(@"UIViewController+CMHybridUi restoreTopBarStatus setStatusBarStyle:UIStatusBarStyleDefault");
@@ -72,7 +114,7 @@
     }
 }
 
--(void) CustomTopBar :(NSString *)mode
+-(void) resetTopBar :(NSString *)mode
 {
     if ([CMPHybridTools isEmptyString:mode])
         mode=@"Y";
@@ -95,7 +137,7 @@
     }
 }
 
-- (void) CustomTopBarBtn
+- (void) resetTopBarBtn
 {
     self.navigationItem.leftBarButtonItem
     = [[UIBarButtonItem alloc]
@@ -145,36 +187,8 @@
     [self trigger:@"close" :nil];
 }
 
--(void) on:(NSString *)eventName :(HybridEventHandler) handler
-{
-    [self on:eventName :handler :nil];
-}
 
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
-{
-    if(nil==self.uiEventHandlers){
-        self.uiEventHandlers=[NSMutableDictionary dictionary];
-    }
-    self.uiEventHandlers[eventName]=handler;
-}
-
--(void) trigger :(NSString *)eventName :(JSO *)extraData
-{
-    HybridEventHandler hdl=self.uiEventHandlers[eventName];
-    if(nil!=hdl){
-        hdl(eventName, extraData);
-    }
-}
-
-
-
-- (void)initUi
-{
-    [self CustomTopBarBtn];
-}
-
-
-//for <iOS9
+//for <iOS9 ?
 - (BOOL)prefersStatusBarHidden {
     NSLog(@"UIViewController+CMHybridUi returns NO");
     return NO;

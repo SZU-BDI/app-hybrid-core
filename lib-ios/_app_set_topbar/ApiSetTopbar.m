@@ -23,10 +23,10 @@
                 //save
                 JSO *uidata =caller.uiData;
                 [uidata setChild:@"topbar" JSO:topbarmode];
-                [caller restoreTopBarStatus];
+                [caller resetTopBarStatus];
             }else{
                 NSString *topbarmode_s=[JSO o2s:topbarmode];
-                [caller CustomTopBar :topbarmode_s];
+                [caller resetTopBar :topbarmode_s];
             }
             //responseCallback([JSO s2o:[JSO id2s:@{@"STS":@"OK"} :YES]]);
             responseCallback([JSO id2o:@{@"STS":@"OK"}]);

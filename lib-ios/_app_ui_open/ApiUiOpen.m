@@ -25,7 +25,7 @@
                 //                }];
                 [ui on:@"close" :^(NSString *eventName, id extraData){
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [caller restoreTopBarStatus];
+                        [caller resetTopBarStatus];
                         responseCallback([JSO id2o:@{@"STS":@"OK",@"name":name_s}]);
                     });
                 }];

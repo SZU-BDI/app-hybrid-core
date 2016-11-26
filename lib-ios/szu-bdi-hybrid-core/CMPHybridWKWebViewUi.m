@@ -10,8 +10,7 @@
 
 //------------  UIViewController ------------
 
-
-- (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
+- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
     
     if (webView != self.myWebView) {
@@ -21,6 +20,20 @@
     //injectDone=NO;
     //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
     //[self notifyPollingInject :webView];
+    //[self spinnerOn];
+}
+
+- (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
+{
+    if (webView != self.myWebView) {
+        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+        return;
+    }
+    //injectDone=NO;
+    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
+    //[self notifyPollingInject :webView];
+    
+    NSLog(@"spinnerOn...");
     [self spinnerOn];
 }
 
@@ -32,6 +45,7 @@
     }
     //NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
     //[self notifyPollingInject :webView];
+    NSLog(@"spinnerOff");
     [self spinnerOff];
 }
 
@@ -102,14 +116,17 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     });
 }
 
-
-//NOTES: can be overrided
 -(void) initUi
 {
+    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+        
+        NSLog(@"initUi() on eventName %@ ", eventName);
+        [self resetTopBarStatus];
+        [self resetTopBarBtn];
+        [self setNeedsStatusBarAppearanceUpdate];
+    } :nil];
     
     [self registerHandlerApi];
-    
-    [self CustomTopBarBtn];
     
     /////////////
     // Create WKWebViewConfiguration instance
@@ -146,14 +163,14 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     self.myWebView.backgroundColor = [UIColor whiteColor];
     
-//    self.edgesForExtendedLayout =UIRectEdgeAll;
-//    //self.extendedLayoutIncludesOpaqueBars=YES;
-//    self.automaticallyAdjustsScrollViewInsets=YES;
-//    // 状态栏不透明(必须设置，并且为NO)
-//    self.navigationController.navigationBar.translucent = NO;
-//    // 视图延伸不考虑透明的Bars(这里包含导航栏和状态栏)
-//    // 意思就是延伸到边界
-//    self.extendedLayoutIncludesOpaqueBars=YES;
+    //    self.edgesForExtendedLayout =UIRectEdgeAll;
+    //    //self.extendedLayoutIncludesOpaqueBars=YES;
+    //    self.automaticallyAdjustsScrollViewInsets=YES;
+    //    // 状态栏不透明(必须设置，并且为NO)
+    //    self.navigationController.navigationBar.translucent = NO;
+    //    // 视图延伸不考虑透明的Bars(这里包含导航栏和状态栏)
+    //    // 意思就是延伸到边界
+    //    self.extendedLayoutIncludesOpaqueBars=YES;
     
     self.myWebView.navigationDelegate=self;//about start/stop/fail etc.
     self.myWebView.UIDelegate=self;//about alert/confirm/prompt
@@ -166,11 +183,12 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
     self.view = self.myWebView;
     
+    [self spinnerInit];
+    [self spinnerOn];
+    
     NSString *address = [[self.uiData getChild:@"address"] toString];
     NSURL *address_url = [NSURL URLWithString:address];
     NSString *scheme_s=[address_url scheme];
-    
-    [self spinnerInit];
     
     if( [ CMPHybridTools isEmptyString:scheme_s ])
     {
@@ -180,8 +198,8 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     }
     
 }
-//NOTES: can be overrided
-- (void) CustomTopBarBtn
+
+- (void) resetTopBarBtn
 {
     UIBarButtonItem *leftBar
     = [[UIBarButtonItem alloc]
@@ -236,25 +254,29 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self.myWebView loadRequest:request];
 }
 
-
+//TODO the height is not good...
 - (void) spinnerInit
 {
     //INIT SPIN
     //UIActivityIndicatorView *
+    
     _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     _myIndicatorView.color =[UIColor whiteColor];
-    _myIndicatorView.layer.cornerRadius = 5;
+    _myIndicatorView.layer.cornerRadius = 4;
     _myIndicatorView.layer.masksToBounds = TRUE;
-    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin
+    | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
+    | UIViewAutoresizingFlexibleHeight;
     
-    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_myIndicatorView setHidesWhenStopped:YES];
+    //_myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    //[_myIndicatorView setHidesWhenStopped:YES];
+    
     _myIndicatorView.center=self.view.center;
-    [self.view addSubview:_myIndicatorView];
     
+    [self.view addSubview:_myIndicatorView];
 }
-
 
 - (void)userContentController: (WKUserContentController *)userContentController
       didReceiveScriptMessage:(WKScriptMessage *)message{

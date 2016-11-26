@@ -19,6 +19,7 @@ typedef void (^HybridDialogCallback)(UIAlertAction* action);
 
 typedef void (^HybridEventHandler)(NSString *eventName, JSO* extraData);
 
+#define CMPHybridEventBeforeDisplay @"beforeDisplay"
 
 #define SINGLETON_shareInstance(classname) \
 + (classname *)shareInstance\
@@ -45,9 +46,9 @@ return _sharedInstance;\
 
 @protocol CMPHybridUi <NSObject>
 
-@property (strong) JSO *uiData;
+@property (strong, nonatomic) JSO *uiData;
 
-@property (strong) NSString *uiName;
+@property (strong, nonatomic) NSString *uiName;
 
 @property (strong, nonatomic) NSMutableDictionary* uiApiHandlers;
 
@@ -57,17 +58,17 @@ return _sharedInstance;\
 
 @optional
 
--(void)initUi;
+-(void) initUi;
 -(void) closeUi;
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler;
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData;
 -(void) trigger :(NSString *)eventName :(JSO *)extraData;
+-(void) trigger :(NSString *)eventName;
 
-
--(void) restoreTopBarStatus;
--(void) CustomTopBarBtn;
--(void) CustomTopBar :(NSString *)mode;
+-(void) resetTopBarBtn;
+-(void) resetTopBar :(NSString *)mode;
+-(void) resetTopBarStatus;
 -(void) hideTopStatusBar;
 -(void) showTopStatusBar;
 -(void) hideTopBar;
