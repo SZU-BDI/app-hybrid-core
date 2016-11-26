@@ -64,6 +64,7 @@
     self.myWebView = [[UIWebView alloc]initWithFrame:rect];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
+    //self.view.backgroundColor=[UIColor whiteColor];
     self.myWebView.backgroundColor = [UIColor blackColor];
     
     self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...

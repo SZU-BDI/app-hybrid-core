@@ -29,21 +29,24 @@
 
 -(void) hideTopStatusBar
 {
+    NSLog(@"UIViewController+CMHybridUi hideTopStatusBar()");
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
 }
 -(void) showTopStatusBar
 {
+    NSLog(@"UIViewController+CMHybridUi showTopStatusBar()");
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
 }
 -(void) hideTopBar
 {
+    NSLog(@"UIViewController+CMHybridUi hideTopBar()");
     [[self navigationController] setNavigationBarHidden:YES animated:NO];
 }
 -(void) showTopBar
 {
+    NSLog(@"UIViewController+CMHybridUi showTopBar()");
     [[self navigationController] setNavigationBarHidden:NO animated:NO];
 }
-
 
 -(void) restoreTopBarStatus
 {
@@ -51,6 +54,22 @@
     JSO *topbarmode=[param getChild:@"topbar"];
     NSString *topbarmode_s=[JSO o2s:topbarmode];
     [self CustomTopBar :topbarmode_s];
+    
+    //self.wantsFullScreenLayout = YES;
+    //[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
+    
+//    @property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
+//    @property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
+//    @property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
+
+    NSString *topbar_color=[JSO o2s:[param getChild:@"topbar_color"]];
+    if([@"B" isEqualToString:topbar_color]){
+        NSLog(@"UIViewController+CMHybridUi restoreTopBarStatus setStatusBarStyle:UIStatusBarStyleDefault");
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    }else{
+        NSLog(@"UIViewController+CMHybridUi restoreTopBarStatus setStatusBarStyle:UIStatusBarStyleLightContent");
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    }
 }
 
 -(void) CustomTopBar :(NSString *)mode
@@ -154,4 +173,17 @@
     [self CustomTopBarBtn];
 }
 
+
+//for <iOS9
+- (BOOL)prefersStatusBarHidden {
+    NSLog(@"UIViewController+CMHybridUi returns NO");
+    return NO;
+}
+
+//for <iOS9
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    //return UIStatusBarStyleLightContent;
+    NSLog(@"UIViewController+CMHybridUi preferredStatusBarStyle returns UIStatusBarStyleDefault");
+    return UIStatusBarStyleDefault;
+}
 @end

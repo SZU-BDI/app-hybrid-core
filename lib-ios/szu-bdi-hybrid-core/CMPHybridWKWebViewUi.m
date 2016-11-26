@@ -143,9 +143,19 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     self.myWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webConfig];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
-    self.myWebView.backgroundColor = [UIColor blackColor];
+    //self.myWebView.backgroundColor = [UIColor whiteColor];
+    self.myWebView.backgroundColor = [UIColor whiteColor];
     
-    self.myWebView.navigationDelegate=self;
+//    self.edgesForExtendedLayout =UIRectEdgeAll;
+//    //self.extendedLayoutIncludesOpaqueBars=YES;
+//    self.automaticallyAdjustsScrollViewInsets=YES;
+//    // 状态栏不透明(必须设置，并且为NO)
+//    self.navigationController.navigationBar.translucent = NO;
+//    // 视图延伸不考虑透明的Bars(这里包含导航栏和状态栏)
+//    // 意思就是延伸到边界
+//    self.extendedLayoutIncludesOpaqueBars=YES;
+    
+    self.myWebView.navigationDelegate=self;//about start/stop/fail etc.
     self.myWebView.UIDelegate=self;//about alert/confirm/prompt
     
     // The page automatically zoom to fit the screen, default NO.
@@ -375,6 +385,15 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
                    });
     
 }
+- (BOOL)prefersStatusBarHidden {
+    NSLog(@"prefersStatusBarHidden returns NO");
+    return NO;
+}
 
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    //return UIStatusBarStyleLightContent;
+    NSLog(@"preferredStatusBarStyle returns UIStatusBarStyleDefault");
+    return UIStatusBarStyleDefault;
+}
 
 @end

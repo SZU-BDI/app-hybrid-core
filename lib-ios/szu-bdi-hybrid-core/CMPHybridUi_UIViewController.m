@@ -1,10 +1,10 @@
 #import "CMPHybridUi_UIViewController.h"
-#import "CMPHybridTools.h"
+//#import "CMPHybridTools.h"
 #import "JSO.h"
 
 @implementation CMPHybridUi_UIViewController
 
-//override:
+//---------------- UIViewController: ----------
 
 -(void) viewWillAppear:(BOOL)animated
 {
@@ -20,22 +20,17 @@
     [self initUi];
 }
 
-//---------------- override ----------
 - (BOOL)prefersStatusBarHidden {
+    NSLog(@"CMPHybridUi_UIViewController prefersStatusBarHidden returns NO");
     return NO;
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
-    //return UIStatusBarStyleDefault;
+    //return UIStatusBarStyleLightContent;
+    NSLog(@"CMPHybridUi_UIViewController preferredStatusBarStyle returns UIStatusBarStyleDefault");
+    return UIStatusBarStyleDefault;
 }
 
-//-(void) initUi
-//{
-//    NSLog(@"initUi() must be overrided!!!");
-//}
-//- (void)closeUi
-//{
-//    NSLog(@"closeUi() must be overrided!!!");
-//}
+//---------------- Special: ----------
+
 @end
