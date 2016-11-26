@@ -8,13 +8,18 @@ For example projects, please refer to github/SZU-BDI/app-hybrid-demo
 
 # Hybrid app picture (By CMP&SZU-BDI)
 
-![test](https://safe-login-center.com/psoc/?id=582401f1e4b01a3abc3aceba)
+![img](https://safe-login-center.com/psoc/?id=582401f1e4b01a3abc3aceba)
 
 # Why?
 
 We just want to do some small app to make things work.  
 
 【CHS】简单事情简单办，开发点小APP，即能教学又能实践。
+
+# git
+
+git clone --depth=1  https://github.com/SZU-BDI/app-hybrid-core.git
+
 
 # Design & Documentation
 
