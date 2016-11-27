@@ -3,6 +3,43 @@
 
 @implementation CMPNativeUi
 
+//---------------- UIViewController: ----------
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    [self trigger:CMPHybridEventMemoryWarning];
+    
+    // Dispose of any resources that can be recreated.
+    [CMPHybridTools quickAlertMsgForOldiOS:@"Memory Warning" callback:^{
+        
+        //TODO...
+    }];
+}
+
+-(void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self trigger:CMPHybridEventBeforeDisplay];
+}
+
+-(void) viewDidLoad
+{
+    [super viewDidLoad];
+    [self initUi];
+}
+
+- (BOOL)prefersStatusBarHidden {
+    NSLog(@"CMPHybridUi_UIViewController prefersStatusBarHidden returns NO");
+    return NO;
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    //return UIStatusBarStyleLightContent;
+    NSLog(@"CMPHybridUi_UIViewController preferredStatusBarStyle returns UIStatusBarStyleDefault");
+    return UIStatusBarStyleDefault;
+}
+
 //------------   <HybridUi> ------------
 
 - (void) resetTopBarBtn
@@ -33,8 +70,10 @@
     NSLog(@"NativeUi: TODO evalJs()");
 }
 
+//call by 
 - (void)initUi
 {
+    [super initUi];
     [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
         
         NSLog(@"initUi() on eventName %@ ", eventName);

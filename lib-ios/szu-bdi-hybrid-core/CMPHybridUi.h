@@ -19,7 +19,8 @@ typedef void (^HybridDialogCallback)(UIAlertAction* action);
 
 typedef void (^HybridEventHandler)(NSString *eventName, JSO* extraData);
 
-#define CMPHybridEventBeforeDisplay @"beforeDisplay"
+#define CMPHybridEventBeforeDisplay @"BeforeDisplay"
+#define CMPHybridEventMemoryWarning @"MemoryWarning"
 
 #define SINGLETON_shareInstance(classname) \
 + (classname *)shareInstance\

@@ -92,7 +92,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     HybridUi  theHybridUi = [[uiClass alloc] init];
     
     if (nil==theHybridUi) {
-        [self quickShowMsgMain:[NSString stringWithFormat:@"%@ is unable to init", strUiName]];
+        [self quickShowMsgMain:[NSString stringWithFormat:@"Failed to start %@ %@", strUiName, className]];
         return nil;
     }
     
@@ -119,6 +119,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
+            ((UIViewController *)theHybridUi).view.backgroundColor=[UIColor brownColor];
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{

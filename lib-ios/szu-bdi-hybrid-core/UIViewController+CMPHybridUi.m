@@ -15,10 +15,10 @@
  */
 - (void)initUi
 {
-    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
-        NSLog(@"callback after alert");
-        [CMPHybridTools quitGracefully];
-    }];
+//    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
+//        NSLog(@"callback after alert");
+//        [CMPHybridTools quitGracefully];
+//    }];
 }
 
 - (void) closeUi
@@ -76,6 +76,7 @@
 
 -(void) trigger :(NSString *)eventName :(JSO *)extraData
 {
+    NSLog(@"trigger(%@) is called.", eventName);
     HybridEventHandler hdl=self.uiEventHandlers[eventName];
     if(nil!=hdl){
         if(nil==extraData) extraData=[JSO id2o:@{}];
