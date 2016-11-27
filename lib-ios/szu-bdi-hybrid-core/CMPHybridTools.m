@@ -475,6 +475,21 @@ SINGLETON_shareInstance(CMPHybridTools);
     //TODO [CMPHybridTools stripComments:js];
     [ctx evaluateScript:js];
 }
++ (NSString *) getLang:(NSString *)key
+{
+#warning TODO(9) getLang()
+    return key;
+}
+
++ (NSInteger) os_compare:(Float32)tgt
+{
+    //TODO improve by cache the floatValue to val?
+    float sysver=[[[UIDevice currentDevice] systemVersion] floatValue];
+    if(sysver>tgt)return 1;
+    if(sysver<tgt)return -1;
+    return 0;
+}
+
 /****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{
     

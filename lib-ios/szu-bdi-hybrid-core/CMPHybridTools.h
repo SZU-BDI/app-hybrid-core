@@ -67,6 +67,13 @@
 + (void) injectJSB :(UIWebView *)webView :(HybridUi )caller;
 //+ (void) injectJSBWK :(WKWebView *)webView :(HybridUi )caller;
 
+
++ (NSInteger) os_compare:(Float32)tgt;
+
+//TODO
++ (NSString *) getLang:(NSString *)key;
+//+ (BOOL) checkCamera;
+
 @end
 
 
