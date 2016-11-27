@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
-
+#import <sys/utsname.h>
 #import "CMPHybridTools.h"
 
 #import "CMPHybridTools.h"
@@ -489,7 +489,21 @@ SINGLETON_shareInstance(CMPHybridTools);
     if(sysver<tgt)return -1;
     return 0;
 }
-
++ (BOOL) is_simulator
+{
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    
+    NSString * tgt= [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    
+    if([tgt isEqualToString:@"i386"]) return YES;
+    if([tgt isEqualToString:@"x86_64"]) return YES;
+    //    NSString *name = [[UIDevice currentDevice] name];
+//    if ([name hasSuffix:@"Simulator"]) {
+//        return YES;
+//    }
+    return NO;
+}
 /****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{
     

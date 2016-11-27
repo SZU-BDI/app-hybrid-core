@@ -69,6 +69,8 @@
 
 
 + (NSInteger) os_compare:(Float32)tgt;
++ (BOOL) is_simulator;
+
 
 //TODO
 + (NSString *) getLang:(NSString *)key;
