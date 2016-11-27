@@ -74,7 +74,7 @@
     }];
 }
 
-#warning (1) try move to HybridTools to share with the UIWebView?
+#warning TODO (1) try move to HybridTools to share with the UIWebView?
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
 {
     [CMPHybridTools quickConfirmMsgMain:message handlerYes:^(UIAlertAction *action) {
@@ -189,16 +189,22 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self spinnerOn];
     
     NSString *address = [[self.uiData getChild:@"address"] toString];
-    NSURL *address_url = [NSURL URLWithString:address];
-    NSString *scheme_s=[address_url scheme];
-    
-    if( [ CMPHybridTools isEmptyString:scheme_s ])
-    {
-        [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+    if ( [CMPHybridTools isEmptyString:address] ){
+        [CMPHybridTools quickShowMsgMain:@"no address?" callback:^{
+            
+            [self closeUi];
+        }];
     }else{
-        [self loadUrl:[address_url absoluteString]];
+        NSURL *address_url = [NSURL URLWithString:address];
+        NSString *scheme_s=[address_url scheme];
+        
+        if( [ CMPHybridTools isEmptyString:scheme_s ])
+        {
+            [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+        }else{
+            [self loadUrl:[address_url absoluteString]];
+        }
     }
-    
 }
 
 - (void) resetTopBarBtn
@@ -256,29 +262,10 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self.myWebView loadRequest:request];
 }
 
-#warning (1) TODO the height is not good...
+#warning TODO (1) TODO the height is not good...
 - (void) spinnerInit
 {
-//    //INIT SPIN
-//    //UIActivityIndicatorView *
-//    
-//    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-//    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-//    _myIndicatorView.color =[UIColor whiteColor];
-//    _myIndicatorView.layer.cornerRadius = 4;
-//    _myIndicatorView.layer.masksToBounds = TRUE;
-//    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin
-//    | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
-//    | UIViewAutoresizingFlexibleHeight;
-//    
-//    //_myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-//    
-//    //[_myIndicatorView setHidesWhenStopped:YES];
-//    
-//    _myIndicatorView.center=self.view.center;
-//    
-//    [self.view addSubview:_myIndicatorView];
-    
+
     //INIT SPIN
     //UIActivitymyIndicatorView *
     _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];

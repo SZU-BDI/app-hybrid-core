@@ -179,11 +179,13 @@ SINGLETON_shareInstance(CMPHybridTools);
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:msg message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:callback];
     [alertController addAction:ok];
     
     //modal
-    [[self findTopRootView] presentViewController:alertController animated:NO completion:callback];
+    [[self findTopRootView] presentViewController:alertController animated:NO completion:^(){
+        //
+    }];
 }
 
 //NOTES: quickAlertMsg()

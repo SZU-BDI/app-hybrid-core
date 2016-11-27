@@ -33,9 +33,14 @@ return _sharedInstance;\
 }
 
 #define HybridUi id<CMPHybridUi>
+//#define HybridUi CMPHybridUi *
+
 //#define HybridApi id<CMPHybridApi>
 
 #endif /* Hybrid_h */
+
+
+
 
 
 #ifndef CMPHybridUi_h

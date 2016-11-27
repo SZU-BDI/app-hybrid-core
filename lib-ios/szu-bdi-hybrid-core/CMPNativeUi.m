@@ -33,7 +33,6 @@
     NSLog(@"NativeUi: TODO evalJs()");
 }
 
-//NOTES: can be overrided
 - (void)initUi
 {
     [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
