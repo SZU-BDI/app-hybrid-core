@@ -16,18 +16,18 @@
     }];
 }
 
--(void) viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self trigger:CMPHybridEventBeforeDisplay];
-}
+//-(void) viewWillAppear:(BOOL)animated
+//{
+//    [super viewWillAppear:animated];
+//    
+//    [self trigger:CMPHybridEventBeforeDisplay];
+//}
 
--(void) viewDidLoad
-{
-    [super viewDidLoad];
-    [self initUi];
-}
+//-(void) viewDidLoad
+//{
+//    [super viewDidLoad];
+//    //[self initUi];//super did...
+//}
 
 - (BOOL)prefersStatusBarHidden {
     NSLog(@"CMPHybridUi_UIViewController prefersStatusBarHidden returns NO");
