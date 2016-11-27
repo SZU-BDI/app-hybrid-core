@@ -42,6 +42,7 @@
 
 //------------   <HybridUi> ------------
 
+//NOTES: for default only, child should override in most real cases.
 - (void) resetTopBarBtn
 {
     UIBarButtonItem *leftBar
@@ -59,31 +60,39 @@
     //       target:self
     //       action:@selector(closeUi)];
     //
-    UIBarButtonItem *rightBtn
-    = [[UIBarButtonItem alloc]
-       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    self.navigationItem.rightBarButtonItem = rightBtn;
+    //    UIBarButtonItem *rightBtn
+    //    = [[UIBarButtonItem alloc]
+    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+    //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-- (void) evalJs :(NSString *)js_s
-{
-    NSLog(@"NativeUi: TODO evalJs()");
-}
+//- (void) evalJs :(NSString *)js_s
+//{
+//    NSLog(@"NativeUi: TODO evalJs()");
+//}
 
-//call by 
+//call by viewDidLoad(), child can override!
 - (void)initUi
 {
     [super initUi];
+    
+    NSString *title = [[self.uiData getChild:@"title"] toString];
+    if ([CMPHybridTools isEmptyString:title]){
+        title=@" - - - ";//TODO
+    }
+    
     [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
         
         NSLog(@"initUi() on eventName %@ ", eventName);
         [self resetTopBarStatus];
         [self resetTopBarBtn];
+        [self setTopBarTitle:title];
         [self setNeedsStatusBarAppearanceUpdate];
     } :nil];
     
     //[self resetTopBarBtn];
     self.view.backgroundColor=[UIColor blackColor];
+    
     //self.navigationController.navigationBar.translucent=NO;
     self.navigationController.navigationBar.backgroundColor=[UIColor blackColor];
     self.navigationController.navigationBar.tintColor = [UIColor brownColor];

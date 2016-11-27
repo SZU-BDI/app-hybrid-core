@@ -119,7 +119,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
-            ((UIViewController *)theHybridUi).view.backgroundColor=[UIColor brownColor];
+            //for test only...((UIViewController *)theHybridUi).view.backgroundColor=[UIColor brownColor];
             [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
         }
         else{

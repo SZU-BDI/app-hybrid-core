@@ -79,6 +79,7 @@ return _sharedInstance;\
 -(void) showTopStatusBar;
 -(void) hideTopBar;
 -(void) showTopBar;
+- (void)setTopBarTitle:(NSString *)title;
 
 - (void) evalJs :(NSString *)js_s;
 

@@ -15,10 +15,10 @@
  */
 - (void)initUi
 {
-//    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
-//        NSLog(@"callback after alert");
-//        [CMPHybridTools quitGracefully];
-//    }];
+    //    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
+    //        NSLog(@"callback after alert");
+    //        [CMPHybridTools quitGracefully];
+    //    }];
 }
 
 - (void) closeUi
@@ -199,4 +199,10 @@
     NSLog(@"UIViewController+CMHybridUi preferredStatusBarStyle returns UIStatusBarStyleDefault");
     return UIStatusBarStyleDefault;
 }
+
+- (void) setTopBarTitle :(NSString *)title
+{
+    self.title=title;
+}
+
 @end
