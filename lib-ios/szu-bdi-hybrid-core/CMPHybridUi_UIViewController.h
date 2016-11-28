@@ -9,6 +9,8 @@
 @property (strong, nonatomic) JSO *uiData;
 @property (strong, nonatomic) NSString *uiName;
 
+@property (strong, nonatomic) JSO *responseData;
+
 @property (strong, nonatomic) NSMutableDictionary* uiApiHandlers;
 @property (strong, nonatomic) NSMutableDictionary* uiEventHandlers;
 

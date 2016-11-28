@@ -89,7 +89,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     
     Class uiClass = NSClassFromString(className);
-    HybridUi  theHybridUi = [[uiClass alloc] init];
+    HybridUi theHybridUi = [[uiClass alloc] init];
     
     if (nil==theHybridUi) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"Failed to start %@ %@", strUiName, className]];
@@ -99,6 +99,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     [uiConfig basicMerge:initData];
     theHybridUi.uiName=strUiName;
     theHybridUi.uiData=uiConfig;
+    //theHybridUi.responseData=[JSO id2o:@{}];
     
     /////////////////////////////////////// Display It {
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
@@ -499,9 +500,9 @@ SINGLETON_shareInstance(CMPHybridTools);
     if([tgt isEqualToString:@"i386"]) return YES;
     if([tgt isEqualToString:@"x86_64"]) return YES;
     //    NSString *name = [[UIDevice currentDevice] name];
-//    if ([name hasSuffix:@"Simulator"]) {
-//        return YES;
-//    }
+    //    if ([name hasSuffix:@"Simulator"]) {
+    //        return YES;
+    //    }
     return NO;
 }
 /****************************** STUB FOR LATER *********************************/

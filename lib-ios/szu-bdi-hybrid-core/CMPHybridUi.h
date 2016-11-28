@@ -56,6 +56,8 @@ return _sharedInstance;\
 
 @property (strong, nonatomic) NSString *uiName;
 
+@property (strong, nonatomic) JSO *responseData;
+
 @property (strong, nonatomic) NSMutableDictionary* uiApiHandlers;
 
 @property (strong, nonatomic) NSMutableDictionary* uiEventHandlers;
@@ -68,8 +70,9 @@ return _sharedInstance;\
 -(void) closeUi;
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler;
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData;
--(void) trigger :(NSString *)eventName :(JSO *)extraData;
+//for some case, some initData is sent and use when trigger
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData;
+-(void) trigger :(NSString *)eventName :(JSO *)triggerData;
 -(void) trigger :(NSString *)eventName;
 
 -(void) resetTopBarBtn;

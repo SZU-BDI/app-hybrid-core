@@ -53,16 +53,20 @@
 #warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
-    [self spinnerOff];
-    [self closeUi];
+    NSLog(@" webview didFailProvisionalNavigation for %@",[error localizedFailureReason]);
+    if(_myWebView==webView)
+        [self spinnerOff];
+    //[self closeUi];
 }
 
 //Invoked when an error occurs during a committed main frame navigation.
 #warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
-    [self spinnerOff];
-    [self closeUi];
+    NSLog(@" webview didFailNavigation for %@",[error localizedFailureReason]);
+    if(_myWebView==webView)
+        [self spinnerOff];
+    //[self closeUi];
 }
 
 
@@ -162,26 +166,19 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     self.myWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webConfig];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
-    //self.myWebView.backgroundColor = [UIColor whiteColor];
-    self.myWebView.backgroundColor = [UIColor whiteColor];
-    
-    //    self.edgesForExtendedLayout =UIRectEdgeAll;
-    //    //self.extendedLayoutIncludesOpaqueBars=YES;
-    //    self.automaticallyAdjustsScrollViewInsets=YES;
-    //    // 状态栏不透明(必须设置，并且为NO)
-    //    self.navigationController.navigationBar.translucent = NO;
-    //    // 视图延伸不考虑透明的Bars(这里包含导航栏和状态栏)
-    //    // 意思就是延伸到边界
-    //    self.extendedLayoutIncludesOpaqueBars=YES;
     
     self.myWebView.navigationDelegate=self;//about start/stop/fail etc.
     self.myWebView.UIDelegate=self;//about alert/confirm/prompt
     
-    // The page automatically zoom to fit the screen, default NO.
-    //self.myWebView.scalesPageToFit = YES;
-    
     // Edges prohibit sliding (default YES)
     self.myWebView.scrollView.bounces = NO;
+    
+    //@property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
+    //@property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
+    //@property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
+    
+    self.extendedLayoutIncludesOpaqueBars=YES;
+    self.automaticallyAdjustsScrollViewInsets=NO;
     
     self.view = self.myWebView;
     
@@ -195,15 +192,20 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
             [self closeUi];
         }];
     }else{
-        NSURL *address_url = [NSURL URLWithString:address];
-        NSString *scheme_s=[address_url scheme];
-        
-        if( [ CMPHybridTools isEmptyString:scheme_s ])
-        {
-            [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
-        }else{
-            [self loadUrl:[address_url absoluteString]];
-        }
+        dispatch_after
+        (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
+         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+         ^{
+             NSURL *address_url = [NSURL URLWithString:address];
+             NSString *scheme_s=[address_url scheme];
+             
+             if( [ CMPHybridTools isEmptyString:scheme_s ])
+             {
+                 [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+             }else{
+                 [self loadUrl:[address_url absoluteString]];
+             }
+         });
     }
 }
 
@@ -265,7 +267,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 #warning TODO (1) TODO the height is not good...
 - (void) spinnerInit
 {
-
+    
     //INIT SPIN
     //UIActivitymyIndicatorView *
     _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -325,7 +327,8 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
     NSURL *url =[webView URL];
     NSString *scheme = [url scheme];
-    NSString *currenturl =[url absoluteString];
+    NSString *fullurl =[url absoluteString];
+    NSString *currenturl=fullurl;
     if( [@"file" isEqualToString:scheme]){
         currenturl=[url lastPathComponent];
     }
@@ -340,7 +343,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
             [found_a removeObjectsInArray:idjj];
             [found_a addObjectsFromArray:idjj];
         }
-        NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :currenturl];
+        NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :fullurl];
         if ([matches count] > 0){
             flagFoundMatch=YES;
             //found_a= [api_auth_a getChild:kkk];
@@ -353,7 +356,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         }
     }
     if(flagFoundMatch!=YES){
-        NSLog(@" !!! find no auth for api %@ for %@", handlerName_s, uiname);
+        NSLog(@" !!! find no auth for handlerName(%@) uiname(%@) url(%@)", handlerName_s, uiname, currenturl);
         return;
     }
     
@@ -401,16 +404,17 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     };
     
     //async delay 0.01 second
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
-                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-                   ^{
-                       NSString *param_s=[param toString];
-                       @try {
-                           handler([JSO s2o:param_s], callback);
-                       } @catch (NSException *exception) {
-                           callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
-                       }
-                   });
+    dispatch_after
+    (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
+     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+     ^{
+         NSString *param_s=[param toString];
+         @try {
+             handler([JSO s2o:param_s], callback);
+         } @catch (NSException *exception) {
+             callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+         }
+     });
     
 }
 - (BOOL)prefersStatusBarHidden {

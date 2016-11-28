@@ -1,49 +1,74 @@
 #import "UIViewController+CMPHybridUi.h"
-#import <UIKit/UIKit.h>
-#import "CMPHybridUi.h"
-#import "CMPHybridTools.h"
-#import "JSO.h"
 
 @implementation UIViewController (CMHybridUi)
 
-/* remember to call initUi at viewDidLoad
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler
+{
+    [self on:eventName :handler :nil];
+}
+
+-(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData
+{
+    if(nil==self.uiEventHandlers){
+        self.uiEventHandlers=[NSMutableDictionary dictionary];
+    }
+    self.uiEventHandlers[eventName]=handler;
+}
+
+-(void) trigger :(NSString *)eventName :(JSO *)triggerData
+{
+    NSLog(@"trigger(%@) is called.", eventName);
+    HybridEventHandler hdl=self.uiEventHandlers[eventName];
+    if(nil!=hdl){
+        if(nil==triggerData) triggerData=[JSO id2o:@{}];
+        NSLog(@"with triggerData %@", [triggerData toString]);
+        hdl(eventName, triggerData);
+    }
+}
+
+-(void) trigger :(NSString *)eventName
+{
+    [self trigger:eventName :nil];
+}
+
+/** NOTES: remember to call initUi at viewDidLoad
  -(void) viewDidLoad
  {
  [super viewDidLoad];
  [self initUi];
  }
  */
-- (void)initUi
-{
-    //    [CMPHybridTools quickAlertMsgForOldiOS:@"Forget to implement initUi() ?!" callback:^{
-    //        NSLog(@"callback after alert");
-    //        [CMPHybridTools quitGracefully];
-    //    }];
-}
+- (void)initUi{}//STUB ONLY
 
 - (void) closeUi
 {
     BOOL flagIsLast=YES;
+    
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
     UINavigationController *nnn=self.navigationController;
-    if (nnn!=nil){
+    if (nil!=nnn){
         NSArray *vvv = nnn.viewControllers;
-        if(vvv!=nil){
+        if(nil!=vvv){
             if(vvv.count>1){
                 [self.navigationController popViewControllerAnimated:YES];
                 flagIsLast=NO;
             }
         }
         if(flagIsLast==YES){
-            NSLog(@" flagIsLast==YES");
+            NSLog(@" flagIsLast==YES for navigationController");
         }
     }else{
-        UIViewController *rootUi  =ddd.window.rootViewController;
+        UIViewController *rootUi=ddd.window.rootViewController;
         if (rootUi == self){
-            NSLog(@" root = self");
+            NSLog(@" flagIsLast==YES for rootViewController root = self");
             flagIsLast=YES;
         }else{
-            [self dismissViewControllerAnimated:YES completion:nil];
+            [self dismissViewControllerAnimated:YES completion:^{
+                NSLog(@"Current View dismissViewControllerAnimated");
+            }];
+            [self trigger:@"close" :self.responseData];
+            return;
         }
     }
     
@@ -53,41 +78,20 @@
          quickConfirmMsgMain:@"Sure to Quit?"
          //handlerYes:^(UIAlertAction *action)
          handlerYes:(HybridDialogCallback) ^{
-             [self dismissViewControllerAnimated:YES completion:nil];
              [CMPHybridTools quitGracefully];
+             [self dismissViewControllerAnimated:YES completion:^{
+                 NSLog(@"Last View dismissViewControllerAnimated");
+             }];
          }
-         handlerNo:nil];
-    }
-    [self trigger:@"close" :nil];
-}
-
--(void) on:(NSString *)eventName :(HybridEventHandler) handler
-{
-    [self on:eventName :handler :nil];
-}
-
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)extraData
-{
-    if(nil==self.uiEventHandlers){
-        self.uiEventHandlers=[NSMutableDictionary dictionary];
-    }
-    self.uiEventHandlers[eventName]=handler;
-}
-
--(void) trigger :(NSString *)eventName :(JSO *)extraData
-{
-    NSLog(@"trigger(%@) is called.", eventName);
-    HybridEventHandler hdl=self.uiEventHandlers[eventName];
-    if(nil!=hdl){
-        if(nil==extraData) extraData=[JSO id2o:@{}];
-        hdl(eventName, extraData);
+         handlerNo:^(UIAlertAction *action) {
+             //[self trigger:@"close" :self.responseData];
+         }];
+        return;
+    }else{
+        [self trigger:@"close" :self.responseData];
     }
 }
 
--(void) trigger :(NSString *)eventName
-{
-    [self trigger:eventName :nil];
-}
 
 //- (void) evalJs :(NSString *)js_s
 //{
@@ -137,20 +141,15 @@
     NSString *topbarmode_s=[JSO o2s:topbarmode];
     [self resetTopBar :topbarmode_s];
     
-    //self.wantsFullScreenLayout = YES;
-    //[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
-    
-    //    @property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
-    //    @property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
-    //    @property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
-    
     NSString *topbar_color=[JSO o2s:[param getChild:@"topbar_color"]];
     if([@"B" isEqualToString:topbar_color]){
         NSLog(@"UIViewController+CMHybridUi restoreTopBarStatus setStatusBarStyle:UIStatusBarStyleDefault");
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    }else{
+    }else if([@"W" isEqualToString:topbar_color]){
         NSLog(@"UIViewController+CMHybridUi restoreTopBarStatus setStatusBarStyle:UIStatusBarStyleLightContent");
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    }else{
+        //ignore...
     }
 }
 
