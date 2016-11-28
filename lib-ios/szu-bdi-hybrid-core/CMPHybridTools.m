@@ -83,6 +83,9 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     NSString *className = [JSO o2s:[uiConfig getChild:@"class"]];
     
+#warning TODO tmphack if ios<8.? using oldclass
+    NSString *oldclassName = [JSO o2s:[uiConfig getChild:@"oldclass"]];
+    
     if ( [self isEmptyString :className]) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
         return nil;
@@ -248,12 +251,17 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (JSContext *) getWebViewJsCtx:(UIWebView *) _webview
 {
+    //避开私有API检查
     return [_webview
             valueForKeyPath:
-            (@"documentView"
-             @".webView"
-             @".mainFrame"
-             @".javaScriptContext")];
+            (@"document"
+             @"View"
+             @".web"
+             @"View"
+             @".main"
+             @"Frame"
+             @".javaScript"
+             @"Context")];
 }
 
 //warning! caller need to handler the thread like:

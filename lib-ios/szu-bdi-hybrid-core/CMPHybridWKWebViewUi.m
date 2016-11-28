@@ -4,9 +4,130 @@
 #import "CMPHybridTools.h"
 #import "JSO.h"
 
+//ref
+//https://github.com/jnjosh/PandoraBoy/
+NSString *PBResourceHost = @".resource.";
+
+@interface ResourceURLProtocol : NSURLProtocol {}
+
+@end
+
+@interface ResourceURL : NSURL {
+}
+
++ (ResourceURL*) resourceURLWithPath:(NSString *)path;
+@end
+
+@implementation ResourceURLProtocol
+
++ (BOOL)canInitWithRequest:(NSURLRequest *)request
+{
+    BOOL flag1=[[[request URL] scheme] isEqualToString:@"local"];
+    BOOL flag2=[[[request URL] host] isEqualToString:PBResourceHost];
+    BOOL rt= (flag1 && flag2);
+    return rt;
+}
+
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
+{
+    return request;
+}
+
+-(void)startLoading
+{
+    NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
+    NSString *notifierPath = [[thisBundle resourcePath] stringByAppendingPathComponent:[[[self request] URL] path]];
+    NSError *err;
+    NSData *data = [NSData dataWithContentsOfFile:notifierPath
+                                          options:NSUncachedRead
+                                            error:&err];
+    if( data )
+    {
+        NSURLResponse *response = [[NSURLResponse alloc] initWithURL:[[self request] URL]
+                                                            MIMEType:@"text/html"
+                                               expectedContentLength:[data length]
+                                                    textEncodingName:nil];
+        
+        [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+        [[self client] URLProtocol:self didLoadData:data];
+        [[self client] URLProtocolDidFinishLoading:self];
+    }
+    else
+    {
+        NSLog(@"BUG:Unable to load resource:%@:%@", notifierPath, [err description]);
+        [[self client] URLProtocol:self didFailWithError:err];
+    }
+}
+
+-(void)stopLoading
+{
+    return;
+}
+
+@end
+
+
+@implementation ResourceURL
+
++ (ResourceURL *) resourceURLWithPath:(NSString *)path
+{
+    NSURL *rt= [[NSURL alloc] initWithScheme:@"local"
+                                    host:PBResourceHost
+                                    path:path];
+    return (ResourceURL *)rt;
+}
+
+@end
+
+
 @implementation CMPHybridWKWebViewUi
 
 //WKWebViewConfiguration *webConfig;
+
+//ref http://www.jianshu.com/p/ccb421c85b2e
+//将文件copy到tmp目录
+- (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL {
+    NSError *error = nil;
+    if (!fileURL.fileURL || ![fileURL checkResourceIsReachableAndReturnError:&error]) {
+        return nil;
+    }
+    // Create "/temp/www" directory
+    NSFileManager *fileManager= [NSFileManager defaultManager];
+    NSURL *temDirURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@"www"];
+    [fileManager createDirectoryAtURL:temDirURL withIntermediateDirectories:YES attributes:nil error:&error];
+    
+    NSURL *dstURL = [temDirURL URLByAppendingPathComponent:fileURL.lastPathComponent];
+    // Now copy given file to the temp directory
+    //[fileManager removeItemAtURL:dstURL error:&error];
+    [fileManager removeItemAtPath:[dstURL path] error:&error];
+    //[fileManager copyItemAtURL:fileURL toURL:dstURL error:&error];
+    [fileManager copyItemAtPath:[fileURL path] toPath:[dstURL path] error:&error];
+    // Files in "/temp/www" load flawlesly :)
+    return dstURL;
+}
+
+//ref http://stackoverflow.com/questions/29723989/accelerate-loading-of-wkwebview
+//- (NSString *) syncAssetToTmp
+//{
+//    // Clear tmp directory
+//    NSArray* temporaryDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+//    for (NSString *file in temporaryDirectory) {
+//        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), file] error:NULL];
+//    }
+//    
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    NSString *sourcePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@""];
+//    NSString *temporaryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@""];
+//    NSLog(@"TODO copy from %@ to %@", sourcePath, temporaryPath);
+//    NSError *error = nil;
+//    
+//    // Copy directory
+//    if(![fileManager copyItemAtPath:sourcePath toPath:temporaryPath error:&error]) {
+//        NSLog(@"Could not copy directory %@",error);
+//    }
+//    return temporaryPath;
+//}
+
 
 //------------  UIViewController ------------
 
@@ -17,6 +138,7 @@
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
+    NSLog(@" didStartProvisionalNavigation TODO...");
     //injectDone=NO;
     //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
     //[self notifyPollingInject :webView];
@@ -53,7 +175,7 @@
 #warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
-    NSLog(@" webview didFailProvisionalNavigation for %@",[error localizedFailureReason]);
+    NSLog(@" webview didFailProvisionalNavigation for desc %@",[error description]);
     if(_myWebView==webView)
         [self spinnerOff];
     //[self closeUi];
@@ -63,7 +185,7 @@
 #warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
-    NSLog(@" webview didFailNavigation for %@",[error localizedFailureReason]);
+    NSLog(@" webview didFailNavigation for desc %@",[error description]);
     if(_myWebView==webView)
         [self spinnerOff];
     //[self closeUi];
@@ -192,20 +314,77 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
             [self closeUi];
         }];
     }else{
-        dispatch_after
-        (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
-         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-         ^{
+//        dispatch_after
+//        (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
+//         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+//         ^{
              NSURL *address_url = [NSURL URLWithString:address];
              NSString *scheme_s=[address_url scheme];
-             
+
+#warning TODO(IMPORTANT) must fix hack before push online!!!
+        Class cls = NSClassFromString(@"WKB"
+                                      @"row"
+                                      @"sing"
+                                      @"Context"
+                                      @"Controller");
+        SEL sel = NSSelectorFromString(@"register"
+                                       @"Scheme"
+                                       @"For"
+                                       @"Custom"
+                                       @"Protocol"
+                                       @":");
+        
+        if ([(id)cls respondsToSelector:sel]) {
+            // 把 http 和 https 请求交给 NSURLProtocol 处理
+            //[(id)cls performSelector:sel withObject:@"http"];
+            //[(id)cls performSelector:sel withObject:@"https"];
+            [(id)cls performSelector:sel withObject:@"local"];
+        }
+        
+            [NSURLProtocol registerClass:[ResourceURLProtocol class]];
+        
              if( [ CMPHybridTools isEmptyString:scheme_s ])
              {
-                 [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+                 //[self loadUrl:[@"http://.resource./" stringByAppendingString:address]];
+                 
+                 ResourceURL *resource = [ResourceURL resourceURLWithPath:[@"/" stringByAppendingString:address]];
+                 [self.myWebView loadRequest:[NSURLRequest requestWithURL:resource]];
+//
+                 //[self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+ 
+                 //[self loadUrl:[@"file://" stringByAppendingString:[self syncAssetToTmp]]];
+                 
+                 //NSURL *requesturl = [NSURL URLWithString:url];
+                 //NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+                 
+                 //ios9
+                 //NSURL *requesturl = [NSURL URLWithString:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+                 //[self.myWebView loadFileURL:requesturl allowingReadAccessToURL:requesturl];
+                 
+                 //[self loadUrl:[address_url relativeString]];
+                 
+                 
+//                 if ([[UIDevice currentDevice].systemVersion floatValue] >= 9.0) {
+//                     // iOS9. One year later things are OK.
+//                     NSURL *fileURL = [NSURL fileURLWithPath:path];
+//                     [self.webView loadFileURL:fileURL allowingReadAccessToURL:fileURL];
+//                 } else {
+                     // iOS8. Things can be workaround-ed
+                     //   Brave people can do just this
+                     //   fileURL = try! pathForBuggyWKWebView8(fileURL)
+                     //   webView.loadRequest(NSURLRequest(URL: fileURL))
+                 
+                 
+//                     NSURL *fileURL = [self fileURLForBuggyWKWebView8:[NSURL fileURLWithPath:[CMPHybridTools fullPathOfAsset:address]]];
+//                 NSLog(@"DEBUG fileURL %@",fileURL);
+//                     NSURLRequest *request = [NSURLRequest requestWithURL:fileURL];
+//                     [self.myWebView loadRequest:request];
+//                 }
+                 
              }else{
                  [self loadUrl:[address_url absoluteString]];
              }
-         });
+//         });
     }
 }
 
