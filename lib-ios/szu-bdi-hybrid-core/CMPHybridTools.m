@@ -332,14 +332,6 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (JSContext *) getWebViewJsCtx:(UIWebView *) _webview
 {
-    //    NSLog(@"!!!!  %@", [self btoa:@"document"
-    //                        @"View"
-    //                        @".web"
-    //                        @"View"]);
-    //    NSLog(@"!!!!  %@", [self btoa:@".main"
-    //                        @"Frame"
-    //                        @".javaScript"
-    //                        @"Context"]);
     //prv api
     NSString *s1 =[self atob:@"ZG9jdW1lbnRWaWV3LndlYlZpZXc="];
     NSString *s2 =[self atob:@"Lm1haW5GcmFtZS5qYXZhU2NyaXB0Q29udGV4dA=="];
@@ -385,43 +377,10 @@ SINGLETON_shareInstance(CMPHybridTools);
                 NSURL *address_url = [NSURL URLWithString:address];
                 NSString *scheme_s=[address_url scheme];
                 
-                //                NSLog(@"!!!!  %@", [self btoa:@"WKB"
-                //                                    @"row"
-                //                                    @"sing"
-                //                                    @"Context"
-                //                                    @"Controller"]);
-                //                NSLog(@"!!!!  %@", [self btoa:@"register"
-                //                                    @"Scheme"
-                //                                    @"For"
-                //                                    @"Custom"
-                //                                    @"Protocol"
-                //                                    @":"]);
                 //prv api
                 [self call_c_do_m_1:[self atob:@"V0tCcm93c2luZ0NvbnRleHRDb250cm9sbGVy"]
                                    :[self atob:@"cmVnaXN0ZXJTY2hlbWVGb3JDdXN0b21Qcm90b2NvbDo="]
                                    :@"local"];
-                
-                //                Class cls = NSClassFromString(@"WKB"
-                //                                              @"row"
-                //                                              @"sing"
-                //                                              @"Context"
-                //                                              @"Controller");
-                //                SEL sss = NSSelectorFromString(@"register"
-                //                                               @"Scheme"
-                //                                               @"For"
-                //                                               @"Custom"
-                //                                               @"Protocol"
-                //                                               @":");
-                //
-                //                if ([(id)cls respondsToSelector:sss]) {
-                //                    // 把 http 和 https 请求交给 NSURLProtocol 处理
-                //                    //[(id)cls performSelector:sel withObject:@"http"];
-                //                    //[(id)cls performSelector:sel withObject:@"https"];
-                ////                    SuppressPerformSelectorLeakWarning(
-                ////                    [(id)cls performSelector:sel withObject:@"local"];
-                ////                                                       );
-                //                    ((void (*)(id, SEL, NSString *))[cls methodForSelector:sss])(cls, sss, @"local");
-                //                }
                 
                 [NSURLProtocol registerClass:[ResourceURLProtocol class]];
                 
@@ -494,22 +453,6 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     return nil;
 }
-
-
-//+ (JSValue *) callWebViewDoJs:(WKWebView *) _webview js:(NSString *)js_s
-//{
-//    @try {
-//        //return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
-//        [_webview evaluateJavaScript:js_s completionHandler:^(id _Nullable val, NSError * _Nullable error) {
-//            //code
-//        }];
-//    } @catch (NSException *exception) {
-//        NSLog(@"callWebViewDoJs error %@", exception);
-//    } @finally {
-//
-//    }
-//    return nil;
-//}
 
 +(NSString *) fullPathOfAsset :(NSString *) filename
 {

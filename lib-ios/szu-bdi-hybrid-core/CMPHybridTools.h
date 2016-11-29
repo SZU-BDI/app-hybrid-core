@@ -60,7 +60,7 @@
 
 + (void) callWebViewLoadUrl:_webview :(NSString *)address;
 
-+ (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
+//+ (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
 //+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
 
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
