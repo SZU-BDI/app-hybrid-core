@@ -3,6 +3,7 @@ package szu.bdi.hybrid.core.eg;
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Looper;
 import android.util.Log;
 
@@ -19,6 +20,7 @@ public class ApiUiOpen extends HybridApi {
         return new HybridHandler() {
             @Override
             public void handler(String dataStr, HybridCallback cb) {
+                final HybridCallback _callback=cb;
                 HybridUi callerAct = getCallerUi();
                 Log.v("_app_activity_open", dataStr);
 
@@ -47,13 +49,20 @@ public class ApiUiOpen extends HybridApi {
                         ui.on("close", new HybridCallback() {
                             @Override
                             public void onCallBack(String cbStr) {
-                                onCallBack(JSO.s2o(cbStr));
+//                                Intent _intent=new Intent();
+//                                _intent.putExtra("rt_s", cbStr);
+//                                ui.setResult(1,_intent);
+
+                                //onCallBack(JSO.s2o(cbStr));
+                                _callback.onCallBack(cbStr);
+                                                                ui.finish();
                             }
 
                             @Override
                             public void onCallBack(JSO jso) {
-                                //onCallBack(JSO.o2s(jso));
-                                ui.finish();
+                                onCallBack(JSO.o2s(jso));
+                                //ui.setResult();
+
                             }
                         });
                     }

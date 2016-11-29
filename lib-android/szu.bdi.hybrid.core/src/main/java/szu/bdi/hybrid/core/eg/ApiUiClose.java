@@ -5,6 +5,7 @@ package szu.bdi.hybrid.core.eg;
 import szu.bdi.hybrid.core.HybridApi;
 import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridHandler;
+import szu.bdi.hybrid.core.HybridUi;
 import szu.bdi.hybrid.core.JSO;
 
 public class ApiUiClose extends HybridApi {
@@ -12,12 +13,16 @@ public class ApiUiClose extends HybridApi {
         return new HybridHandler() {
             @Override
             public void handler(String data, HybridCallback cb) {
-                getCallerUi().close();
+
+                handler(JSO.s2o(data), cb);
             }
 
             @Override
             public void handler(JSO jso, HybridCallback cbFunc) {
-                handler(JSO.o2s(jso), cbFunc);
+                HybridUi ui=getCallerUi();
+
+                ui.setResponseData(jso);
+                ui.close();
             }
         };
     }

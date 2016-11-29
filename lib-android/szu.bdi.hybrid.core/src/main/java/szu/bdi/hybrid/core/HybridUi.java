@@ -26,6 +26,7 @@ public class HybridUi extends Activity {
     private static String LOGTAG = "HybridUi";
 
     JSO _uiData;
+    JSO _responseData;
 
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -99,12 +100,17 @@ public class HybridUi extends Activity {
     }
 
 
+
     public void close() {
         //{name: $name, address: adress}
-        JSO o = new JSO();
-        o.setChild("name", getUiData("name"));
-        o.setChild("address", getUiData("address"));
-
+        JSO o = _responseData;
+        if (_responseData==null) {
+            o=new JSO();
+            o.setChild("name", getUiData("name"));
+            o.setChild("address", getUiData("address"));
+        }else{
+            //
+        }
         trigger("close", o);
 
 //        Intent rtIntent = new Intent();
@@ -190,6 +196,12 @@ public class HybridUi extends Activity {
         return _uiData.getChild(k);
     }
 
+    public void setResponseData(JSO jso){
+        _responseData=jso;
+    }
+    public JSO getResponseData(){
+        return _responseData;
+    }
     protected HybridCallback _cb = null;
 
     public void setCallBackFunction(HybridCallback cb) {
