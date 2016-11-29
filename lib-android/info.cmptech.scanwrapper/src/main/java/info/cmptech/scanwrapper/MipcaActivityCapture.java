@@ -1,22 +1,18 @@
 package info.cmptech.scanwrapper;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.net.ConnectivityManager;
+//import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Vibrator;
+import android.os.Message;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.widget.Toast;
-
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -24,31 +20,30 @@ import com.google.zxing.Result;
 import java.io.IOException;
 import java.util.Vector;
 
-/**
- * Initial the camera
- * @author Ryan.Tang
- */
 public class MipcaActivityCapture extends Activity implements Callback {
 
-	private CaptureActivityHandler handler;
-	private ViewfinderView viewfinderView;
-	private boolean hasSurface;
-	private Vector<BarcodeFormat> decodeFormats;
-	private String characterSet;
-	private InactivityTimer inactivityTimer;
-	private MediaPlayer mediaPlayer;
-	private boolean playBeep;
-	private static final float BEEP_VOLUME = 0.10f;
-	private boolean vibrate;
-	private int clicktime=1;
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    //    private static final float BEEP_VOLUME = 0.10f;
+    private CaptureActivityHandler handler;
+    private ViewfinderView viewfinderView;
+    private boolean hasSurface;
+    private Vector<BarcodeFormat> decodeFormats;
+    private String characterSet;
+    private InactivityTimer inactivityTimer;
+//    private MediaPlayer mediaPlayer;
+//    private boolean playBeep;
+//    private boolean vibrate;
+//    private int clicktime = 1;
 
-		//requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.activity_mipca_activity_capture);
-		//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        setContentView(R.layout.activity_mipca_activity_capture);
+        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.set_activity_tltle_style);
 //		Button title_btn_back=(Button)findViewById(R.id.title_btn);
 
 //		TextView title_TextView=(TextView)findViewById(R.id.title_textView);
@@ -61,142 +56,136 @@ public class MipcaActivityCapture extends Activity implements Callback {
 //			}
 //		});
 
-		CameraManager.init(getApplication());
-		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+        CameraManager.init(getApplication());
+        viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 
-		hasSurface = false;
-		inactivityTimer = new InactivityTimer(this);
-	}
+        hasSurface = false;
+        inactivityTimer = new InactivityTimer(this);
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
-		SurfaceHolder surfaceHolder = surfaceView.getHolder();
-		if (hasSurface) {
-			initCamera(surfaceHolder);
-		} else {
-			surfaceHolder.addCallback(this);
-			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		}
-		decodeFormats = null;
-		characterSet = null;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
+        if (hasSurface) {
+            initCamera(surfaceHolder);
+        } else {
+            surfaceHolder.addCallback(this);
+            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+        decodeFormats = null;
+        characterSet = null;
 
-		playBeep = true;
-		AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);
-		if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
-			playBeep = false;
-		}
-		//initBeepSound();
-		vibrate = true;
+//        playBeep = true;
+//        AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);
+//        if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
+//            playBeep = false;
+//        }
+//        //initBeepSound();
+//        vibrate = true;
 
-	}
+    }
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		if (handler != null) {
-			handler.quitSynchronously();
-			handler = null;
-		}
-		CameraManager.get().closeDriver();
-	}
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (handler != null) {
+            handler.quitSynchronously();
+            handler = null;
+        }
+        CameraManager.get().closeDriver();
+    }
 
-	@Override
-	protected void onDestroy() {
-		inactivityTimer.shutdown();
-		super.onDestroy();
-	}
+    @Override
+    protected void onDestroy() {
+        inactivityTimer.shutdown();
+        super.onDestroy();
+    }
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//
+//        finish();
+//        /*if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+//            if((System.currentTimeMillis()-exitTime) > 2000){
+//                Toast.makeText(getApplicationContext(), getText(R.string.WebActivity_finishi), Toast.LENGTH_SHORT).show();
+//                exitTime = System.currentTimeMillis();
+//            } else {
+//                finish();
+//            }
+//            return true;
+//        }*/
+//        return true;
+//    }
 
-		finish();
-        /*if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
-            if((System.currentTimeMillis()-exitTime) > 2000){
-                Toast.makeText(getApplicationContext(), getText(R.string.WebActivity_finishi), Toast.LENGTH_SHORT).show();
-                exitTime = System.currentTimeMillis();
-            } else {
-                finish();
-            }
-            return true;
-        }*/
-		return true;
-	}
+    public void handleDecode(Result result, Bitmap barcode) {
+        inactivityTimer.onActivity();
+        //playBeepSoundAndVibrate();
+        String resultString = result.getText();
+        if (resultString.equals("")) {
+            Toast.makeText(MipcaActivityCapture.this, "R.string.bitmap_scan_failed"//R.string.bitmap_scan_failed
+                    , Toast.LENGTH_SHORT).show();
+        } else {
+            CameraManager.get().stopPreview();
 
-
-	/**
-	 * ����ɨ����
-	 * @param result
-	 * @param barcode
-	 */
-	public void handleDecode(Result result, Bitmap barcode) {
-		inactivityTimer.onActivity();
-		playBeepSoundAndVibrate();
-		String resultString = result.getText();
-		if (resultString.equals("")) {
-			Toast.makeText(MipcaActivityCapture.this, "R.string.bitmap_scan_failed"//R.string.bitmap_scan_failed
-					 , Toast.LENGTH_SHORT).show();
-		}else {
-			CameraManager.get().stopPreview();
-
-			Log.v("MipcaActivityCapture", " !!!!!!! TODO found scan = "+ resultString);
+            Log.v("MipcaActivityCapture", " !!!!!!! TODO found scan = " + resultString);
 //			if (AppHelper.getsid().equals("")){
 //				checkNetWork();
 //			}else {
 //				AppHelper.openUrlAtNewActivityWithTitle(MipcaActivityCapture.this, Uri.parse(AppHelper.getApiEntry("../saas_ace/WebFacePay.ScanQR.api") + "&token=" + resultString), OpenWebViewActivity.class, getText(R.string.title_activity_FacePay).toString());
 //			}
-		}
-		MipcaActivityCapture.this.finish();
-	}
+        }
+        MipcaActivityCapture.this.finish();
+    }
 
-	private void initCamera(SurfaceHolder surfaceHolder) {
-		try {
-			CameraManager.get().openDriver(surfaceHolder);
-		} catch (IOException ioe) {
-			return;
-		} catch (RuntimeException e) {
-			return;
-		}
-		if (handler == null) {
-			handler = new CaptureActivityHandler(this, decodeFormats,
-					characterSet);
-		}
-	}
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        try {
+            CameraManager.get().openDriver(surfaceHolder);
+        } catch (IOException ioe) {
+            return;
+        } catch (RuntimeException e) {
+            return;
+        }
+        if (handler == null) {
+            handler = new CaptureActivityHandler(this, decodeFormats,
+                    characterSet);
+        }
+    }
 
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-							   int height) {
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
 
-	}
+    }
 
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		if (!hasSurface) {
-			hasSurface = true;
-			initCamera(holder);
-		}
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (!hasSurface) {
+            hasSurface = true;
+            initCamera(holder);
+        }
 
-	}
+    }
 
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		hasSurface = false;
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        hasSurface = false;
 
-	}
+    }
 
-	public ViewfinderView getViewfinderView() {
-		return viewfinderView;
-	}
+    public ViewfinderView getViewfinderView() {
+        return viewfinderView;
+    }
 
-	public Handler getHandler() {
-		return handler;
-	}
+    public Handler getHandler() {
+        return handler;
+    }
 
-	public void drawViewfinder() {
-		viewfinderView.drawViewfinder();
+    public void drawViewfinder() {
+        viewfinderView.drawViewfinder();
 
-	}
+    }
 
 //	private void initBeepSound() {
 //		if (playBeep && mediaPlayer == null) {
@@ -222,40 +211,26 @@ public class MipcaActivityCapture extends Activity implements Callback {
 //		}
 //	}
 
-	private static final long VIBRATE_DURATION = 200L;
+//	private static final long VIBRATE_DURATION = 200L;
+//
+//	private void playBeepSoundAndVibrate() {
+//		if (playBeep && mediaPlayer != null) {
+//			mediaPlayer.start();
+//		}
+//		if (vibrate) {
+//			Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+//			vibrator.vibrate(VIBRATE_DURATION);
+//		}
+//	}
 
-	private void playBeepSoundAndVibrate() {
-		if (playBeep && mediaPlayer != null) {
-			mediaPlayer.start();
-		}
-		if (vibrate) {
-			Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-			vibrator.vibrate(VIBRATE_DURATION);
-		}
-	}
-
-	/**
-	 * When the beep has finished playing, rewind to queue up another one.
-	 */
-	private final OnCompletionListener beepListener = new OnCompletionListener() {
-		public void onCompletion(MediaPlayer mediaPlayer) {
-			mediaPlayer.seekTo(0);
-		}
-	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * When the beep has finished playing, rewind to queue up another one.
+     */
+//	private final OnCompletionListener beepListener = new OnCompletionListener() {
+//		public void onCompletion(MediaPlayer mediaPlayer) {
+//			mediaPlayer.seekTo(0);
+//		}
+//	};
 
 //	public void checkNetWork() {
 //		boolean flag = false;
@@ -304,13 +279,111 @@ public class MipcaActivityCapture extends Activity implements Callback {
 //
 //	}
 
-	public boolean A(){
-		boolean flag=false;
-		ConnectivityManager cwjManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+//	public boolean A(){
+//		boolean flag=false;
+//		ConnectivityManager cwjManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//		if (cwjManager.getActiveNetworkInfo() != null)
+//			flag = cwjManager.getActiveNetworkInfo().isAvailable();
+//		return flag;
+//
+//	}
 
-		if (cwjManager.getActiveNetworkInfo() != null)
-			flag = cwjManager.getActiveNetworkInfo().isAvailable();
-		return flag;
+    /**
+     * This class handles all the messaging which comprises the state machine for capture.
+     */
+    public static final class CaptureActivityHandler extends Handler {
 
-	}
+        private static final String TAG = CaptureActivityHandler.class.getSimpleName();
+
+        private final MipcaActivityCapture activity;
+        private final DecodeThread decodeThread;
+        private State state;
+
+        public CaptureActivityHandler(MipcaActivityCapture activity, Vector<BarcodeFormat> decodeFormats,
+                                      String characterSet) {
+            this.activity = activity;
+            decodeThread = new DecodeThread(activity, decodeFormats, characterSet, new ViewfinderResultPointCallback(activity.getViewfinderView()));
+            decodeThread.start();
+            state = State.SUCCESS;
+            // Start ourselves capturing previews and decoding.
+            CameraManager.get().startPreview();
+            restartPreviewAndDecode();
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            Log.v(TAG, "CaptureActivityHandler handleMessage " + message.toString());
+            if (message.what == R.id.auto_focus) {//Log.d(TAG, "Got auto-focus message");
+                // When one auto focus pass finishes, start another. This is the closest thing to
+                // continuous AF. It does seem to hunt a bit, but I'm not sure what else to do.
+                if (state == State.PREVIEW) {
+                    CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
+                }
+
+            } else if (message.what == R.id.restart_preview) {
+                Log.d(TAG, "Got restart preview message");
+                restartPreviewAndDecode();
+
+            } else if (message.what == R.id.decode_succeeded) {
+                Log.d(TAG, "Got decode succeeded message");
+                state = State.SUCCESS;
+                Bundle bundle = message.getData();
+
+                /***********************************************************************/
+                Bitmap barcode = bundle == null ? null : (Bitmap) bundle.getParcelable(DecodeThread.BARCODE_BITMAP);
+
+                activity.handleDecode((Result) message.obj, barcode);
+
+            } else if (message.what == R.id.decode_failed) {// We're decoding as fast as possible, so when one decode fails, start another.
+                state = State.PREVIEW;
+                CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
+
+            } else if (message.what == R.id.return_scan_result) {
+                Log.d(TAG, "Got return scan result message");
+                activity.setResult(RESULT_OK, (Intent) message.obj);
+                activity.finish();
+
+            } else if (message.what == R.id.launch_product_query) {
+                Log.d(TAG, "Got product query message");
+                String url = (String) message.obj;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                activity.startActivity(intent);
+
+            }
+        }
+
+        public void quitSynchronously() {
+            state = State.DONE;
+            CameraManager.get().stopPreview();
+            Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
+            quit.sendToTarget();
+            try {
+                decodeThread.join();
+            } catch (InterruptedException e) {
+                // continue
+            }
+
+            // Be absolutely sure we don't send any queued up messages
+            removeMessages(R.id.decode_succeeded);
+            removeMessages(R.id.decode_failed);
+        }
+
+        private void restartPreviewAndDecode() {
+            if (state == State.SUCCESS) {
+                state = State.PREVIEW;
+                CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
+                CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
+                activity.drawViewfinder();
+            }
+        }
+
+        private enum State {
+            PREVIEW,
+            SUCCESS,
+            DONE
+        }
+
+    }
 }

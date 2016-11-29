@@ -20,8 +20,8 @@ package info.cmptech.scanwrapper;
  * This class provides the constants to use when sending an Intent to Barcode Scanner.
  * These strings are effectively API and cannot be changed.
  */
-class Intents {
-    private Intents() {
+class MyConstants {
+    private MyConstants() {
     }
 
     public static final class Scan {
