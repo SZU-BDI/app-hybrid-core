@@ -86,18 +86,11 @@
     self.view = self.myWebView;
     
     NSString *address = [[self.uiData getChild:@"address"] toString];
-    NSURL *address_url = [NSURL URLWithString:address];
-    NSString *scheme_s=[address_url scheme];
     
     [self spinnerInit];
     [self spinnerOn];
-    
-    if( [ CMPHybridTools isEmptyString:scheme_s ])
-    {
-        [self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
-    }else{
-        [self loadUrl:[address_url absoluteString]];
-    }
+
+    [CMPHybridTools callWebViewLoadUrl:_myWebView :address];
     
 }
 //NOTES: can be overrided

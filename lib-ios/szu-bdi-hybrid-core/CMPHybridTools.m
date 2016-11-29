@@ -6,6 +6,86 @@
 #import "CMPHybridTools.h"
 @import JavaScriptCore;
 
+
+/////////////////////////////////////////////////////////////
+
+//ref
+//https://github.com/jnjosh/PandoraBoy/
+NSString *PBResourceHost = @".resource.";
+
+@interface ResourceURLProtocol : NSURLProtocol {}
+
+@end
+
+@interface ResourceURL : NSURL {
+}
+
++ (ResourceURL*) resourceURLWithPath:(NSString *)path;
+@end
+
+@implementation ResourceURLProtocol
+
++ (BOOL)canInitWithRequest:(NSURLRequest *)request
+{
+    BOOL flag1=[[[request URL] scheme] isEqualToString:@"local"];
+    BOOL flag2=[[[request URL] host] isEqualToString:PBResourceHost];
+    BOOL rt= (flag1 && flag2);
+    return rt;
+}
+
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
+{
+    return request;
+}
+
+-(void)startLoading
+{
+    NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
+    NSString *notifierPath = [[thisBundle resourcePath] stringByAppendingPathComponent:[[[self request] URL] path]];
+    NSError *err;
+    NSData *data = [NSData dataWithContentsOfFile:notifierPath
+                                          options:NSUncachedRead
+                                            error:&err];
+    if( data )
+    {
+        NSURLResponse *response = [[NSURLResponse alloc] initWithURL:[[self request] URL]
+                                                            MIMEType:@"text/html"
+                                               expectedContentLength:[data length]
+                                                    textEncodingName:nil];
+        
+        [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+        [[self client] URLProtocol:self didLoadData:data];
+        [[self client] URLProtocolDidFinishLoading:self];
+    }
+    else
+    {
+        NSLog(@"BUG:Unable to load resource:%@:%@", notifierPath, [err description]);
+        [[self client] URLProtocol:self didFailWithError:err];
+    }
+}
+
+-(void)stopLoading
+{
+    return;
+}
+
+@end
+
+
+@implementation ResourceURL
+
++ (ResourceURL *) resourceURLWithPath:(NSString *)path
+{
+    NSURL *rt= [[NSURL alloc] initWithScheme:@"local"
+                                        host:PBResourceHost
+                                        path:path];
+    return (ResourceURL *)rt;
+}
+
+@end
+
+
+
 /////////////////////////////////////////////////////////////
 //internal class(CmpUIAlertView) to handle the callback for quickAlertMsg()
 @interface CmpUIAlertView : UIAlertView
@@ -264,15 +344,90 @@ SINGLETON_shareInstance(CMPHybridTools);
              @"Context")];
 }
 
-//warning! caller need to handler the thread like:
-
++ (void) callWebViewLoadUrl:_webview :(NSString *)address
+{
+    if([CMPHybridTools isEmptyString:address]) return;
+    
+    if( [_webview isKindOfClass:[WKWebView class]] ){
+        WKWebView *wv=_webview;
+        @try {
+            {
+                NSURL *address_url = [NSURL URLWithString:address];
+                NSString *scheme_s=[address_url scheme];
+                
+                Class cls = NSClassFromString(@"WKB"
+                                              @"row"
+                                              @"sing"
+                                              @"Context"
+                                              @"Controller");
+                SEL sel = NSSelectorFromString(@"register"
+                                               @"Scheme"
+                                               @"For"
+                                               @"Custom"
+                                               @"Protocol"
+                                               @":");
+                
+                if ([(id)cls respondsToSelector:sel]) {
+                    // 把 http 和 https 请求交给 NSURLProtocol 处理
+                    //[(id)cls performSelector:sel withObject:@"http"];
+                    //[(id)cls performSelector:sel withObject:@"https"];
+                    [(id)cls performSelector:sel withObject:@"local"];
+                }
+                
+                [NSURLProtocol registerClass:[ResourceURLProtocol class]];
+                
+                
+                if( [ CMPHybridTools isEmptyString:scheme_s ])
+                {
+                    ResourceURL *resource = [ResourceURL resourceURLWithPath:[@"/" stringByAppendingString:address]];
+                    [wv loadRequest:[NSURLRequest requestWithURL:resource]];
+                    
+                }else{
+                    //[self loadUrl:[address_url absoluteString]];
+                    NSURL *requesturl = [NSURL URLWithString:[address_url absoluteString]];
+                    NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+                    [wv loadRequest:request];
+                }
+            }
+            
+        } @catch (NSException *exception) {
+            NSLog(@"WKWebView callWebViewLoadUrl error %@", exception);
+        } @finally {
+            
+        }
+    }else if ([_webview isKindOfClass:[UIWebView class]]){
+        UIWebView *wv=_webview;
+        @try {
+            
+            NSURL *address_url = [NSURL URLWithString:address];
+            NSString *scheme_s=[address_url scheme];
+            
+            if( [ CMPHybridTools isEmptyString:scheme_s ])
+            {
+                NSURL *requesturl = [NSURL URLWithString:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+                NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+                [wv loadRequest:request];
+                //[self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
+            }else{
+                NSURL *requesturl = [NSURL URLWithString:[address_url absoluteString]];
+                NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+                [wv loadRequest:request];
+                //[self loadUrl:[address_url absoluteString]];
+            }
+        } @catch (NSException *exception) {
+            NSLog(@"UIWebView callWebViewLoadUrl error %@", exception);
+        } @finally {
+            
+        }
+    }
+}
 + (JSValue *) callWebViewDoJs:(id) _webview :(NSString *)js_s
 {
     if( [_webview isKindOfClass:[UIWebView class]] ){
         @try {
             return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
         } @catch (NSException *exception) {
-            NSLog(@"_webview JsCtx evaluateScript error %@", exception);
+            NSLog(@"UIWebView JsCtx evaluateScript error %@", exception);
         } @finally {
             
         }

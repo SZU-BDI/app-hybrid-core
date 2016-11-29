@@ -4,82 +4,6 @@
 #import "CMPHybridTools.h"
 #import "JSO.h"
 
-//ref
-//https://github.com/jnjosh/PandoraBoy/
-NSString *PBResourceHost = @".resource.";
-
-@interface ResourceURLProtocol : NSURLProtocol {}
-
-@end
-
-@interface ResourceURL : NSURL {
-}
-
-+ (ResourceURL*) resourceURLWithPath:(NSString *)path;
-@end
-
-@implementation ResourceURLProtocol
-
-+ (BOOL)canInitWithRequest:(NSURLRequest *)request
-{
-    BOOL flag1=[[[request URL] scheme] isEqualToString:@"local"];
-    BOOL flag2=[[[request URL] host] isEqualToString:PBResourceHost];
-    BOOL rt= (flag1 && flag2);
-    return rt;
-}
-
-+ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
-{
-    return request;
-}
-
--(void)startLoading
-{
-    NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
-    NSString *notifierPath = [[thisBundle resourcePath] stringByAppendingPathComponent:[[[self request] URL] path]];
-    NSError *err;
-    NSData *data = [NSData dataWithContentsOfFile:notifierPath
-                                          options:NSUncachedRead
-                                            error:&err];
-    if( data )
-    {
-        NSURLResponse *response = [[NSURLResponse alloc] initWithURL:[[self request] URL]
-                                                            MIMEType:@"text/html"
-                                               expectedContentLength:[data length]
-                                                    textEncodingName:nil];
-        
-        [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
-        [[self client] URLProtocol:self didLoadData:data];
-        [[self client] URLProtocolDidFinishLoading:self];
-    }
-    else
-    {
-        NSLog(@"BUG:Unable to load resource:%@:%@", notifierPath, [err description]);
-        [[self client] URLProtocol:self didFailWithError:err];
-    }
-}
-
--(void)stopLoading
-{
-    return;
-}
-
-@end
-
-
-@implementation ResourceURL
-
-+ (ResourceURL *) resourceURLWithPath:(NSString *)path
-{
-    NSURL *rt= [[NSURL alloc] initWithScheme:@"local"
-                                    host:PBResourceHost
-                                    path:path];
-    return (ResourceURL *)rt;
-}
-
-@end
-
-
 @implementation CMPHybridWKWebViewUi
 
 //WKWebViewConfiguration *webConfig;
@@ -308,51 +232,17 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self spinnerOn];
     
     NSString *address = [[self.uiData getChild:@"address"] toString];
+
     if ( [CMPHybridTools isEmptyString:address] ){
         [CMPHybridTools quickShowMsgMain:@"no address?" callback:^{
             
             [self closeUi];
         }];
-    }else{
-//        dispatch_after
-//        (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
-//         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-//         ^{
-             NSURL *address_url = [NSURL URLWithString:address];
-             NSString *scheme_s=[address_url scheme];
-
-#warning TODO(IMPORTANT) must fix hack before push online!!!
-        Class cls = NSClassFromString(@"WKB"
-                                      @"row"
-                                      @"sing"
-                                      @"Context"
-                                      @"Controller");
-        SEL sel = NSSelectorFromString(@"register"
-                                       @"Scheme"
-                                       @"For"
-                                       @"Custom"
-                                       @"Protocol"
-                                       @":");
-        
-        if ([(id)cls respondsToSelector:sel]) {
-            // 把 http 和 https 请求交给 NSURLProtocol 处理
-            //[(id)cls performSelector:sel withObject:@"http"];
-            //[(id)cls performSelector:sel withObject:@"https"];
-            [(id)cls performSelector:sel withObject:@"local"];
-        }
-        
-            [NSURLProtocol registerClass:[ResourceURLProtocol class]];
-        
-             if( [ CMPHybridTools isEmptyString:scheme_s ])
-             {
-                 ResourceURL *resource = [ResourceURL resourceURLWithPath:[@"/" stringByAppendingString:address]];
-                 [self.myWebView loadRequest:[NSURLRequest requestWithURL:resource]];
-
-             }else{
-                 [self loadUrl:[address_url absoluteString]];
-             }
-//         });
+        return;
     }
+    
+    [CMPHybridTools callWebViewLoadUrl:_myWebView :address];
+    
 }
 
 - (void) resetTopBarBtn

@@ -58,6 +58,8 @@
 //+ (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
 //+ (JSValue *) callWebViewDoJs :(WKWebView *) _webview js:(NSString *)js_s;
 
++ (void) callWebViewLoadUrl:_webview :(NSString *)address;
+
 + (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
 //+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
 
