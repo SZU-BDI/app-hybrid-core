@@ -38,7 +38,7 @@ import java.util.HashSet;
  * rectangle and partial transparency outside it, as well as the laser scanner
  * animation and result points.
  */
-class ViewfinderView extends View {
+public class ViewfinderView extends View {
     //private static final String TAG = "log";
 
     private static final long ANIMATION_DELAY = 10L;
@@ -61,6 +61,7 @@ class ViewfinderView extends View {
     private Bitmap resultBitmap;
     private Collection<ResultPoint> possibleResultPoints;
     private Collection<ResultPoint> lastPossibleResultPoints;
+    private HashSet<ResultPoint> hashSetResultPoints;
 
     public ViewfinderView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -75,6 +76,13 @@ class ViewfinderView extends View {
 
         resultPointColor = resources.getColor(R.color.possible_result_points);
         possibleResultPoints = new HashSet<ResultPoint>(5);
+
+        hashSetResultPoints = new HashSet<ResultPoint>(5);
+    }
+
+    void resetPoints() {
+        hashSetResultPoints = null;
+        hashSetResultPoints = new HashSet<ResultPoint>(5);
     }
 
     @Override
@@ -135,7 +143,6 @@ class ViewfinderView extends View {
             canvas.drawRect(frame.left + MIDDLE_LINE_PADDING, slideTop - MIDDLE_LINE_WIDTH / 2, frame.right - MIDDLE_LINE_PADDING, slideTop + MIDDLE_LINE_WIDTH / 2, paint);
 
 
-            //��ɨ����������
             paint.setColor(Color.WHITE);
             paint.setTextSize(TEXT_SIZE * density);
             paint.setAlpha(0x40);
@@ -153,7 +160,8 @@ class ViewfinderView extends View {
             if (currentPossible.isEmpty()) {
                 lastPossibleResultPoints = null;
             } else {
-                possibleResultPoints = new HashSet<ResultPoint>(5);
+                resetPoints();
+                possibleResultPoints = hashSetResultPoints;
                 lastPossibleResultPoints = currentPossible;
                 paint.setAlpha(OPAQUE);
                 paint.setColor(resultPointColor);

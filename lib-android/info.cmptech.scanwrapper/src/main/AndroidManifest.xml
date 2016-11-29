@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.cmptech.scanwrapper">
-    <!--<application android:name="android.app.Application"-->
-    <!--<application android:allowBackup="false">-->
+
+    <application android:name="android.app.Application">
+        <!--<application android:allowBackup="false">-->
         <!--<activity android:name="szu.bdi.hybrid.core.HybridUi" />-->
         <!--<activity android:name="szu.bdi.hybrid.core.NativeUi" />-->
         <!--<activity android:name="szu.bdi.hybrid.core.SimpleHybridWebViewUi" />-->
-    <!--</application>-->
+        <activity android:name="info.cmptech.scanwrapper.MipcaActivityCapture" />
+    </application>
 
 </manifest>

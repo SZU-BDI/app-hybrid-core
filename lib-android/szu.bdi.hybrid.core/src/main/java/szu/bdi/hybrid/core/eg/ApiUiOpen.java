@@ -15,6 +15,11 @@ import szu.bdi.hybrid.core.HybridHandler;
 import szu.bdi.hybrid.core.HybridUiCallback;
 import szu.bdi.hybrid.core.JSO;
 
+
+/**
+ *
+ *
+ */
 public class ApiUiOpen extends HybridApi {
     public HybridHandler getHandler() {
         return new HybridHandler() {

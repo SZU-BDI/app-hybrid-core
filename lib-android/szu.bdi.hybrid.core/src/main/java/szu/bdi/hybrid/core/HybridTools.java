@@ -313,6 +313,7 @@ public class HybridTools {
         JSO uia = getAppConfig(UI_MAPPING);
         if (uia == null) {
             HybridTools.quickShowMsgMain("config.json error!!!");
+            //HybridTools.appAlert(getAppContext(),"config.json error !",null);
             return;
         }
 
