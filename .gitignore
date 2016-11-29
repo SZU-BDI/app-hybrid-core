@@ -6,3 +6,4 @@ backup/
 *.apk
 */.DS_Store
 *.tmp/
+proguard-rules.pro

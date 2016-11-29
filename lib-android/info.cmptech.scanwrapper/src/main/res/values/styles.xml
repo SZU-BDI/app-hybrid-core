@@ -1,0 +1,100 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--</style>-->
+
+
+    <style parent="android:Theme.Light" name="AppBaseTheme">
+
+    <!-- Theme customizations available in newer API levels can go in res/values-vXX/styles.xml, while customizations related to backward-compatibility can go here. -->
+    </style>
+
+
+
+    <style parent="@android:style/Widget.TextView" name="textview">
+
+    <item name="android:layout_width">wrap_content</item>
+
+    <item name="android:layout_height">wrap_content</item>
+
+    <item name="android:textColor">@android:color/black</item>
+
+    <item name="android:textSize">14sp</item>
+
+    <!--<item name="android:fontFamily">sans-serif-light</item>-->
+
+    </style>
+   <!--                                 <style name="Mytextstyle">
+                                        <item name="android:layout_gravity">center</item>
+                                        <item name="android:layout_width">wrap_content</item>
+                                        <item name="android:layout_height">wrap_content</item>
+                                        <item name="android:gravity">center</item>
+                                        <item name="android:paddingLeft">45dp</item>
+                                    </style>-->
+
+    <!--<style name="TitleBackgroundColor">
+        <item name="android:background">#FF0000FF</item>
+    </style>
+    <style name="test" parent="android:Theme">
+        <item name="android:windowTitleSize">40dp</item>
+        <item name="android:windowTitleBackgroundStyle">@style/CustomWindowTitleBackground</item>
+    </style>-->
+ <!--               <style name="MyTitleStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+
+
+                    <item name="android:windowTitleStyle">@style/Mytextstyle</item>
+                    <item name="android:windowActionBar">false</item>
+                   &lt;!&ndash; <item name="android:textIsSelectable">true</item>&ndash;&gt;
+
+
+                </style>-->
+
+    <!--<style name="CustomWindowTitleBackground">
+        <item name="android:background">#565656</item>
+    </style>-->
+
+
+
+    <style name="MyActionBarStyle" parent="android:Theme.Light">
+        <item name="android:windowTitleSize">50dp</item>
+        <item name="android:windowTitleBackgroundStyle">@style/StatusBarBackground</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- <item name="titleTextStyle">@style/MyTitleStyle</item>-->
+    </style>
+
+    <style name="StatusBarBackground">
+        <item name="android:background">#013465</item>
+    </style>
+
+
+
+
+
+
+
+   <!-- <style name="CustomDialog" parent="android:style/Theme.Holo.Dialog">
+        &lt;!&ndash;背景颜色及透明程度&ndash;&gt;
+        <item name="android:windowBackground">@android:color/transparent</item>
+        &lt;!&ndash;是否有标题 &ndash;&gt;
+        <item name="android:windowNoTitle">true</item>
+        &lt;!&ndash;是否浮现在activity之上&ndash;&gt;
+        <item name="android:windowIsFloating">true</item>
+        &lt;!&ndash;是否模糊&ndash;&gt;
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>-->
+
+
+<!--
+    广告栏小圆点的样式
+-->
+    <!--<style name="dot_style">-->
+        <!--<item name="android:layout_width">5dip</item>-->
+        <!--<item name="android:layout_height">5dip</item>-->
+        <!--<item name="android:background">@drawable/dot_normal</item>-->
+        <!--<item name="android:layout_marginLeft">1.5dip</item>-->
+        <!--<item name="android:layout_marginRight">1.5dip</item>-->
+    <!--</style>-->
+
+</resources>
