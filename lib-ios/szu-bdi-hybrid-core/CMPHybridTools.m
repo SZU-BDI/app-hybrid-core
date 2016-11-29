@@ -266,33 +266,46 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 //warning! caller need to handler the thread like:
 
-+ (JSValue *) callWebViewDoJs:(UIWebView *) _webview :(NSString *)js_s
++ (JSValue *) callWebViewDoJs:(id) _webview :(NSString *)js_s
 {
-    @try {
-        return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
-    } @catch (NSException *exception) {
-        NSLog(@"callWebViewDoJs error %@", exception);
-    } @finally {
-        
+    if( [_webview isKindOfClass:[UIWebView class]] ){
+        @try {
+            return [[self getWebViewJsCtx :_webview] evaluateScript:js_s];
+        } @catch (NSException *exception) {
+            NSLog(@"_webview JsCtx evaluateScript error %@", exception);
+        } @finally {
+            
+        }
+    }else if ([_webview isKindOfClass:[WKWebView class]]){
+        @try {
+            //return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
+            [_webview evaluateJavaScript:js_s completionHandler:^(id _Nullable val, NSError * _Nullable error) {
+                //code
+            }];
+        } @catch (NSException *exception) {
+            NSLog(@"WKWebView evaluateJavaScript error %@", exception);
+        } @finally {
+            
+        }
     }
     return nil;
 }
 
 
-+ (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s
-{
-    @try {
-        //return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
-        [_webview evaluateJavaScript:js_s completionHandler:^(id _Nullable val, NSError * _Nullable error) {
-            //code
-        }];
-    } @catch (NSException *exception) {
-        NSLog(@"callWebViewDoJs error %@", exception);
-    } @finally {
-        
-    }
-    return nil;
-}
+//+ (JSValue *) callWebViewDoJs:(WKWebView *) _webview js:(NSString *)js_s
+//{
+//    @try {
+//        //return [[self getWKWebViewJsCtx :_webview] evaluateScript:js_s];
+//        [_webview evaluateJavaScript:js_s completionHandler:^(id _Nullable val, NSError * _Nullable error) {
+//            //code
+//        }];
+//    } @catch (NSException *exception) {
+//        NSLog(@"callWebViewDoJs error %@", exception);
+//    } @finally {
+//        
+//    }
+//    return nil;
+//}
 
 +(NSString *) fullPathOfAsset :(NSString *) filename
 {

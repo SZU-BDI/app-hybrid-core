@@ -54,8 +54,9 @@
 + (void) suspendApp;
 + (void) quitGracefully;
 
-+ (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
-+ (JSValue *) callWKWebViewDoJs:(WKWebView *) _webview :(NSString *)js_s;
++ (JSValue *) callWebViewDoJs:(id) _webview :(NSString *)js_s;
+//+ (JSValue *) callWebViewDoJs :(UIWebView *)_webview :(NSString *)js_s;
+//+ (JSValue *) callWebViewDoJs :(WKWebView *) _webview js:(NSString *)js_s;
 
 + (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
 //+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;

@@ -240,7 +240,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 - (void) evalJs:(NSString *)js_s
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [CMPHybridTools callWKWebViewDoJs:self.myWebView :js_s];
+        [CMPHybridTools callWebViewDoJs:self.myWebView :js_s];
     });
 }
 
@@ -345,42 +345,9 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         
              if( [ CMPHybridTools isEmptyString:scheme_s ])
              {
-                 //[self loadUrl:[@"http://.resource./" stringByAppendingString:address]];
-                 
                  ResourceURL *resource = [ResourceURL resourceURLWithPath:[@"/" stringByAppendingString:address]];
                  [self.myWebView loadRequest:[NSURLRequest requestWithURL:resource]];
-//
-                 //[self loadUrl:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
- 
-                 //[self loadUrl:[@"file://" stringByAppendingString:[self syncAssetToTmp]]];
-                 
-                 //NSURL *requesturl = [NSURL URLWithString:url];
-                 //NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
-                 
-                 //ios9
-                 //NSURL *requesturl = [NSURL URLWithString:[@"file://" stringByAppendingString:[CMPHybridTools fullPathOfAsset:address]]];
-                 //[self.myWebView loadFileURL:requesturl allowingReadAccessToURL:requesturl];
-                 
-                 //[self loadUrl:[address_url relativeString]];
-                 
-                 
-//                 if ([[UIDevice currentDevice].systemVersion floatValue] >= 9.0) {
-//                     // iOS9. One year later things are OK.
-//                     NSURL *fileURL = [NSURL fileURLWithPath:path];
-//                     [self.webView loadFileURL:fileURL allowingReadAccessToURL:fileURL];
-//                 } else {
-                     // iOS8. Things can be workaround-ed
-                     //   Brave people can do just this
-                     //   fileURL = try! pathForBuggyWKWebView8(fileURL)
-                     //   webView.loadRequest(NSURLRequest(URL: fileURL))
-                 
-                 
-//                     NSURL *fileURL = [self fileURLForBuggyWKWebView8:[NSURL fileURLWithPath:[CMPHybridTools fullPathOfAsset:address]]];
-//                 NSLog(@"DEBUG fileURL %@",fileURL);
-//                     NSURLRequest *request = [NSURLRequest requestWithURL:fileURL];
-//                     [self.myWebView loadRequest:request];
-//                 }
-                 
+
              }else{
                  [self loadUrl:[address_url absoluteString]];
              }
@@ -572,7 +539,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
         @try {
             NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(function(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [CMPHybridTools callWKWebViewDoJs:webView :javascriptCommand];
+                [CMPHybridTools callWebViewDoJs:webView :javascriptCommand];
             });
             //[caller evalJs:javascriptCommand];
         } @catch (NSException *exception) {
