@@ -74,6 +74,11 @@
 + (NSInteger) os_compare:(Float32)tgt;
 + (BOOL) is_simulator;
 
++ (NSString *) btoa:(NSString *)s;
++ (NSString *) base64encode:(NSString *)s;
+
++ (NSString *) atob:(NSString *)s;
++ (NSString *) base64decode:(NSString *)s;
 
 //TODO
 + (NSString *) getLang:(NSString *)key;

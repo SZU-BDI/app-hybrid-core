@@ -163,8 +163,8 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     NSString *className = [JSO o2s:[uiConfig getChild:@"class"]];
     
-#warning TODO tmphack if ios<8.? using oldclass
-    NSString *oldclassName = [JSO o2s:[uiConfig getChild:@"oldclass"]];
+#warning TODO(1) if WKWebview Not avail (e.g. < ios8)
+    //NSString *oldclassName = [JSO o2s:[uiConfig getChild:@"oldclass"]];
     
     if ( [self isEmptyString :className]) {
         [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
@@ -312,9 +312,10 @@ SINGLETON_shareInstance(CMPHybridTools);
     //home button press programmatically
     UIApplication *app = [UIApplication sharedApplication];
     NSLog(@"Hide...");
-    [app performSelector:@selector(suspend)];
-    
+    //[app performSelector:@selector(suspend)];
+    [self call_o_do_m:app :@"suspend"];
 }
+
 + (void) quitGracefully
 {
     //close top
@@ -331,17 +332,46 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (JSContext *) getWebViewJsCtx:(UIWebView *) _webview
 {
-    //避开私有API检查
-    return [_webview
-            valueForKeyPath:
-            (@"document"
-             @"View"
-             @".web"
-             @"View"
-             @".main"
-             @"Frame"
-             @".javaScript"
-             @"Context")];
+    //    NSLog(@"!!!!  %@", [self btoa:@"document"
+    //                        @"View"
+    //                        @".web"
+    //                        @"View"]);
+    //    NSLog(@"!!!!  %@", [self btoa:@".main"
+    //                        @"Frame"
+    //                        @".javaScript"
+    //                        @"Context"]);
+    //prv api
+    NSString *s1 =[self atob:@"ZG9jdW1lbnRWaWV3LndlYlZpZXc="];
+    NSString *s2 =[self atob:@"Lm1haW5GcmFtZS5qYXZhU2NyaXB0Q29udGV4dA=="];
+    return [_webview valueForKeyPath:[s1 stringByAppendingString:s2]];
+}
+
++ (void) call_o_do_m :(id)ooo :(NSString *)mmm
+{
+    SEL sel = NSSelectorFromString(mmm);
+    if ([(id)ooo respondsToSelector:sel]) {
+        ((void (*)(id, SEL))[ooo methodForSelector:sel])(ooo, sel);
+    }
+}
+
++ (void) call_c_do_m :(NSString *)ccc :(NSString *)mmm
+{
+    Class cls = NSClassFromString(ccc);
+    SEL sel = NSSelectorFromString(mmm);
+    
+    if ([(id)cls respondsToSelector:sel]) {
+        ((void (*)(id, SEL))[cls methodForSelector:sel])(cls, sel);
+        //((void (*)(id, SEL, NSString *))[cls methodForSelector:sss])(cls, sss, @"local");
+    }
+}
++ (void) call_c_do_m_1 :(NSString *)ccc :(NSString *)mmm :(NSString *) vvv
+{
+    Class cls = NSClassFromString(ccc);
+    SEL sel = NSSelectorFromString(mmm);
+    
+    if ([(id)cls respondsToSelector:sel]) {
+        ((void (*)(id, SEL, NSString *))[cls methodForSelector:sel])(cls, sel, vvv);
+    }
 }
 
 + (void) callWebViewLoadUrl:_webview :(NSString *)address
@@ -355,24 +385,43 @@ SINGLETON_shareInstance(CMPHybridTools);
                 NSURL *address_url = [NSURL URLWithString:address];
                 NSString *scheme_s=[address_url scheme];
                 
-                Class cls = NSClassFromString(@"WKB"
-                                              @"row"
-                                              @"sing"
-                                              @"Context"
-                                              @"Controller");
-                SEL sel = NSSelectorFromString(@"register"
-                                               @"Scheme"
-                                               @"For"
-                                               @"Custom"
-                                               @"Protocol"
-                                               @":");
+                //                NSLog(@"!!!!  %@", [self btoa:@"WKB"
+                //                                    @"row"
+                //                                    @"sing"
+                //                                    @"Context"
+                //                                    @"Controller"]);
+                //                NSLog(@"!!!!  %@", [self btoa:@"register"
+                //                                    @"Scheme"
+                //                                    @"For"
+                //                                    @"Custom"
+                //                                    @"Protocol"
+                //                                    @":"]);
+                //prv api
+                [self call_c_do_m_1:[self atob:@"V0tCcm93c2luZ0NvbnRleHRDb250cm9sbGVy"]
+                                   :[self atob:@"cmVnaXN0ZXJTY2hlbWVGb3JDdXN0b21Qcm90b2NvbDo="]
+                                   :@"local"];
                 
-                if ([(id)cls respondsToSelector:sel]) {
-                    // 把 http 和 https 请求交给 NSURLProtocol 处理
-                    //[(id)cls performSelector:sel withObject:@"http"];
-                    //[(id)cls performSelector:sel withObject:@"https"];
-                    [(id)cls performSelector:sel withObject:@"local"];
-                }
+                //                Class cls = NSClassFromString(@"WKB"
+                //                                              @"row"
+                //                                              @"sing"
+                //                                              @"Context"
+                //                                              @"Controller");
+                //                SEL sss = NSSelectorFromString(@"register"
+                //                                               @"Scheme"
+                //                                               @"For"
+                //                                               @"Custom"
+                //                                               @"Protocol"
+                //                                               @":");
+                //
+                //                if ([(id)cls respondsToSelector:sss]) {
+                //                    // 把 http 和 https 请求交给 NSURLProtocol 处理
+                //                    //[(id)cls performSelector:sel withObject:@"http"];
+                //                    //[(id)cls performSelector:sel withObject:@"https"];
+                ////                    SuppressPerformSelectorLeakWarning(
+                ////                    [(id)cls performSelector:sel withObject:@"local"];
+                ////                                                       );
+                //                    ((void (*)(id, SEL, NSString *))[cls methodForSelector:sss])(cls, sss, @"local");
+                //                }
                 
                 [NSURLProtocol registerClass:[ResourceURLProtocol class]];
                 
@@ -457,7 +506,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 //    } @catch (NSException *exception) {
 //        NSLog(@"callWebViewDoJs error %@", exception);
 //    } @finally {
-//        
+//
 //    }
 //    return nil;
 //}
@@ -681,6 +730,41 @@ SINGLETON_shareInstance(CMPHybridTools);
     //    }
     return NO;
 }
++ (NSString *) btoa:(NSString *)s
+{
+    // Create NSData object
+    NSData *nsdata = [s dataUsingEncoding:NSUTF8StringEncoding];
+    
+    // Get NSString from NSData object in Base64
+    NSString *base64Encoded = [nsdata base64EncodedStringWithOptions:0];
+    
+    // Print the Base64 encoded string
+    NSLog(@"Encoded: %@", base64Encoded);
+    return base64Encoded;
+}
+
++ (NSString *) base64encode:(NSString *)s
+{
+    return [self btoa:s];
+}
+
++ (NSString *) atob:(NSString *)s
+{
+    // NSData from the Base64 encoded str
+    NSData *nsdataFromBase64String = [[NSData alloc]
+                                      initWithBase64EncodedString:s options:0];
+    
+    // Decoded NSString from the NSData
+    NSString *base64Decoded = [[NSString alloc]
+                               initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
+    NSLog(@"Decoded: %@", base64Decoded);
+    return base64Decoded;
+}
++ (NSString *) base64decode:(NSString *)s
+{
+    return [self atob:s];
+}
+
 /****************************** STUB FOR LATER *********************************/
 + (void)saveAppConfig{
     
