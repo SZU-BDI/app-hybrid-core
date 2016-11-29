@@ -143,6 +143,19 @@ public class MipcaActivityCapture extends Activity implements Callback {
         String resultString = result.getText();
 
         //TODO prompt user "OK?", if user NO, than start again, if YES, continue return....
+//        public static void appConfirm(
+//                Context ctx, String msg,
+//                AlertDialog.OnClickListener okListener,
+//                AlertDialog.OnClickListener cancelListener) {
+//            AlertDialog.Builder b2;
+//            b2 = new AlertDialog.Builder(ctx);
+//            b2.setMessage(msg)
+//                    .setPositiveButton("NO", cancelListener)
+//                    .setNegativeButton("YES", okListener);
+//            b2.setCancelable(false);
+//            b2.create();
+//            b2.show();
+//        }
 
         CameraManager.get().stopPreview();
         if (null == resultString || resultString.equals("")) {

@@ -23,6 +23,7 @@ public class ApiUiClose extends HybridApi {
 
                 ui.setResponseData(jso);
                 ui.closeUi();
+                //ui.closeUi(jso);
             }
         };
     }
