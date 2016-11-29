@@ -1,6 +1,7 @@
 package info.cmptech.scanwrapper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 //import android.media.MediaPlayer;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -33,6 +35,19 @@ public class MipcaActivityCapture extends Activity implements Callback {
 //    private boolean playBeep;
 //    private boolean vibrate;
 //    private int clicktime = 1;
+
+    public static void quickShowMsg(Context mContext, String msg) {
+        //@ref http://blog.csdn.net/droid_zhlu/article/details/7685084
+        //A toast is a view containing a quick little message for the user.
+        // The toast class helps you create and show those.
+        try {
+            Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     /**
      * Called when the activity is first created.
@@ -97,12 +112,6 @@ public class MipcaActivityCapture extends Activity implements Callback {
         CameraManager.get().closeDriver();
     }
 
-    @Override
-    protected void onDestroy() {
-        inactivityTimer.shutdown();
-        super.onDestroy();
-    }
-
 //    @Override
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {
 //
@@ -118,25 +127,39 @@ public class MipcaActivityCapture extends Activity implements Callback {
 //        }*/
 //        return true;
 //    }
+//public static void quickShowMsgMain(String msg) {
+//    quickShowMsg(getAppContext(), msg);
+//}
+
+    @Override
+    protected void onDestroy() {
+        inactivityTimer.shutdown();
+        super.onDestroy();
+    }
 
     public void handleDecode(Result result, Bitmap barcode) {
         inactivityTimer.onActivity();
         //playBeepSoundAndVibrate();
         String resultString = result.getText();
-        if (resultString.equals("")) {
-            Toast.makeText(MipcaActivityCapture.this, "R.string.bitmap_scan_failed"//R.string.bitmap_scan_failed
-                    , Toast.LENGTH_SHORT).show();
-        } else {
-            CameraManager.get().stopPreview();
 
-            Log.v("MipcaActivityCapture", " !!!!!!! TODO found scan = " + resultString);
-//			if (AppHelper.getsid().equals("")){
-//				checkNetWork();
-//			}else {
-//				AppHelper.openUrlAtNewActivityWithTitle(MipcaActivityCapture.this, Uri.parse(AppHelper.getApiEntry("../saas_ace/WebFacePay.ScanQR.api") + "&token=" + resultString), OpenWebViewActivity.class, getText(R.string.title_activity_FacePay).toString());
-//			}
+        //TODO prompt user "OK?", if user NO, than start again, if YES, continue return....
+
+        CameraManager.get().stopPreview();
+        if (null == resultString || resultString.equals("")) {
+            quickShowMsg(MipcaActivityCapture.this, "Failed Scan");
+//            Toast.makeText(MipcaActivityCapture.this, "Failed Scan" //R.string.bitmap_scan_failed
+//                    , Toast.LENGTH_SHORT).show();
+        } else {
+
+            Log.v("MipcaActivityCapture", " scan = " + resultString);
+
+            Intent id = new Intent();
+            id.putExtra("result", resultString);
+            //MipcaActivityCapture.this.setResult(1, id);
+            setResult(1, id);
         }
-        MipcaActivityCapture.this.finish();
+        //MipcaActivityCapture.this.finish();
+        finish();
     }
 
     private void initCamera(SurfaceHolder surfaceHolder) {

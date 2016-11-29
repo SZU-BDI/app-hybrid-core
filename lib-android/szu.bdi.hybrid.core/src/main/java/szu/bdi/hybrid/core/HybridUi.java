@@ -100,15 +100,14 @@ public class HybridUi extends Activity {
     }
 
 
-
-    public void close() {
+    public void closeUi() {
         //{name: $name, address: adress}
         JSO o = _responseData;
-        if (_responseData==null) {
-            o=new JSO();
+        if (_responseData == null) {
+            o = new JSO();
             o.setChild("name", getUiData("name"));
             o.setChild("address", getUiData("address"));
-        }else{
+        } else {
             //
         }
         trigger("close", o);
@@ -131,7 +130,7 @@ public class HybridUi extends Activity {
         _cba.put(eventName, cb);
     }
 
-    private void trigger(String eventName, JSO o) {
+    public void trigger(String eventName, JSO o) {
         HybridCallback cb = _cba.get(eventName);
         if (cb == null) {
             Log.v(LOGTAG, "trigger() found no handler for " + eventName);
@@ -141,13 +140,13 @@ public class HybridUi extends Activity {
         }
     }
 
-    //NOTES: when user click the left-upper button on the top bar
+    //NOTES: when user click the left-upper button on the top bar, then regard as closeUi...
     //@ref setDisplayHomeAsUpEnabled()
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.close();
+                this.closeUi();
                 break;
         }
         return true;
@@ -163,7 +162,7 @@ public class HybridUi extends Activity {
 //            reallyClose = HybridTools.ifLastActThenPromptUser(this);
 
             if (reallyClose)
-                this.close();
+                this.closeUi();
             return reallyClose;
         }
         return super.onKeyDown(keyCode, event);
@@ -196,33 +195,35 @@ public class HybridUi extends Activity {
         return _uiData.getChild(k);
     }
 
-    public void setResponseData(JSO jso){
-        _responseData=jso;
+    public void setResponseData(JSO jso) {
+        _responseData = jso;
     }
-    public JSO getResponseData(){
+
+    public JSO getResponseData() {
         return _responseData;
     }
-    protected HybridCallback _cb = null;
 
-    public void setCallBackFunction(HybridCallback cb) {
-        _cb = cb;
-    }
+    //deprecated, use trigger !!
+    //protected HybridCallback _cb = null;
+    //public void setCallBackFunction(HybridCallback cb) {
+//        _cb = cb;
+//    }
 
     //@ref this.startActivityForResult() + (setResult() + finish())
-    protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
-        Log.v(LOGTAG, "resultCode=" + resultCode);
-        if (rtIntent != null) {
-            Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
-            if (_cb != null && resultCode > 0) {
-                Log.v(LOGTAG, "onCallBack OK");
-                _cb.onCallBack(rtIntent.getStringExtra("rt"));
-            }
-        }
-    }
+//    protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
+//        Log.v(LOGTAG, "resultCode=" + resultCode);
+//        if (rtIntent != null) {
+//            Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
+//            if (_cb != null && resultCode > 0) {
+//                Log.v(LOGTAG, "onCallBack OK");
+//                _cb.onCallBack(rtIntent.getStringExtra("rt"));
+//            }
+//        }
+//    }
 
     @Override
     public void onBackPressed() {
-        this.close();
+        this.closeUi();
     }
 
 }

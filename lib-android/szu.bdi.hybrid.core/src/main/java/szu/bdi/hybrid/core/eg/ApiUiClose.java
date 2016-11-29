@@ -22,7 +22,7 @@ public class ApiUiClose extends HybridApi {
                 HybridUi ui=getCallerUi();
 
                 ui.setResponseData(jso);
-                ui.close();
+                ui.closeUi();
             }
         };
     }

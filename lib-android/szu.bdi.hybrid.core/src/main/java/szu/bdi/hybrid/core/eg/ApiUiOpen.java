@@ -20,7 +20,7 @@ public class ApiUiOpen extends HybridApi {
         return new HybridHandler() {
             @Override
             public void handler(String dataStr, HybridCallback cb) {
-                final HybridCallback _callback=cb;
+                final HybridCallback _callback = cb;
                 HybridUi callerAct = getCallerUi();
                 Log.v("_app_activity_open", dataStr);
 
@@ -55,7 +55,7 @@ public class ApiUiOpen extends HybridApi {
 
                                 //onCallBack(JSO.s2o(cbStr));
                                 _callback.onCallBack(cbStr);
-                                                                ui.finish();
+                                ui.finish();
                             }
 
                             @Override
