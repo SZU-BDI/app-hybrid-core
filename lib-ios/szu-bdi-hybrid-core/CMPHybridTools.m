@@ -199,16 +199,20 @@ SINGLETON_shareInstance(CMPHybridTools);
             ddd.window.rootViewController = nav;
         }
     }
+    //preload
+    UIViewController *ui = (UIViewController *)theHybridUi;
+    [ui.view layoutSubviews];
+    
     if (objCaller == nil) {
     }
     else{
         if (((UIViewController *)objCaller).navigationController != nil) {
             //for test only...((UIViewController *)theHybridUi).view.backgroundColor=[UIColor brownColor];
-            [((UIViewController *)objCaller).navigationController pushViewController:(UIViewController *)theHybridUi animated:YES];
+            [((UIViewController *)objCaller).navigationController pushViewController:ui animated:YES];
         }
         else{
             // modal
-            [(UIViewController *)objCaller presentViewController:(UIViewController *)theHybridUi animated:YES completion:nil];
+            [(UIViewController *)objCaller presentViewController:ui animated:YES completion:nil];
         }
     }
     /////////////////////////////////////// Display It }

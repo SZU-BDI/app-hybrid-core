@@ -55,19 +55,20 @@
 
 //------------  UIViewController ------------
 
-- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
-{
-    
-    if (webView != self.myWebView) {
-        NSLog(@" webViewDidStartLoad: not the same webview?? ");
-        return;
-    }
-    NSLog(@" didStartProvisionalNavigation TODO...");
-    //injectDone=NO;
-    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
-    //[self notifyPollingInject :webView];
-    //[self spinnerOn];
-}
+//- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
+//{
+//    
+//    if (webView != self.myWebView)
+//    {
+//        NSLog(@" webViewDidStartLoad: not the same webview?? ");
+//        return;
+//    }
+//    NSLog(@" didStartProvisionalNavigation TODO...");
+//    //injectDone=NO;
+//    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
+//    //[self notifyPollingInject :webView];
+//    //[self spinnerOn];
+//}
 
 - (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
 {
