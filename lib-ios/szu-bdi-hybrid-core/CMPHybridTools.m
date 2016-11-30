@@ -84,6 +84,154 @@ NSString *PBResourceHost = @".resource.";
 
 @end
 
+@interface WKScriptMessageHandler : NSObject  <WKScriptMessageHandler>
+
+@property (weak) HybridUi caller;
+
++(instancetype) initWithHybridUI:(HybridUi) ui;
+
+@end
+
+@implementation WKScriptMessageHandler
++(instancetype) initWithHybridUI:(HybridUi) ui
+{
+    WKScriptMessageHandler *idid = [[self alloc] init];
+    idid.caller=ui;
+    return idid;
+}
+
+- (void)userContentController: (WKUserContentController *)userContentController
+      didReceiveScriptMessage:(WKScriptMessage *)message{
+    
+    //    if(message.webView!=_myWebView){
+    //        NSLog(@" userContentController: not the same webview?? ");
+    //        return;
+    //    }
+    //
+    //HybridUi caller=self;
+    HybridUi caller=_caller;
+    
+    NSLog(@"message.body = %@", message.body);
+    //    NSLog(@"message.name = %@", message.name);
+    //    NSLog(@"message.frameInfo = %@", message.frameInfo);
+    //    NSLog(@"message.WKWebView = %@", message.webView);
+    JSO * msg=[JSO id2o:message.body];
+    NSString * handlerName_s = [[msg getChild:@"handlerName"] toString];
+    __block NSString * callBackId_s =[[msg getChild:@"callbackId"] toString];
+    JSO * param =[msg getChild:@"data"];
+    WKWebView *webView=message.webView;
+    
+    //to check the handlerName is auth by api_auth in config.json for current url
+    
+    JSO * api_auth = [CMPHybridTools getAppConfig:@"api_auth"];
+    NSString * uiname = caller.uiName;
+    JSO * api_auth_a = [api_auth getChild:uiname];
+    if(nil==api_auth_a){
+        NSLog(@" !!! find no api_auth for uiname %@", uiname);
+        return;
+    }
+    //NSString * handlerName_s = [handlerName toString];
+    if([CMPHybridTools isEmptyString:handlerName_s]){
+        NSLog(@" empty handlerName?? %@", param);
+        return;
+    }
+    BOOL flagFoundMatch=NO;
+    NSMutableArray *found_a=[[NSMutableArray alloc] init];
+    
+    NSURL *url =[webView URL];
+    NSString *scheme = [url scheme];
+    NSString *fullurl =[url absoluteString];
+    NSString *currenturl=fullurl;
+    if( [@"file" isEqualToString:scheme]){
+        currenturl=[url lastPathComponent];
+    }
+    for (NSString *kkk in [api_auth_a getChildKeys]) {
+        if([currenturl isEqualToString:kkk]){
+            flagFoundMatch=YES;
+            //found_a= [api_auth_a getChild:kkk];
+            //break;
+            //[found_a basicMerge:[api_auth_a getChild:kkk]];
+            JSO *jj =[api_auth_a getChild:kkk];
+            id idjj = [jj toId];
+            [found_a removeObjectsInArray:idjj];
+            [found_a addObjectsFromArray:idjj];
+        }
+        NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :fullurl];
+        if ([matches count] > 0){
+            flagFoundMatch=YES;
+            //found_a= [api_auth_a getChild:kkk];
+            //break;
+            //[found_a basicMerge:[api_auth_a getChild:kkk]];
+            JSO *jj =[api_auth_a getChild:kkk];
+            id idjj = [jj toId];
+            [found_a removeObjectsInArray:idjj];
+            [found_a addObjectsFromArray:idjj];
+        }
+    }
+    if(flagFoundMatch!=YES){
+        NSLog(@" !!! find no auth for handlerName(%@) uiname(%@) url(%@)", handlerName_s, uiname, currenturl);
+        return;
+    }
+    
+    BOOL flagInList=NO;
+    NSArray * keys =[found_a copy];
+    for (NSString *vvv in keys){
+        if([handlerName_s isEqualToString:vvv]){
+            flagInList=YES;
+            break;
+        }
+    }
+    
+    if (flagInList!=YES){
+        NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
+        return;
+    }
+    if(nil==caller.uiApiHandlers) {
+        NSLog(@" !!! caller.myApiHandlers is nil !!! %@", caller.uiData);
+        return;
+    }
+    
+    HybridHandler handler = caller.uiApiHandlers[handlerName_s];
+    
+    if (nil==handler) {
+        NSLog(@" !!! found no handler for %@", handlerName_s);
+        return;
+    }
+    
+    //NSString *callBackId_s=[callBackId toString];
+    HybridCallback callback=^(JSO *responseData){
+        NSLog(@"HybridCallback responseData %@", [responseData toString]);
+        NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
+        
+        @try {
+            NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(function(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [CMPHybridTools callWebViewDoJs:webView :javascriptCommand];
+            });
+            //[caller evalJs:javascriptCommand];
+        } @catch (NSException *exception) {
+            NSLog(@" !!! error when callback to js %@",exception);
+        } @finally {
+        }
+        
+    };
+    
+    //async delay 0.01 second
+    dispatch_after
+    (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
+     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+     ^{
+         NSString *param_s=[param toString];
+         @try {
+             handler([JSO s2o:param_s], callback);
+         } @catch (NSException *exception) {
+             callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
+         }
+     });
+    
+}
+
+@end
 
 
 /////////////////////////////////////////////////////////////
@@ -781,6 +929,44 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     [[NSUserDefaults standardUserDefaults] setObject:pswd forKey:@"lock"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (id) initHybridWebView :(Class)c :(HybridUi) caller
+{
+    if(c==[WKWebView class]){
+        WKWebViewConfiguration *
+        webConfig = [[WKWebViewConfiguration alloc]init];
+        
+        // Setup WKUserContentController instance for injecting user script
+        WKUserContentController* userController = [[WKUserContentController alloc]init];
+        
+        // Get script that's to be injected into the document
+        NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js" :YES];
+        
+        // Specify when and where and what user script needs to be injected into the web document
+        WKUserScript* userScript
+        = [[WKUserScript alloc] initWithSource:js
+                                 injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                              forMainFrameOnly:NO];
+        
+        [userController addUserScript:userScript];
+        
+        webConfig.userContentController= userController;
+        
+        //[webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
+        [webConfig.userContentController addScriptMessageHandler:[WKScriptMessageHandler initWithHybridUI:caller] name:@"nativejsb"];
+        
+        id rt = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webConfig];
+        return rt;
+    }else if(c==[UIWebView class]){
+        CGRect rect = [UIScreen mainScreen].bounds;
+        UIWebView *wv = [[UIWebView alloc]initWithFrame:rect];
+        wv.delegate = (id<UIWebViewDelegate>) caller;
+        return wv;
+    }else{
+        NSLog(@"unknow class initHybridWebView %@",c);
+    }
+    return nil;
 }
 
 /****************************** STUB FOR LATER *********************************/

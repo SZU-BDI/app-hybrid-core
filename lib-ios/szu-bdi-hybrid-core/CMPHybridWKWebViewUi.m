@@ -6,70 +6,6 @@
 
 @implementation CMPHybridWKWebViewUi
 
-//WKWebViewConfiguration *webConfig;
-
-////ref http://www.jianshu.com/p/ccb421c85b2e
-////将文件copy到tmp目录
-//- (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL {
-//    NSError *error = nil;
-//    if (!fileURL.fileURL || ![fileURL checkResourceIsReachableAndReturnError:&error]) {
-//        return nil;
-//    }
-//    // Create "/temp/www" directory
-//    NSFileManager *fileManager= [NSFileManager defaultManager];
-//    NSURL *temDirURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@"www"];
-//    [fileManager createDirectoryAtURL:temDirURL withIntermediateDirectories:YES attributes:nil error:&error];
-//
-//    NSURL *dstURL = [temDirURL URLByAppendingPathComponent:fileURL.lastPathComponent];
-//    // Now copy given file to the temp directory
-//    //[fileManager removeItemAtURL:dstURL error:&error];
-//    [fileManager removeItemAtPath:[dstURL path] error:&error];
-//    //[fileManager copyItemAtURL:fileURL toURL:dstURL error:&error];
-//    [fileManager copyItemAtPath:[fileURL path] toPath:[dstURL path] error:&error];
-//    // Files in "/temp/www" load flawlesly :)
-//    return dstURL;
-//}
-
-//ref http://stackoverflow.com/questions/29723989/accelerate-loading-of-wkwebview
-//- (NSString *) syncAssetToTmp
-//{
-//    // Clear tmp directory
-//    NSArray* temporaryDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-//    for (NSString *file in temporaryDirectory) {
-//        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), file] error:NULL];
-//    }
-//
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    NSString *sourcePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@""];
-//    NSString *temporaryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@""];
-//    NSLog(@"TODO copy from %@ to %@", sourcePath, temporaryPath);
-//    NSError *error = nil;
-//
-//    // Copy directory
-//    if(![fileManager copyItemAtPath:sourcePath toPath:temporaryPath error:&error]) {
-//        NSLog(@"Could not copy directory %@",error);
-//    }
-//    return temporaryPath;
-//}
-
-
-//------------  UIViewController ------------
-
-//- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
-//{
-//
-//    if (webView != self.myWebView)
-//    {
-//        NSLog(@" webViewDidStartLoad: not the same webview?? ");
-//        return;
-//    }
-//    NSLog(@" didStartProvisionalNavigation TODO...");
-//    //injectDone=NO;
-//    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
-//    //[self notifyPollingInject :webView];
-//    //[self spinnerOn];
-//}
-
 - (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
 {
     if (webView != self.myWebView) {
@@ -101,9 +37,11 @@
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
     NSLog(@" webview didFailProvisionalNavigation for desc %@",[error description]);
-    if(_myWebView==webView)
+    if(_myWebView==webView){
         [self spinnerOff];
-    //[self closeUi];
+#warning TODO(!!!) judge whether first time load
+        [self closeUi];
+    }
 }
 
 //Invoked when an error occurs during a committed main frame navigation.
@@ -181,35 +119,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
     [self registerHandlerApi];
     
-    /////////////////////////////////////////////////////////////////
-    
-    WKWebViewConfiguration *
-    webConfig = [[WKWebViewConfiguration alloc]init];
-    
-    // Setup WKUserContentController instance for injecting user script
-    WKUserContentController* userController = [[WKUserContentController alloc]init];
-    
-    // Get script that's to be injected into the document
-    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js" :YES];
-    
-    // Specify when and where and what user script needs to be injected into the web document
-    WKUserScript* userScript
-    = [[WKUserScript alloc] initWithSource:js
-                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
-                          forMainFrameOnly:NO];
-    
-    [userController addUserScript:userScript];
-    
-    webConfig.userContentController= userController;
-    
-    [webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
-    
-    /////////////////////////////////////////////////////////////////
-    
-    //CGRect rect = [UIScreen mainScreen].bounds;
-    
-    //self.myWebView = [[WKWebView alloc]initWithFrame:rect];
-    self.myWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webConfig];
+    self.myWebView = [CMPHybridTools initHybridWebView :[WKWebView class] :self];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     
@@ -268,14 +178,6 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-- (void) spinnerOn
-{
-    [_myIndicatorView startAnimating];
-}
-- (void) spinnerOff
-{
-    [_myIndicatorView stopAnimating];
-}
 
 - (void)registerHandlerApi{
     
@@ -294,163 +196,13 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     }
 }
 
-- (void) loadUrl:(NSString *)url{
-    NSURL *requesturl = [NSURL URLWithString:url];
-    NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
-    [self.myWebView loadRequest:request];
-}
+//- (void) loadUrl:(NSString *)url{
+//    NSURL *requesturl = [NSURL URLWithString:url];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+//    [self.myWebView loadRequest:request];
+//}
 
-#warning TODO (1) TODO the height is not good...
-- (void) spinnerInit
-{
-    
-    //INIT SPIN
-    //UIActivitymyIndicatorView *
-    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-    _myIndicatorView.color =[UIColor whiteColor];
-    _myIndicatorView.layer.cornerRadius = 5;
-    _myIndicatorView.layer.masksToBounds = TRUE;
-    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
-    
-    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_myIndicatorView setHidesWhenStopped:YES];
-    _myIndicatorView.center=self.view.center;
-    [self.view addSubview:_myIndicatorView];
-}
 
-/**
- * handle message from webview
- */
-- (void)userContentController: (WKUserContentController *)userContentController
-      didReceiveScriptMessage:(WKScriptMessage *)message{
-    
-    if(message.webView!=_myWebView){
-        NSLog(@" userContentController: not the same webview?? ");
-        return;
-    }
-    
-    HybridUi caller=self;
-    
-    NSLog(@"message.body = %@", message.body);
-    //    NSLog(@"message.name = %@", message.name);
-    //    NSLog(@"message.frameInfo = %@", message.frameInfo);
-    //    NSLog(@"message.WKWebView = %@", message.webView);
-    JSO * msg=[JSO id2o:message.body];
-    NSString * handlerName_s = [[msg getChild:@"handlerName"] toString];
-    __block NSString * callBackId_s =[[msg getChild:@"callbackId"] toString];
-    JSO * param =[msg getChild:@"data"];
-    WKWebView *webView=message.webView;
-    
-    //to check the handlerName is auth by api_auth in config.json for current url
-    
-    JSO * api_auth = [CMPHybridTools getAppConfig:@"api_auth"];
-    NSString * uiname = caller.uiName;
-    JSO * api_auth_a = [api_auth getChild:uiname];
-    if(nil==api_auth_a){
-        NSLog(@" !!! find no api_auth for uiname %@", uiname);
-        return;
-    }
-    //NSString * handlerName_s = [handlerName toString];
-    if([CMPHybridTools isEmptyString:handlerName_s]){
-        NSLog(@" empty handlerName?? %@", param);
-        return;
-    }
-    BOOL flagFoundMatch=NO;
-    NSMutableArray *found_a=[[NSMutableArray alloc] init];
-    
-    NSURL *url =[webView URL];
-    NSString *scheme = [url scheme];
-    NSString *fullurl =[url absoluteString];
-    NSString *currenturl=fullurl;
-    if( [@"file" isEqualToString:scheme]){
-        currenturl=[url lastPathComponent];
-    }
-    for (NSString *kkk in [api_auth_a getChildKeys]) {
-        if([currenturl isEqualToString:kkk]){
-            flagFoundMatch=YES;
-            //found_a= [api_auth_a getChild:kkk];
-            //break;
-            //[found_a basicMerge:[api_auth_a getChild:kkk]];
-            JSO *jj =[api_auth_a getChild:kkk];
-            id idjj = [jj toId];
-            [found_a removeObjectsInArray:idjj];
-            [found_a addObjectsFromArray:idjj];
-        }
-        NSArray * matches = [CMPHybridTools quickRegExpMatch :kkk :fullurl];
-        if ([matches count] > 0){
-            flagFoundMatch=YES;
-            //found_a= [api_auth_a getChild:kkk];
-            //break;
-            //[found_a basicMerge:[api_auth_a getChild:kkk]];
-            JSO *jj =[api_auth_a getChild:kkk];
-            id idjj = [jj toId];
-            [found_a removeObjectsInArray:idjj];
-            [found_a addObjectsFromArray:idjj];
-        }
-    }
-    if(flagFoundMatch!=YES){
-        NSLog(@" !!! find no auth for handlerName(%@) uiname(%@) url(%@)", handlerName_s, uiname, currenturl);
-        return;
-    }
-    
-    BOOL flagInList=NO;
-    NSArray * keys =[found_a copy];
-    for (NSString *vvv in keys){
-        if([handlerName_s isEqualToString:vvv]){
-            flagInList=YES;
-            break;
-        }
-    }
-    
-    if (flagInList!=YES){
-        NSLog(@" !!! handler %@ is not in auth list %@", handlerName_s, keys);
-        return;
-    }
-    if(nil==caller.uiApiHandlers) {
-        NSLog(@" !!! caller.myApiHandlers is nil !!! %@", caller.uiData);
-        return;
-    }
-    
-    HybridHandler handler = caller.uiApiHandlers[handlerName_s];
-    
-    if (nil==handler) {
-        NSLog(@" !!! found no handler for %@", handlerName_s);
-        return;
-    }
-    
-    //NSString *callBackId_s=[callBackId toString];
-    HybridCallback callback=^(JSO *responseData){
-        NSLog(@"HybridCallback responseData %@", [responseData toString]);
-        NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
-        
-        @try {
-            NSString* javascriptCommand = [NSString stringWithFormat:@"setTimeout(function(){WebViewJavascriptBridge._app2js(%@);},1);", rt_s];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [CMPHybridTools callWebViewDoJs:webView :javascriptCommand];
-            });
-            //[caller evalJs:javascriptCommand];
-        } @catch (NSException *exception) {
-            NSLog(@" !!! error when callback to js %@",exception);
-        } @finally {
-        }
-        
-    };
-    
-    //async delay 0.01 second
-    dispatch_after
-    (dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)),
-     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-     ^{
-         NSString *param_s=[param toString];
-         @try {
-             handler([JSO s2o:param_s], callback);
-         } @catch (NSException *exception) {
-             callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
-         }
-     });
-    
-}
 - (BOOL)prefersStatusBarHidden {
     NSLog(@"prefersStatusBarHidden returns NO");
     return NO;
@@ -461,5 +213,4 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     NSLog(@"preferredStatusBarStyle returns UIStatusBarStyleDefault");
     return UIStatusBarStyleDefault;
 }
-
 @end

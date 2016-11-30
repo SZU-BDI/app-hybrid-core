@@ -9,9 +9,9 @@
 
 @property (nonatomic, strong) UIWebView * myWebView;
 
-@property (nonatomic, strong) UIActivityIndicatorView *myIndicatorView;
+//@property (nonatomic, strong) UIActivityIndicatorView *myIndicatorView;
 
--(void) loadUrl :(NSString *)url;
+//-(void) loadUrl :(NSString *)url;
 
 @end
 

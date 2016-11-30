@@ -4,15 +4,13 @@
 #import "CMPHybridUi.h"
 #import "CMPHybridUi_UIViewController.h"
 
-@interface CMPHybridWKWebViewUi :CMPHybridUi_UIViewController <WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+@interface CMPHybridWKWebViewUi :CMPHybridUi_UIViewController <WKNavigationDelegate, WKUIDelegate>
 {
-@protected UIActivityIndicatorView * _myIndicatorView;
-    
 }
 
 @property (nonatomic, strong) WKWebView * myWebView;
 
--(void) loadUrl :(NSString *)url;
+//-(void) loadUrl :(NSString *)url;
 
 @end
 

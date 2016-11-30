@@ -98,6 +98,8 @@
 
 + (void)saveGesturesPassword:(NSString*)pswd;
 
++ (id) initHybridWebView :(Class)c :(HybridUi) caller;
+
 @end
 
 

@@ -8,7 +8,6 @@
 
 @implementation CMPHybridWebViewUi
 
-
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     
     if (webView != self.myWebView) {
@@ -67,15 +66,16 @@
     [self CustomTopBarBtn];
     
     // initial the webView and add webview in window：
-    CGRect rect = [UIScreen mainScreen].bounds;
-    
-    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
+//    CGRect rect = [UIScreen mainScreen].bounds;
+//    
+//    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
+    self.myWebView=[CMPHybridTools initHybridWebView:[UIWebView class] :(HybridUi) self];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     //self.view.backgroundColor=[UIColor whiteColor];
     //self.myWebView.backgroundColor = [UIColor blackColor];
     
-    self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
+    //self.myWebView.delegate = self;// NOTES: UIWebViewDelegate, using "self" as the responder...
     
     // The page automatically zoom to fit the screen, default NO.
     self.myWebView.scalesPageToFit = YES;
@@ -89,7 +89,7 @@
     
     [self spinnerInit];
     [self spinnerOn];
-
+    
     [CMPHybridTools callWebViewLoadUrl:_myWebView :address];
     
 }
@@ -144,15 +144,6 @@
     }];
 }
 
-- (void) spinnerOn
-{
-    [_myIndicatorView startAnimating];
-}
-- (void) spinnerOff
-{
-    [_myIndicatorView stopAnimating];
-}
-
 - (void)registerHandlerApi{
     
     self.uiApiHandlers = [NSMutableDictionary dictionary];
@@ -170,30 +161,12 @@
     }
 }
 
-- (void) loadUrl:(NSString *)url{
-    NSURL *requesturl = [NSURL URLWithString:url];
-    NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
-    [self.myWebView loadRequest:request];
-}
+//- (void) loadUrl:(NSString *)url{
+//    NSURL *requesturl = [NSURL URLWithString:url];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:requesturl];
+//    [self.myWebView loadRequest:request];
+//}
 
-
-- (void) spinnerInit
-{
-    //INIT SPIN
-    //UIActivitymyIndicatorView *
-    _myIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    _myIndicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-    _myIndicatorView.color =[UIColor whiteColor];
-    _myIndicatorView.layer.cornerRadius = 5;
-    _myIndicatorView.layer.masksToBounds = TRUE;
-    _myIndicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
-    
-    _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_myIndicatorView setHidesWhenStopped:YES];
-    _myIndicatorView.center=self.view.center;
-    [self.view addSubview:_myIndicatorView];
-    
-}
 
 
 @end
