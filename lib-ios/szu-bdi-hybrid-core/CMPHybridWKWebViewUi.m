@@ -8,27 +8,27 @@
 
 //WKWebViewConfiguration *webConfig;
 
-//ref http://www.jianshu.com/p/ccb421c85b2e
-//将文件copy到tmp目录
-- (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL {
-    NSError *error = nil;
-    if (!fileURL.fileURL || ![fileURL checkResourceIsReachableAndReturnError:&error]) {
-        return nil;
-    }
-    // Create "/temp/www" directory
-    NSFileManager *fileManager= [NSFileManager defaultManager];
-    NSURL *temDirURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@"www"];
-    [fileManager createDirectoryAtURL:temDirURL withIntermediateDirectories:YES attributes:nil error:&error];
-    
-    NSURL *dstURL = [temDirURL URLByAppendingPathComponent:fileURL.lastPathComponent];
-    // Now copy given file to the temp directory
-    //[fileManager removeItemAtURL:dstURL error:&error];
-    [fileManager removeItemAtPath:[dstURL path] error:&error];
-    //[fileManager copyItemAtURL:fileURL toURL:dstURL error:&error];
-    [fileManager copyItemAtPath:[fileURL path] toPath:[dstURL path] error:&error];
-    // Files in "/temp/www" load flawlesly :)
-    return dstURL;
-}
+////ref http://www.jianshu.com/p/ccb421c85b2e
+////将文件copy到tmp目录
+//- (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL {
+//    NSError *error = nil;
+//    if (!fileURL.fileURL || ![fileURL checkResourceIsReachableAndReturnError:&error]) {
+//        return nil;
+//    }
+//    // Create "/temp/www" directory
+//    NSFileManager *fileManager= [NSFileManager defaultManager];
+//    NSURL *temDirURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@"www"];
+//    [fileManager createDirectoryAtURL:temDirURL withIntermediateDirectories:YES attributes:nil error:&error];
+//    
+//    NSURL *dstURL = [temDirURL URLByAppendingPathComponent:fileURL.lastPathComponent];
+//    // Now copy given file to the temp directory
+//    //[fileManager removeItemAtURL:dstURL error:&error];
+//    [fileManager removeItemAtPath:[dstURL path] error:&error];
+//    //[fileManager copyItemAtURL:fileURL toURL:dstURL error:&error];
+//    [fileManager copyItemAtPath:[fileURL path] toPath:[dstURL path] error:&error];
+//    // Files in "/temp/www" load flawlesly :)
+//    return dstURL;
+//}
 
 //ref http://stackoverflow.com/questions/29723989/accelerate-loading-of-wkwebview
 //- (NSString *) syncAssetToTmp
@@ -181,8 +181,8 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
     [self registerHandlerApi];
     
-    /////////////
-    // Create WKWebViewConfiguration instance
+    /////////////////////////////////////////////////////////////////
+
     WKWebViewConfiguration *
     webConfig = [[WKWebViewConfiguration alloc]init];
     
@@ -190,23 +190,22 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     
     // Get script that's to be injected into the document
-    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js"];
+    NSString *js = [CMPHybridTools readAssetInStr:@"WebViewJavascriptBridge.js" :YES];
     
     // Specify when and where and what user script needs to be injected into the web document
-    WKUserScript* userScript = [[WKUserScript alloc] initWithSource:js
-                                                      injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
-                                                   forMainFrameOnly:NO];
-    
-    // Add the user script to the WKUserContentController instance
+    WKUserScript* userScript
+    = [[WKUserScript alloc] initWithSource:js
+                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                          forMainFrameOnly:NO];
+
     [userController addUserScript:userScript];
     
-    // Configure the WKWebViewConfiguration instance with the WKUserContentController
     webConfig.userContentController= userController;
     
     [webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
     
-    /////////////
-    // initial the webView and add webview in window：
+    /////////////////////////////////////////////////////////////////
+
     //CGRect rect = [UIScreen mainScreen].bounds;
     
     //self.myWebView = [[WKWebView alloc]initWithFrame:rect];

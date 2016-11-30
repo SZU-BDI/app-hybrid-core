@@ -129,7 +129,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     CMPHybridTools *hybridManager = [self shareInstance];
     if(nil==hybridManager.jso){
         //TODO [CMPHybridTools stripComment:s]
-        NSString *s =[self readAssetInStr:@"config.json"];
+        NSString *s =[self readAssetInStr:@"config.json" :YES];
         hybridManager.jso = [JSO s2o:s];
     }
 }
@@ -182,6 +182,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     [uiConfig basicMerge:initData];
     theHybridUi.uiName=strUiName;
     theHybridUi.uiData=uiConfig;
+    
     //theHybridUi.responseData=[JSO id2o:@{}];
     
     /////////////////////////////////////// Display It {
@@ -192,15 +193,15 @@ SINGLETON_shareInstance(CMPHybridTools);
             ddd.window.rootViewController = (UIViewController *)theHybridUi;
         }
         else{
-            
-            UINavigationController *nav = [[UINavigationController alloc]
-                                           initWithRootViewController:(UIViewController *)theHybridUi];
-            
+            UINavigationController *nav
+            = [[UINavigationController alloc] initWithRootViewController:(UIViewController *)theHybridUi];
             ddd.window.rootViewController = nav;
         }
     }
-    //preload
+    
     UIViewController *ui = (UIViewController *)theHybridUi;
+    
+    //preload, which will call viewDidLoad first.
     [ui.view layoutSubviews];
     
     if (objCaller == nil) {
@@ -475,20 +476,43 @@ SINGLETON_shareInstance(CMPHybridTools);
             error:NULL];
 }
 
++(NSString *)readAssetInStr :(NSString *)filename :(BOOL)removeComments
+{
+    NSString *rt=[self readAssetInStr:filename];
+    rt=[self quickRegExpReplace :@"^[ \t]*//.*$" :rt :@""];
+    return rt;
+}
+
+
 +(BOOL) isEmptyString :(NSString *)s
 {
     return (nil==s || [@"" isEqualToString:s]);
 }
 
+
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt
 {
     NSError *error = NULL;
     NSRange range = NSMakeRange(0, [txt length]);
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regex_s options:0 error:&error];
+    NSRegularExpression *regex =
+    [NSRegularExpression regularExpressionWithPattern:regex_s
+                                              options:0
+                                                error:&error];
     if(nil!=error){
         NSLog(@"error when quickRegExpMatch %@",error);
     }
     return [regex matchesInString:txt options:0 range:range];
+}
+
++(NSString *) quickRegExpReplace :(NSString *)regex_s :(NSString *)src :(NSString *)tgt
+{
+    NSError *error = NULL;
+    NSRange range = NSMakeRange(0, [src length]);
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regex_s options:NSRegularExpressionAnchorsMatchLines error:&error];
+    if(nil!=error){
+        NSLog(@"error when quickRegExpReplace %@",error);
+    }
+    return [regex stringByReplacingMatchesInString:src options:0 range:range withTemplate:tgt];
 }
 
 + (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block

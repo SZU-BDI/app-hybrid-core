@@ -39,6 +39,8 @@
 
 + (NSString *) fullPathOfAsset :(NSString *)filename;
 +(NSString *)readAssetInStr :(NSString *)filename;
++(NSString *)readAssetInStr :(NSString *)filename :(BOOL)removeComments;
+
 +(BOOL) isEmptyString :(NSString *)s;
 
 + (void) quickShowMsgMain :(NSString *)msg;
@@ -63,7 +65,14 @@
 //+ (JSContext *) getWebViewJsCtx :(UIWebView *) _webview;
 //+ (JSContext *) getWKWebViewJsCtx :(WKWebView *) _webview;
 
+/**
+ *
+ * Return a array of "matches".
+ * Usage
+ *   if ([matches count] > 0) ...
+ */
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt;
++(NSString *) quickRegExpReplace :(NSString *)regex_s :(NSString *)src :(NSString *)tgt;
 
 + (void) countDown:(double)interval initTime:(double)initTime block:(BOOL (^)(NSTimer *tm))block;
 
