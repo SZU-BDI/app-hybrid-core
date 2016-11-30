@@ -22,6 +22,23 @@ import com.google.zxing.Result;
 import java.io.IOException;
 import java.util.Vector;
 
+/**
+ * Usage
+ *
+ * @Override Intent intent = new Intent();
+ * intent.setClass(ScanUi.this, info.cmptech.scanwrapper.MipcaActivityCapture.class);
+ * intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//do top
+ * startActivityForResult(intent, 1);
+ * @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+ * ....
+ * String resultString = null;
+ * if (null != data) {
+ * resultString = data.getStringExtra("rt");
+ * }
+ * ....
+ * }
+ */
+
 public class MipcaActivityCapture extends Activity implements Callback {
 
     //    private static final float BEEP_VOLUME = 0.10f;
@@ -137,25 +154,26 @@ public class MipcaActivityCapture extends Activity implements Callback {
         super.onDestroy();
     }
 
+    //    public static void appConfirm(
+//            Context ctx, String msg,
+//            AlertDialog.OnClickListener okListener,
+//            AlertDialog.OnClickListener cancelListener) {
+//        AlertDialog.Builder b2;
+//        b2 = new AlertDialog.Builder(ctx);
+//        b2.setMessage(msg)
+//                .setPositiveButton("NO", cancelListener)
+//                .setNegativeButton("YES", okListener);
+//        b2.setCancelable(false);
+//        b2.create();
+//        b2.show();
+//    }
     public void handleDecode(Result result, Bitmap barcode) {
         inactivityTimer.onActivity();
         //playBeepSoundAndVibrate();
         String resultString = result.getText();
 
         //TODO prompt user "OK?", if user NO, than start again, if YES, continue return....
-//        public static void appConfirm(
-//                Context ctx, String msg,
-//                AlertDialog.OnClickListener okListener,
-//                AlertDialog.OnClickListener cancelListener) {
-//            AlertDialog.Builder b2;
-//            b2 = new AlertDialog.Builder(ctx);
-//            b2.setMessage(msg)
-//                    .setPositiveButton("NO", cancelListener)
-//                    .setNegativeButton("YES", okListener);
-//            b2.setCancelable(false);
-//            b2.create();
-//            b2.show();
-//        }
+
 
         CameraManager.get().stopPreview();
         if (null == resultString || resultString.equals("")) {
@@ -167,7 +185,8 @@ public class MipcaActivityCapture extends Activity implements Callback {
             Log.v("MipcaActivityCapture", " scan = " + resultString);
 
             Intent id = new Intent();
-            id.putExtra("result", resultString);
+            id.putExtra("rt", resultString);
+
             //MipcaActivityCapture.this.setResult(1, id);
             setResult(1, id);
         }
