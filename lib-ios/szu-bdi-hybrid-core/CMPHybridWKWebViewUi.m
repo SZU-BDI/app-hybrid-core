@@ -6,17 +6,15 @@
 
 @implementation CMPHybridWKWebViewUi
 
+BOOL isFirstLoad=YES;
+
 - (void) webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
 {
     if (webView != self.myWebView) {
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    //injectDone=NO;
-    //NSLog(@" notifyPollingInject from webViewDidStartLoad...");
-    //[self notifyPollingInject :webView];
     
-    NSLog(@"spinnerOn...");
     [self spinnerOn];
 }
 
@@ -26,26 +24,24 @@
         NSLog(@" webViewDidStartLoad: not the same webview?? ");
         return;
     }
-    //NSLog(@" notifyPollingInject from webViewDidFinishLoad...");
-    //[self notifyPollingInject :webView];
-    NSLog(@"spinnerOff");
+    isFirstLoad=NO;
     [self spinnerOff];
 }
 
 //Invoked when an error occurs while starting to load data for the main frame.
-#warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
     NSLog(@" webview didFailProvisionalNavigation for desc %@",[error description]);
     if(_myWebView==webView){
-        [self spinnerOff];
-#warning TODO(!!!) judge whether first time load
-        [self closeUi];
+        
+        if(isFirstLoad)
+            [self closeUi];
+        else
+            [self spinnerOff];
     }
 }
 
 //Invoked when an error occurs during a committed main frame navigation.
-#warning TODO (1) after alert error, page should auto close...
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
     NSLog(@" webview didFailNavigation for desc %@",[error description]);
@@ -53,7 +49,6 @@
         [self spinnerOff];
     //[self closeUi];
 }
-
 
 //----------------   <WKUIDelegate>   -----------------
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
@@ -63,7 +58,6 @@
     }];
 }
 
-#warning TODO (1) try move to HybridTools to share with the UIWebView?
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
 {
     [CMPHybridTools quickConfirmMsgMain:message handlerYes:^(UIAlertAction *action) {
@@ -109,29 +103,31 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 
 -(void) initUi
 {
+    NSString *title = [[self.uiData getChild:@"title"] toString];
+    if ([CMPHybridTools isEmptyString:title]){
+        title=@" - - - ";//TODO
+    }
     [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
         
         NSLog(@"initUi() on eventName %@ ", eventName);
         [self resetTopBarStatus];
         [self resetTopBarBtn];
+        [self setTopBarTitle:title];
         [self setNeedsStatusBarAppearanceUpdate];
     } :nil];
     
     [self registerHandlerApi];
+    //[self resetTopBarBtn];
     
     self.myWebView = [CMPHybridTools initHybridWebView :[WKWebView class] :self];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
     
-    self.myWebView.navigationDelegate=self;//about start/stop/fail etc.
-    self.myWebView.UIDelegate=self;//about alert/confirm/prompt
+    self.myWebView.navigationDelegate=self;//for start/stop/fail etc.
+    self.myWebView.UIDelegate=self;//for alert/confirm/prompt
     
     // Edges prohibit sliding (default YES)
     self.myWebView.scrollView.bounces = NO;
-    
-    //@property(nonatomic,assign) UIRectEdge edgesForExtendedLayout NS_AVAILABLE_IOS(7_0); // Defaults to UIRectEdgeAll
-    //@property(nonatomic,assign) BOOL extendedLayoutIncludesOpaqueBars NS_AVAILABLE_IOS(7_0); // Defaults to NO, but bars are translucent by default on 7_0.
-    //@property(nonatomic,assign) BOOL automaticallyAdjustsScrollViewInsets NS_AVAILABLE_IOS(7_0); // Defaults to YES
     
     self.extendedLayoutIncludesOpaqueBars=YES;
     self.automaticallyAdjustsScrollViewInsets=NO;
@@ -145,7 +141,6 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
     if ( [CMPHybridTools isEmptyString:address] ){
         [CMPHybridTools quickShowMsgMain:@"no address?" callback:^{
-            
             [self closeUi];
         }];
         return;
@@ -178,7 +173,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     //    self.navigationItem.rightBarButtonItem = rightBtn;
 }
 
-
+//register will cache the handler inside the memory for speeding up.  so it's important
 - (void)registerHandlerApi{
     
     self.uiApiHandlers = [NSMutableDictionary dictionary];

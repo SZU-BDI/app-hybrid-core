@@ -7,10 +7,8 @@
 @interface CMPHybridWKWebViewUi :CMPHybridUi_UIViewController <WKNavigationDelegate, WKUIDelegate>
 {
 }
-
 @property (nonatomic, strong) WKWebView * myWebView;
 
-//-(void) loadUrl :(NSString *)url;
 
 @end
 

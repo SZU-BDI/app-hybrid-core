@@ -53,22 +53,27 @@
 //NOTES: can be overrided
 -(void) initUi
 {
+    NSString *title = [[self.uiData getChild:@"title"] toString];
+    if ([CMPHybridTools isEmptyString:title]){
+        title=@" - - - ";//TODO
+    }
     [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
         
         NSLog(@"initUi() on eventName %@ ", eventName);
         [self resetTopBarStatus];
         [self resetTopBarBtn];
+        [self setTopBarTitle:title];
         [self setNeedsStatusBarAppearanceUpdate];
     } :nil];
     
     [self registerHandlerApi];
     
-    [self CustomTopBarBtn];
+    //[self CustomTopBarBtn];
     
     // initial the webView and add webview in window：
-//    CGRect rect = [UIScreen mainScreen].bounds;
-//    
-//    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
+    //    CGRect rect = [UIScreen mainScreen].bounds;
+    //
+    //    self.myWebView = [[UIWebView alloc]initWithFrame:rect];
     self.myWebView=[CMPHybridTools initHybridWebView:[UIWebView class] :(HybridUi) self];
     
     //self.myWebView.backgroundColor = [UIColor whiteColor];
@@ -93,29 +98,29 @@
     [CMPHybridTools callWebViewLoadUrl:_myWebView :address];
     
 }
-//NOTES: can be overrided
-- (void) CustomTopBarBtn
-{
-    UIBarButtonItem *leftBar
-    = [[UIBarButtonItem alloc]
-       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-       style:UIBarButtonItemStylePlain
-       target:self
-       action:@selector(closeUi) //on('click')=>close()
-       ];
-    leftBar.tintColor = [UIColor blueColor];
-    
-    //    self.navigationItem.leftBarButtonItem
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-    //       target:self
-    //       action:@selector(closeUi)];
-    
-    //    UIBarButtonItem *rightBtn
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    //    self.navigationItem.rightBarButtonItem = rightBtn;
-}
+////NOTES: can be overrided
+//- (void) CustomTopBarBtn
+//{
+//    UIBarButtonItem *leftBar
+//    = [[UIBarButtonItem alloc]
+//       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+//       style:UIBarButtonItemStylePlain
+//       target:self
+//       action:@selector(closeUi) //on('click')=>close()
+//       ];
+//    leftBar.tintColor = [UIColor blueColor];
+//    
+//    //    self.navigationItem.leftBarButtonItem
+//    //    = [[UIBarButtonItem alloc]
+//    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+//    //       target:self
+//    //       action:@selector(closeUi)];
+//    
+//    //    UIBarButtonItem *rightBtn
+//    //    = [[UIBarButtonItem alloc]
+//    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+//    //    self.navigationItem.rightBarButtonItem = rightBtn;
+//}
 
 //------------ self -----------------
 
