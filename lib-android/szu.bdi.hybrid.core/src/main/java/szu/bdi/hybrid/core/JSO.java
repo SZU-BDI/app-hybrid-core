@@ -214,7 +214,7 @@ public final class JSO {
     //for JO
     public JSO getChild(String k) {
         JSO jso = new JSO();
-        if (_jv instanceof JsonObject) {
+        if (k!=null && _jv instanceof JsonObject) {
             JsonValue jv = _jv.asObject().get(k);
             jso.setValue(jv);
         }
