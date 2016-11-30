@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
@@ -335,14 +336,10 @@ public class HybridTools {
         //HybridUi callee = null;
         Intent intent = null;
         try {
-            //reflection:
-            //callee = (HybridUi) Class.forName(clsName).newInstance();
-            //Log.v(LOGTAG, "class " + clsName + " found for name " + name);
-
-            //intent = new Intent(caller, callee.getClass());
             intent = new Intent(caller, Class.forName(clsName));
         } catch (Exception ex) {
-            HybridTools.quickShowMsgMain("config.json error!!! error " + ex.getMessage());
+            Looper.prepare();
+            HybridTools.quickShowMsgMain("not found " + clsName);
             return;
         }
 
@@ -395,6 +392,7 @@ public class HybridTools {
 //            }
             //caller.startActivity()
         } catch (Throwable t) {
+            Log.v(LOGTAG, "Throwable "+t.getMessage() +"  check manifest xml???");
             quickShowMsgMain("Error:" + t.getMessage());
         }
         //Log.v(LOGTAG, "startUi() try to return null...");

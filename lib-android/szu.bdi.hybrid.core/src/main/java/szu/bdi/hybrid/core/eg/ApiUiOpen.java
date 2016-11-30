@@ -46,7 +46,7 @@ public class ApiUiOpen extends HybridApi {
 //                        uiName = t;
 //                    }
 //                }
-                Looper.prepare();
+
                 HybridTools.startUi(uiName, dataStr, (Activity) callerAct, new HybridUiCallback() {
                     @Override
                     public void onCallBack(final HybridUi ui) {

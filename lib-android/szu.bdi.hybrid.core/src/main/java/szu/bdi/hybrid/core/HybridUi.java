@@ -111,15 +111,7 @@ public class HybridUi extends Activity {
             //
         }
         trigger("close", o);
-
-//        Intent rtIntent = new Intent();
-//        rtIntent.putExtra("rt", o.toString());
-//
-//        //@ref onActivityResult()
-//        setResult(1, rtIntent);
-//
-////        HybridTools.closeHybridUi(this);
-//        finish();
+        finish();
     }
 
     Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();

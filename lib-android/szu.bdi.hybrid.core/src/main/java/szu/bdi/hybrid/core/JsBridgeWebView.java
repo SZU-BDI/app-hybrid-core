@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -166,6 +167,7 @@ public class JsBridgeWebView extends WebView {
                 (new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Looper.prepare();
                         handler.handler(param_s, responseFunction);
                     }
                 })).start();
