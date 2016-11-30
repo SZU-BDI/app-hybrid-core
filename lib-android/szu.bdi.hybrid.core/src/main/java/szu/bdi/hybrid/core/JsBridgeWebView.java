@@ -127,9 +127,9 @@ public class JsBridgeWebView extends WebView {
 
             final String uiName = ((HybridUi) _context).getUiData("name").toString();
 
-            Log.v(LOGTAG, "TODO js2app handlerName " + handlerName + " uiName " + uiName);
+            Log.v(LOGTAG, " js2app handlerName " + handlerName + " uiName " + uiName);
 
-            //TODO 这里要有个 auth-mapping (whitelist) check!!!!
+            //TODO !!!! 这里要有个 auth-mapping (url-regexp) check!!!!
 
             final HybridCallback responseFunction = new HybridCallback() {
                 @Override
@@ -169,6 +169,8 @@ public class JsBridgeWebView extends WebView {
                         handler.handler(param_s, responseFunction);
                     }
                 })).start();
+            }else{
+                Log.v(LOGTAG, " not found registered handlerName " + handlerName + " uiName " + uiName);
             }
             return "OK";
         }

@@ -19,7 +19,7 @@
 //    NSFileManager *fileManager= [NSFileManager defaultManager];
 //    NSURL *temDirURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@"www"];
 //    [fileManager createDirectoryAtURL:temDirURL withIntermediateDirectories:YES attributes:nil error:&error];
-//    
+//
 //    NSURL *dstURL = [temDirURL URLByAppendingPathComponent:fileURL.lastPathComponent];
 //    // Now copy given file to the temp directory
 //    //[fileManager removeItemAtURL:dstURL error:&error];
@@ -38,13 +38,13 @@
 //    for (NSString *file in temporaryDirectory) {
 //        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), file] error:NULL];
 //    }
-//    
+//
 //    NSFileManager *fileManager = [NSFileManager defaultManager];
 //    NSString *sourcePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@""];
 //    NSString *temporaryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@""];
 //    NSLog(@"TODO copy from %@ to %@", sourcePath, temporaryPath);
 //    NSError *error = nil;
-//    
+//
 //    // Copy directory
 //    if(![fileManager copyItemAtPath:sourcePath toPath:temporaryPath error:&error]) {
 //        NSLog(@"Could not copy directory %@",error);
@@ -57,7 +57,7 @@
 
 //- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
 //{
-//    
+//
 //    if (webView != self.myWebView)
 //    {
 //        NSLog(@" webViewDidStartLoad: not the same webview?? ");
@@ -182,7 +182,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self registerHandlerApi];
     
     /////////////////////////////////////////////////////////////////
-
+    
     WKWebViewConfiguration *
     webConfig = [[WKWebViewConfiguration alloc]init];
     
@@ -197,7 +197,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     = [[WKUserScript alloc] initWithSource:js
                              injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
                           forMainFrameOnly:NO];
-
+    
     [userController addUserScript:userScript];
     
     webConfig.userContentController= userController;
@@ -205,7 +205,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [webConfig.userContentController addScriptMessageHandler:self name:@"nativejsb"];
     
     /////////////////////////////////////////////////////////////////
-
+    
     //CGRect rect = [UIScreen mainScreen].bounds;
     
     //self.myWebView = [[WKWebView alloc]initWithFrame:rect];
@@ -232,7 +232,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     [self spinnerOn];
     
     NSString *address = [[self.uiData getChild:@"address"] toString];
-
+    
     if ( [CMPHybridTools isEmptyString:address] ){
         [CMPHybridTools quickShowMsgMain:@"no address?" callback:^{
             
@@ -342,9 +342,7 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     JSO * param =[msg getChild:@"data"];
     WKWebView *webView=message.webView;
     
-    //^(JSValue *callBackId,JSValue *handlerName,JSValue *param){
-    
-    //to check the handlerName is auth by api_auth in config.json for current url !!
+    //to check the handlerName is auth by api_auth in config.json for current url
     
     JSO * api_auth = [CMPHybridTools getAppConfig:@"api_auth"];
     NSString * uiname = caller.uiName;
