@@ -93,6 +93,11 @@
 + (NSString *) getLang:(NSString *)key;
 //+ (BOOL) checkCamera;
 
+// 手势密码读写
++ (NSString *)loadGesturesPassword;
+
++ (void)saveGesturesPassword:(NSString*)pswd;
+
 @end
 
 

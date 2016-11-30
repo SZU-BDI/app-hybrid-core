@@ -763,6 +763,26 @@ SINGLETON_shareInstance(CMPHybridTools);
 + (void)loadUserConfig{
     
 }
+
+#pragma mark - 手势密码读写
++ (NSString *)loadGesturesPassword{
+    
+    NSString *pswd = [[NSUserDefaults standardUserDefaults] objectForKey:@"lock"];
+    
+    if (pswd != nil && ![pswd isEqualToString:@""] && ![pswd isEqualToString:@"(null)"]) {
+        
+        return pswd;
+    }
+    
+    return nil;
+}
+
++ (void)saveGesturesPassword:(NSString*)pswd{
+    
+    [[NSUserDefaults standardUserDefaults] setObject:pswd forKey:@"lock"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 /****************************** STUB FOR LATER *********************************/
 
 @end
