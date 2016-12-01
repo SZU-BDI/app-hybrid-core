@@ -7,7 +7,7 @@ import java.util.Date;
 import szu.bdi.hybrid.core.HybridApi;
 import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridHandler;
-import szu.bdi.hybrid.core.JSO;
+import info.cmptech.JSO;
 
 public class ApiPingPong extends HybridApi {
     public HybridHandler getHandler() {

@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="info.cmptech.printwrapper">
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+    <application android:name="android.app.Application">
+        <activity android:name=".ConnectBTPairedActivity"></activity>
+        <activity android:name=".SearchBTActivity"></activity>
+        <activity android:name=".SelectPrinterActivity"></activity>
+
+        <service
+            android:name=".PrintService"
+            android:enabled="true"></service>
+        <service
+            android:name="info.cmptech.printwrapper.PrinterWorkService"
+            android:enabled="true"></service>
+    </application>
+
+</manifest>

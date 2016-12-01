@@ -18,6 +18,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import info.cmptech.JSO;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

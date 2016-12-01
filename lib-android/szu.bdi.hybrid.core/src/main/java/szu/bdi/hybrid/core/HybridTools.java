@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import info.cmptech.JSO;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -227,7 +229,7 @@ public class HybridTools {
     }
 
     //private static JSONObject _jAppConfig = new JSONObject();
-    private static JSO _jAppConfig = null;//new JSO();
+    private static JSO _jAppConfig = null;//new info.cmptech.JSO();
 
     //init (replace the app config)
     public static void initAppConfig(JSO o) {

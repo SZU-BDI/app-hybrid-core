@@ -2,8 +2,6 @@ package szu.bdi.hybrid.core.eg;
 
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
-import android.app.Activity;
-import android.os.Looper;
 import android.util.Log;
 
 import java.util.Date;
@@ -11,10 +9,8 @@ import java.util.Date;
 import szu.bdi.hybrid.core.HybridApi;
 import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridHandler;
-import szu.bdi.hybrid.core.HybridTools;
-import szu.bdi.hybrid.core.HybridUi;
-import szu.bdi.hybrid.core.HybridUiCallback;
-import szu.bdi.hybrid.core.JSO;
+
+import info.cmptech.JSO;
 
 
 /**

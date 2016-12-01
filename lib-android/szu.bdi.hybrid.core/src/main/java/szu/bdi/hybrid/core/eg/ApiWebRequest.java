@@ -6,7 +6,7 @@ import szu.bdi.hybrid.core.HybridApi;
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridHandler;
-import szu.bdi.hybrid.core.JSO;
+import info.cmptech.JSO;
 
 //just an example Api return {STS:TODO} only
 

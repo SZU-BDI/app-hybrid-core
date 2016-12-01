@@ -1,5 +1,7 @@
 package szu.bdi.hybrid.core.eg;
 
+import info.cmptech.JSO;
+
 import szu.bdi.hybrid.core.*;
 
 public class ApiUiClose extends HybridApi {
