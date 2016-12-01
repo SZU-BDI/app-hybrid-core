@@ -55,7 +55,7 @@ public class JsBridgeWebView extends WebView {
         init(context);
 
         //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            this.addJavascriptInterface(new nativejsb(context), "nativejsb");
+        this.addJavascriptInterface(new nativejsb(context), "nativejsb");
         //} else {
         //    HybridTools.quickShowMsg(context, "Your android is too low version");
         //}
@@ -171,7 +171,7 @@ public class JsBridgeWebView extends WebView {
                         handler.handler(param_s, responseFunction);
                     }
                 })).start();
-            }else{
+            } else {
                 Log.v(LOGTAG, " not found registered handlerName " + handlerName + " uiName " + uiName);
             }
             return "OK";
@@ -187,12 +187,17 @@ public class JsBridgeWebView extends WebView {
 
         @Override
         public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-            HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    result.confirm();
-                }
-            });
+            try {
+                HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.confirm();
+                    }
+                });
+            } catch (Throwable th) {
+                th.printStackTrace();
+                result.confirm();
+            }
             return true;
         }
 

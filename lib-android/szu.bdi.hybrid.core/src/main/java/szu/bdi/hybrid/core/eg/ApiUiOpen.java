@@ -24,14 +24,11 @@ public class ApiUiOpen extends HybridApi {
     public HybridHandler getHandler() {
         return new HybridHandler() {
             @Override
-            public void handler(String dataStr, HybridCallback cb) {
-                final HybridCallback _callback = cb;
-                HybridUi callerAct = getCallerUi();
+            public void handler(String dataStr, final HybridCallback apiCallback) {
+                HybridUi callerUi = getCallerUi();
                 Log.v("_app_activity_open", dataStr);
 
-                //callerAct.setCallBackFunction(cb);
-
-                String uiName = "UiContent";//default
+                String uiName = "UiContent";//default to UiContent
 
                 JSO data_o = JSO.s2o(dataStr);
 
@@ -39,35 +36,24 @@ public class ApiUiOpen extends HybridApi {
                 if (!HybridTools.isEmptyString(t)) {
                     uiName = t;
                 }
-                //try override by the callParam.name
-//                if (data_o != null) {
-//                    String t = data_o.optString("name");
-//                    if (!HybridTools.isEmptyString(t)) {
-//                        uiName = t;
-//                    }
-//                }
 
-                HybridTools.startUi(uiName, dataStr, (Activity) callerAct, new HybridUiCallback() {
+                HybridTools.startUi(uiName, dataStr, callerUi, new HybridUiCallback() {
                     @Override
                     public void onCallBack(final HybridUi ui) {
                         //listen "close" event
                         ui.on("close", new HybridCallback() {
                             @Override
                             public void onCallBack(String cbStr) {
-//                                Intent _intent=new Intent();
-//                                _intent.putExtra("rt_s", cbStr);
-//                                ui.setResult(1,_intent);
-
-                                //onCallBack(JSO.s2o(cbStr));
-                                _callback.onCallBack(cbStr);
-                                ui.finish();
+                                //fwd
+                                onCallBack(JSO.s2o(cbStr));
                             }
 
                             @Override
                             public void onCallBack(JSO jso) {
-                                onCallBack(JSO.o2s(jso));
-                                //ui.setResult();
-
+                                //manually close it
+                                ui.finish();
+                                //api callback
+                                apiCallback.onCallBack(jso);
                             }
                         });
                     }
