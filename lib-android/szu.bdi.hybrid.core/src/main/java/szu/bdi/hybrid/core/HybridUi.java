@@ -100,21 +100,27 @@ public class HybridUi extends Activity {
     }
 
 
-    public void closeUi() {
-        //{name: $name, address: adress}
+    public boolean closeUi(JSO resultJSO) {
+        if (null != resultJSO) setResponseData(resultJSO);
+        return closeUi();
+    }
+
+    public boolean closeUi() {
+
         JSO o = _responseData;
         if (_responseData == null) {
+            //if not responseData default return {name: $name, address: adress} for caller reference only
             o = new JSO();
             o.setChild("name", getUiData("name"));
             o.setChild("address", getUiData("address"));
-        } else {
-            //
         }
         if (false == trigger("close", o)) {
 
             //if no handler from trigger, i need to close by self.
             finish();
+            return true;//real closed at this call
         }
+        return false;//didn't real close at this call
     }
 
     Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
