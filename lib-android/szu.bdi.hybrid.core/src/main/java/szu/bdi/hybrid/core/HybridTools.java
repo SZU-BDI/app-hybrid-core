@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -40,7 +41,7 @@ public class HybridTools {
         return _shareInstance;
     }
 
-    final private static String LOGTAG = "HybridTools";
+    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
     //    private Context _appContext = null;
     private static String _localWebRoot = "";
@@ -64,6 +65,7 @@ public class HybridTools {
             return thisApp.getApplicationContext();
         } catch (Exception ex) {
             ex.printStackTrace();
+            KillAppSelf();
             //TODO gracefully quit?
         }
 //        if (_appContext == null) {
@@ -294,6 +296,16 @@ public class HybridTools {
             Context ctx, String msg,
             AlertDialog.OnClickListener okListener,
             AlertDialog.OnClickListener cancelListener) {
+        if (null == cancelListener) {
+            cancelListener = new AlertDialog.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //dialog.cancel();
+                    //Log.v(LOGTAG, ".appConfirm().click()");
+                }
+            };
+        }
+        if (null == ctx) ctx = getAppContext();
         AlertDialog.Builder b2;
         b2 = new AlertDialog.Builder(ctx);
         b2.setMessage(msg)
@@ -392,7 +404,7 @@ public class HybridTools {
 //            }
             //caller.startActivity()
         } catch (Throwable t) {
-            Log.v(LOGTAG, "Throwable "+t.getMessage() +"  check manifest xml???");
+            Log.v(LOGTAG, "Throwable " + t.getMessage() + "  check manifest xml???");
             quickShowMsgMain("Error:" + t.getMessage());
         }
         //Log.v(LOGTAG, "startUi() try to return null...");

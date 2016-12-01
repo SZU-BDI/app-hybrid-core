@@ -110,8 +110,11 @@ public class HybridUi extends Activity {
         } else {
             //
         }
-        trigger("close", o);
-        finish();
+        if (false == trigger("close", o)) {
+
+            //if no handler from trigger, i need to close by self.
+            finish();
+        }
     }
 
     Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
@@ -122,13 +125,14 @@ public class HybridUi extends Activity {
         _cba.put(eventName, cb);
     }
 
-    public void trigger(String eventName, JSO o) {
+    public boolean trigger(String eventName, JSO o) {
         HybridCallback cb = _cba.get(eventName);
         if (cb == null) {
             Log.v(LOGTAG, "trigger() found no handler for " + eventName);
+            return false;//have no handler
         } else {
-            Log.v(LOGTAG, "do onCallBack() with o for " + eventName);
             cb.onCallBack(o);
+            return true;//have handler...
         }
     }
 
