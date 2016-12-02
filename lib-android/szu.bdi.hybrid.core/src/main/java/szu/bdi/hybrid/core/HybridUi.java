@@ -12,15 +12,12 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-import info.cmptech.JSO;
-
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO change the behavior to on/trigger.  and let the caller to do the decision later
-public class HybridUi extends Activity {
+import info.cmptech.JSO;
 
-    //    public static HybridUi tmpUiForLink = null;
+public class HybridUi extends Activity {
 
     //TODO TMP UGLY SOLUTION...TO IMPROVE LATER !!!
     public static HybridUiCallback tmpUiCallback = null;
@@ -29,7 +26,7 @@ public class HybridUi extends Activity {
 
     JSO _uiData;
     JSO _responseData;
-
+    Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -53,19 +50,11 @@ public class HybridUi extends Activity {
             }
             HybridUi.tmpUiCallback = null;
         }
-//        tmpUiForLink = this;
 
-//        Activity parent = getParent();
-////        if(parent instanceof)
-//        HybridTools.addHybridUi(this);
-//
-//        //TODO debug now...
-//        HybridTools.debugHybridUis();
+        resetTopBar();
+    }
 
-        //getParent().notifyChild($id)
-
-        //TODO 下面的搬去 setTopBar()
-
+    public void resetTopBar() {
         //N: FullScreen + top status, Y: Have Bar + top status, M: only bar - top status, F: full screen - top status
         String topbar = HybridTools.optString(getUiData("topbar"));
 
@@ -101,7 +90,6 @@ public class HybridUi extends Activity {
         }
     }
 
-
     public boolean closeUi(JSO resultJSO) {
         if (null != resultJSO) setResponseData(resultJSO);
         return closeUi();
@@ -125,8 +113,7 @@ public class HybridUi extends Activity {
         return false;//didn't real close at this call
     }
 
-    Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
-
+    //TODO 暂时只支持一对一 on/trigger， 以后有需求再改一对多（类似jQuery）
     public void on(String eventName, HybridCallback cb) {
         Log.v(LOGTAG, "Hybrid.on( " + eventName + ")");
         _cba.remove(eventName);
@@ -156,18 +143,11 @@ public class HybridUi extends Activity {
         return true;
     }
 
-    //in case old androids dont have onBackPress(), need onKeyDown() to do it
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        Log.v(LOGTAG, "onKeyDown " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Boolean reallyClose = true;
-//TODO
-//            reallyClose = HybridTools.ifLastActThenPromptUser(this);
-
-            if (reallyClose)
-                this.closeUi();
-            return reallyClose;
+            this.closeUi();
+            //return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -184,46 +164,20 @@ public class HybridUi extends Activity {
 
     public void setUiData(String k, JSO v) {
         _uiData.setChild(k, v);
-//        try {
-//            _uiData.put(k, v);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public JSO getUiData(String k) {
         if (null == _uiData) return null;
-        //Log.v(LOGTAG, "getUiData()  _uiData=" + _uiData);
-//        Log.v(LOGTAG, " getUiData " + k + "=>" + _uiData.opt(k));
-//        return _uiData.opt(k);
         return _uiData.getChild(k);
-    }
-
-    public void setResponseData(JSO jso) {
-        _responseData = jso;
     }
 
     public JSO getResponseData() {
         return _responseData;
     }
 
-    //deprecated, use trigger !!
-    //protected HybridCallback _cb = null;
-    //public void setCallBackFunction(HybridCallback cb) {
-//        _cb = cb;
-//    }
-
-    //@ref this.startActivityForResult() + (setResult() + finish())
-//    protected void onActivityResult(int requestCode, int resultCode, Intent rtIntent) {
-//        Log.v(LOGTAG, "resultCode=" + resultCode);
-//        if (rtIntent != null) {
-//            Log.v(LOGTAG, "rtIntent.getStringExtra(rt)=" + rtIntent.getStringExtra("rt"));
-//            if (_cb != null && resultCode > 0) {
-//                Log.v(LOGTAG, "onCallBack OK");
-//                _cb.onCallBack(rtIntent.getStringExtra("rt"));
-//            }
-//        }
-//    }
+    public void setResponseData(JSO jso) {
+        _responseData = jso;
+    }
 
     @Override
     public void onBackPressed() {

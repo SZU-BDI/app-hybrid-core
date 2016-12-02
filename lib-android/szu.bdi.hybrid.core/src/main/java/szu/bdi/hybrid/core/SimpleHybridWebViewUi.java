@@ -11,6 +11,7 @@ import android.util.Log;
 public class SimpleHybridWebViewUi extends HybridUi {
 
     final private static String LOGTAG = "SimpleHybridWebViewUi";
+    private JsBridgeWebView _wv = null;
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -25,7 +26,7 @@ public class SimpleHybridWebViewUi extends HybridUi {
 
         final Context _ctx = this;
 
-        JsBridgeWebView _wv = new JsBridgeWebView(_ctx);
+        _wv = new JsBridgeWebView(_ctx);
 
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";
@@ -52,5 +53,12 @@ public class SimpleHybridWebViewUi extends HybridUi {
 //        }
         //Log.v(LOGTAG, "load url=" + url);
         _wv.loadUrl(url);
+    }
+
+    protected void onPostResume() {
+        super.onPostResume();
+        if(null!=_wv){
+            _wv.loadUrl("javascript:try{$(document).trigger('postresume');}catch(ex){}");
+        }
     }
 }

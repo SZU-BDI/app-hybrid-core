@@ -229,6 +229,8 @@ public class JsBridgeWebView extends WebView {
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            //TODO 参考 ios的逻辑优化（polling the document.readyState)
+
             notifyPollingInject(view, url);
             super.onPageFinished(view, url);
         }
@@ -238,18 +240,14 @@ public class JsBridgeWebView extends WebView {
             super.onPageStarted(view, url, favicon);
         }
 
-        //TODO 参考 ios的逻辑优化（polling the document.readyState)
-        //TODO 小于API 19的虽然很少，不过还是要兼顾，如果判断url不在接受的范围内直接 removeJavascriptInterface("nativejsb")！！
-
         public void notifyPollingInject(WebView view, String url) {
             //inject
             String jsContent = readJsWithoutComments(view.getContext(), "WebViewJavascriptBridge.js");
 
-            //NOTES: no need to runOnUiThread() here...
+            //NOTES: no need to runOnUiThread() here...because called by onPageXXXX
             view.loadUrl("javascript:" + jsContent);
-
-            super.onPageFinished(view, url);
         }
+
         //NOTES
         //for <input type=file/> we suggest to give it up. using api to invoke activity to handle it...
         //which means the page need to call the jsb for the api by yourself ;)

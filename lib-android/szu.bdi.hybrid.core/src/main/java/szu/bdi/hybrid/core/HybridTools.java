@@ -45,44 +45,30 @@ public class HybridTools {
 
     final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
-    //    private Context _appContext = null;
-    private static String _localWebRoot = "";
 
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
 
-//    public static void setAppContext(Context ctx) {
-//
-//        //_appContext = ctx;
-//        shareInstance().appContext = ctx;
-//    }
+    private static Application _thisApp = null;
 
-    //TODO buffer later...using non static field...
-    public static Context getAppContext() {
+    public static Application getApplication() {
         try {
-            Application thisApp = (Application) Class.forName("android.app.ActivityThread")
-                    .getMethod("currentApplication").invoke(null, (Object[]) null);
-            //_appContext = thisApp.getApplicationContext();
-            return thisApp.getApplicationContext();
+            if (null == _thisApp) {
+                _thisApp = (Application) Class.forName("android.app.ActivityThread")
+                        .getMethod("currentApplication").invoke(null, (Object[]) null);
+            }
+            if (null == _thisApp) KillAppSelf();
+            ;
         } catch (Exception ex) {
             ex.printStackTrace();
             KillAppSelf();
-            //TODO gracefully quit?
         }
-//        if (_appContext == null) {
-//            try {
-//                Application thisApp = (Application) Class.forName("android.app.ActivityThread")
-//                        .getMethod("currentApplication").invoke(null, (Object[]) null);
-//                _appContext = thisApp.getApplicationContext();
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//                //TODO gracefully quit?
-//            }
-//        }
-//        return _appContext;
-//        return shareInstance().appContext;
-        return null;
+        return _thisApp;
+    }
+
+    public static Context getAppContext() {
+        return getApplication().getApplicationContext();
     }
 
     //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
@@ -104,7 +90,8 @@ public class HybridTools {
         }
     }
 
-    //NOTES:  because getSeeting will cause mis-understanding
+    //persistent save/load
+    //NOTES:  because getSetting will cause mis-understanding
     public static String getSavedSetting(Context mContext, String whichSp, String field) {
         SharedPreferences sp = mContext.getSharedPreferences(whichSp, Context.MODE_PRIVATE);
         String s = sp.getString(field, "");
@@ -122,7 +109,6 @@ public class HybridTools {
         String return_s = null;
 
         try {
-
             URL url = new URL(uu);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
@@ -142,7 +128,6 @@ public class HybridTools {
                 } catch (Throwable t) {
                 }
             }
-
         } catch (Throwable ex) {
             //TODO 如果是 filenotfound的exception，多数是因为远程错误400之类的，待处理
             ex.printStackTrace();
@@ -347,7 +332,9 @@ public class HybridTools {
             HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
             return;
         }
-        //HybridUi callee = null;
+
+        //////////////////////////////////////////////
+        //caller, calleeClass, uiDataJSO, cb
         Intent intent = null;
         try {
             intent = new Intent(caller, Class.forName(clsName));
@@ -365,52 +352,17 @@ public class HybridTools {
 
         intent.putExtra("uiData", uiData_s);
 
-//        if (cb != null) {
-//            //callee.setCallBackFunction(cb);
-//            //caller.setCallBackFunction(cb);
-//        }
         try {
             final Intent tmpIntent = intent;
             final Activity tmpCaller = caller;
 
-            HybridUi.tmpUiCallback = cb;
+            HybridUi.tmpUiCallback = cb;//tmp ugly working solution, improve in future...
 
             tmpCaller.startActivity(tmpIntent);
-
-            //caller.startActivityForResult(intent, 1);//onActivityResult()
-//            (new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    tmpCaller.startActivity(tmpIntent);
-//                }
-//            })).run();
-//            new Handler().postDelayed(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    tmpCaller.startActivity(tmpIntent);
-//                }
-//            }, 10);
-
-//            int i = 50;
-//            while (i > 0) {
-//                Log.v(LOGTAG, "!!! " + i);
-//                Thread.sleep(200);
-//                if (HybridUi.tmpUiForLink != null) {
-//                    HybridUi rt = HybridUi.tmpUiForLink;
-//                    //HybridUi.tmpUiForLink = null;
-//                    Log.v(LOGTAG, "try to return HybridUi.tmpUiForLink!!!!!");
-//                    return rt;
-//                }
-//                i--;
-//            }
-            //caller.startActivity()
         } catch (Throwable t) {
             Log.v(LOGTAG, "Throwable " + t.getMessage() + "  check manifest xml???");
             quickShowMsgMain("Error:" + t.getMessage());
         }
-        //Log.v(LOGTAG, "startUi() try to return null...");
-        //return null;//where is callee
     }
 
     protected static JSO findSubAuth(JSO jso, String nameOf) {
@@ -459,7 +411,6 @@ public class HybridTools {
         String address = optString(callerAct.getUiData("address"));
         JSO foundAuth = findSubAuth(authObj, address);
         if (foundAuth == null) {
-            //TODO
             HybridTools.quickShowMsgMain("ConfigError: not found match auth for address (" + address + ") !!!");
             return;
         }
@@ -581,6 +532,8 @@ public class HybridTools {
         return o.getClass().getName();
     }
 
+    private static String _localWebRoot = "";
+
     public static String getLocalWebRoot() {
         if (isEmptyString(_localWebRoot)) {
             _localWebRoot = "/android_asset/web/";
@@ -610,6 +563,8 @@ public class HybridTools {
         System.exit(0);
     }
 
+    ///////////////////////////////////////////////////////
+    //UI-Holders
 //    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();
 //
 //    public static ArrayList<HybridUi> debugHybridUis() {
@@ -625,7 +580,6 @@ public class HybridTools {
 //        if (_uia.contains(ui))
 //            _uia.remove(ui);
 //    }
-
 
 }
 
