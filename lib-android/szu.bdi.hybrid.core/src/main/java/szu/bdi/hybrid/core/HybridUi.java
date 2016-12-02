@@ -71,7 +71,9 @@ public class HybridUi extends Activity {
                 break;
             case "M":
                 //M: only top bar w- top status
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                }
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 break;
             case "N":
@@ -81,17 +83,24 @@ public class HybridUi extends Activity {
             case "Y":
             default:
                 //Y: top bar w+ top status (default)
-                requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    requestWindowFeature(Window.FEATURE_ACTION_BAR);
+                }
                 break;
         }
 
         try {
             //for some model of android
-            ActionBar actionBar = getActionBar();
+            ActionBar actionBar = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                actionBar = getActionBar();
+            }
             //NOTES: setDisplayHomeAsUpEnabled make onOptionsItemSelected() work
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ex) {
-        } catch (NoSuchMethodError ex) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
         }
     }
 
