@@ -561,6 +561,46 @@ public class HybridTools {
         System.exit(0);
     }
 
+    public static String readAssetInStr(String file_s) {
+        return readAssetInStr(file_s, false);//default original
+    }
+
+    public static String readAssetInStr(String file_s, boolean filterRowComments) {
+        InputStream in = null;
+        try {
+            in = getAppContext().getAssets().open(file_s);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            do {
+                line = bufferedReader.readLine();
+                if (filterRowComments) {
+                    if (line != null && !line.matches("^\\s*\\/\\/.*")) {
+                        sb.append(line);
+                    }
+                } else {
+                    sb.append(line);
+                }
+            } while (line != null);
+
+            bufferedReader.close();
+            in.close();
+
+            return sb.toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+                //in = null;
+            }
+        }
+        return null;
+    }
+
     ///////////////////////////////////////////////////////
     //UI-Holders
 //    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();

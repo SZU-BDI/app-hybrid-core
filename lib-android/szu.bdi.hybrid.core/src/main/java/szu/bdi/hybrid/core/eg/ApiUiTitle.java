@@ -2,22 +2,15 @@ package szu.bdi.hybrid.core.eg;
 
 //@doc https://szu-bdi.gitbooks.io/app-hybrid/content/
 
-import android.util.Log;
 
 import java.util.Date;
 
-import szu.bdi.hybrid.core.HybridApi;
-import szu.bdi.hybrid.core.HybridCallback;
-import szu.bdi.hybrid.core.HybridHandler;
+import szu.bdi.hybrid.core.*;
 
 import info.cmptech.JSO;
 
-
-/**
- *
- *
- */
 public class ApiUiTitle extends HybridApi {
+    //    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
     public HybridHandler getHandler() {
         return new HybridHandler() {
 //            @Override

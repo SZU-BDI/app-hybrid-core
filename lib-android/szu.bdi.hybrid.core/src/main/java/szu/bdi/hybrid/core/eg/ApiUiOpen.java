@@ -7,6 +7,7 @@ import info.cmptech.JSO;
 
 
 public class ApiUiOpen extends HybridApi {
+    //    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
     public HybridHandler getHandler() {
         return new HybridHandler() {
 //            @Override
@@ -60,12 +61,6 @@ public class ApiUiOpen extends HybridApi {
 
                         //listen "close" event
                         ui.on("close", new HybridCallback() {
-//                            @Override
-//                            public void onCallBack(String cbStr) {
-//
-//                                //fwd
-//                                onCallBack(JSO.s2o(cbStr));
-//                            }
 
                             @Override
                             public void onCallBack(JSO jso) {
@@ -79,8 +74,6 @@ public class ApiUiOpen extends HybridApi {
                         });
                     }
                 });
-//                //fwd
-//                handler(JSO.o2s(jso), cbFunc);
             }
         };
     }

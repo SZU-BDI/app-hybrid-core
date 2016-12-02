@@ -2,15 +2,11 @@ package szu.bdi.hybrid.core.eg;
 
 import android.util.Log;
 
-import szu.bdi.hybrid.core.HybridApi;
-import szu.bdi.hybrid.core.HybridTools;
-import szu.bdi.hybrid.core.HybridCallback;
-import szu.bdi.hybrid.core.HybridHandler;
+import szu.bdi.hybrid.core.*;
 import info.cmptech.JSO;
 
-//just an example Api return {STS:TODO} only
-
 public class ApiWebRequest extends HybridApi {
+    //    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
     public HybridHandler getHandler() {
         return new HybridHandler() {
 //            @Override
@@ -54,7 +50,6 @@ public class ApiWebRequest extends HybridApi {
                     rt.setChild("STS", "KO");
                     apiCallback.onCallBack(rt);
                 }
-                //handler(JSO.o2s(jso), cbFunc);
             }
         };
     }

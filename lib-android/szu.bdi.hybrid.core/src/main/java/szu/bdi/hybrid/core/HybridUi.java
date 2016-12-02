@@ -22,7 +22,7 @@ public class HybridUi extends Activity {
     //TODO TMP UGLY SOLUTION...TO IMPROVE LATER !!!
     public static HybridUiCallback tmpUiCallback = null;
 
-    private static String LOGTAG = "HybridUi";
+    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
     private JSO _uiData;
     private JSO _responseData;

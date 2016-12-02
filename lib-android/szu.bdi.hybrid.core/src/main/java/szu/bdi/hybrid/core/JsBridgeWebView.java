@@ -20,10 +20,6 @@ import android.webkit.WebViewClient;
 
 import info.cmptech.JSO;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +33,7 @@ public class JsBridgeWebView extends WebView {
 //    private final static String DATA_STR = "data";
 //    private final static String HANDLER_NAME_STR = "handlerName";
 
-    private final String LOGTAG = "JsBridgeWebView";
+    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
@@ -56,44 +52,12 @@ public class JsBridgeWebView extends WebView {
         super(context);
         init(context);
 
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
         this.addJavascriptInterface(new nativejsb(context), "nativejsb");
         //} else {
-        //    HybridTools.quickShowMsg(context, "Your android is too low version");
+        // TODO limit for some security...
+        //    //HybridTools.quickShowMsg(context, "Your android is too low version");
         //}
-    }
-
-    //copy from jsbridge, maybe improve or find more elegant version...
-    private static String readJsWithoutComments(Context c, String urlStr) {
-        InputStream in = null;
-        try {
-            in = c.getAssets().open(urlStr);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            StringBuilder sb = new StringBuilder();
-            do {
-                line = bufferedReader.readLine();
-                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                    sb.append(line);
-                }
-            } while (line != null);
-
-            bufferedReader.close();
-            in.close();
-
-            return sb.toString();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-                //in = null;
-            }
-        }
-        return null;
     }
 
     private void init(Context context) {
@@ -238,6 +202,12 @@ public class JsBridgeWebView extends WebView {
             });
             return true;
         }
+        //TODO design a loading % bar in future
+//        @Override
+//        public void onProgressChanged(WebView view, int progress) {
+//            super.onProgressChanged(view,progress);
+//            // Do something cool here
+//        }
     }
 
     class MyWebViewClient extends WebViewClient {
@@ -249,24 +219,24 @@ public class JsBridgeWebView extends WebView {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            //TODO 参考 ios的逻辑优化（polling the document.readyState)
-
             notifyPollingInject(view, url);
             super.onPageFinished(view, url);
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            notifyPollingInject(view, url);
             super.onPageStarted(view, url, favicon);
         }
 
         public void notifyPollingInject(WebView view, String url) {
             //inject
-            String jsContent = readJsWithoutComments(view.getContext(), "WebViewJavascriptBridge.js");
+            String jsContent = HybridTools.readAssetInStr("WebViewJavascriptBridge.js", true);
 
             //NOTES: no need to runOnUiThread() here...because called by onPageXXXX
             view.loadUrl("javascript:" + jsContent);
         }
+
 
         //NOTES
         //for <input type=file/> we suggest to give it up. using api to invoke activity to handle it...

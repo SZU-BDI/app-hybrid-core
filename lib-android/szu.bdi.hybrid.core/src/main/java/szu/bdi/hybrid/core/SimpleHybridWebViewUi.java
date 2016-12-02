@@ -10,7 +10,7 @@ import android.util.Log;
 //@SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class SimpleHybridWebViewUi extends HybridUi {
 
-    final private static String LOGTAG = "SimpleHybridWebViewUi";
+    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
     private JsBridgeWebView _wv = null;
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
