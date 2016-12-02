@@ -576,10 +576,10 @@ public class HybridTools {
                 line = bufferedReader.readLine();
                 if (filterRowComments) {
                     if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                        sb.append(line);
+                        sb.append(line +"\n");
                     }
                 } else {
-                    sb.append(line);
+                    sb.append(line +"\n");
                 }
             } while (line != null);
 
