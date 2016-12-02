@@ -1,19 +1,14 @@
 package szu.bdi.hybrid.core;
 
-
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-//@SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class SimpleHybridWebViewUi extends HybridUi {
 
     final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
     private JsBridgeWebView _wv = null;
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOGTAG, ".onCreate()");
