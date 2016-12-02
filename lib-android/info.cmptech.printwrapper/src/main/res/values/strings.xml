@@ -3,8 +3,6 @@
 
 
     <!-- 程序名称及活动标题-->
-    <string name="app_name">AsiaWeiLuy</string>
-    <string name="hello_world">你好，世界！</string>
     <string name="title_activity_apitest">JSON数据传输部分</string>
     <string name="title_activity_finishi">主活动，用于继承</string>
 
@@ -338,9 +336,9 @@
     <string name="button_bt_search_Printer">Search printer</string>
     <string name="button_bt_connect_Printer">Connect printer</string>
     <string name="button_bt_disconnect_Printer">Disconnect printer</string>
-    <string name="search_and_connect_printer">搜索并连接打印机</string>
-    <string name="disconnect_printer">断开打印机连接</string>
-    <string name="connect_matched_printer">连接已配对打印机</string>
+    <string name="search_and_connect_printer">Search and Connect Printer</string>
+    <string name="disconnect_printer">Disconnect printer</string>
+    <string name="connect_matched_printer">Connect Matched Printer</string>
 
 
 </resources>

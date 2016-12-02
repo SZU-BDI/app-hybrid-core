@@ -28,6 +28,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This object wraps the Camera service object and expects to be the only one talking to it. The
@@ -43,7 +45,9 @@ public final class CameraManager {
   private static final int MAX_FRAME_WIDTH = 700;
   private static final int MAX_FRAME_HEIGHT = 800;*/
 
-    private static CameraManager cameraManager;
+    private static Map<String, Object> dataStore = new HashMap<String, Object>();
+
+    //private static CameraManager cameraManager;
 
     static final int SDK_INT; // Later we can use Build.VERSION.SDK_INT
 
@@ -82,9 +86,12 @@ public final class CameraManager {
      * @param context The Activity which wants to use the camera.
      */
     public static void init(Context context) {
+        CameraManager cameraManager = (CameraManager) dataStore.get("cameraManager");
         if (cameraManager == null) {
             cameraManager = new CameraManager(context);
+            dataStore.put("cameraManager", cameraManager);
         }
+        //return cameraManager;
     }
 
     /**
@@ -92,7 +99,11 @@ public final class CameraManager {
      *
      * @return A reference to the CameraManager singleton.
      */
-    public static CameraManager get() {
+    public static CameraManager getShareInstance() {
+        CameraManager cameraManager = (CameraManager) dataStore.get("cameraManager");
+//        if (cameraManager == null) {
+//            throw new Exception("CameraManager is not init...");
+//        }
         return cameraManager;
     }
 

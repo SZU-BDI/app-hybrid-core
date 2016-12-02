@@ -57,7 +57,7 @@ class MyConstants {
         public static final String CHARACTER_SET = "CHARACTER_SET";
 
         /**
-         * Decode only UPC and EAN barcodes. This is the right choice for shopping apps which get
+         * Decode only UPC and EAN barcodes. This is the right choice for shopping apps which getShareInstance
          * prices, reviews, etc. for products.
          */
         public static final String PRODUCT_MODE = "PRODUCT_MODE";

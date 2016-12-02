@@ -1,5 +1,6 @@
 package szu.bdi.hybrid.core;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -37,20 +38,18 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class HybridTools {
-    private static HybridTools _shareInstance = new HybridTools();
-
-    public static HybridTools shareInstance() {
-        return _shareInstance;
-    }
-
-    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
-
-
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
+    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
+    @SuppressLint("StaticFieldLeak")
     private static Application _thisApp = null;
+    //private static JSONObject _jAppConfig = new JSONObject();
+    private static JSO _jAppConfig = null;//new info.cmptech.JSO();
+    private static String _localWebRoot = "";
+
+    //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
 
     public static Application getApplication() {
         try {
@@ -70,8 +69,6 @@ public class HybridTools {
     public static Context getAppContext() {
         return getApplication().getApplicationContext();
     }
-
-    //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
 
     public static void quickShowMsgMain(String msg) {
         quickShowMsg(getAppContext(), msg);
@@ -169,7 +166,6 @@ public class HybridTools {
         return rt;
     }
 
-
     public static String isoDateTime() {
         //String time_s = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale("en_US"));
@@ -212,9 +208,6 @@ public class HybridTools {
         }
         return null;
     }
-
-    //private static JSONObject _jAppConfig = new JSONObject();
-    private static JSO _jAppConfig = null;//new info.cmptech.JSO();
 
     //init (replace the app config)
     public static void initAppConfig(JSO o) {
@@ -531,8 +524,6 @@ public class HybridTools {
         if (o == null) return "null";
         return o.getClass().getName();
     }
-
-    private static String _localWebRoot = "";
 
     public static String getLocalWebRoot() {
         if (isEmptyString(_localWebRoot)) {

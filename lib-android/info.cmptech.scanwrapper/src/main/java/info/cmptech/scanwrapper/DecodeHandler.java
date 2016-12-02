@@ -33,8 +33,6 @@ import com.google.zxing.common.HybridBinarizer;
 
 import java.util.Hashtable;
 
-import info.cmptech.scanwrapper.R;
-
 
 class DecodeHandler extends Handler {
 
@@ -74,7 +72,7 @@ class DecodeHandler extends Handler {
         width = height;
         height = tmp;
 
-        PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(rotatedData, width, height);
+        PlanarYUVLuminanceSource source = CameraManager.getShareInstance().buildLuminanceSource(rotatedData, width, height);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         try {
             rawResult = multiFormatReader.decodeWithState(bitmap);

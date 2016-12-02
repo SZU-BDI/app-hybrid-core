@@ -75,7 +75,8 @@ public class ConnectBTPairedActivity extends Activity implements
         SharedPreferences sharedPref = getSharedPreferences("FileName", MODE_PRIVATE);
         SharedPreferences.Editor prefEditor = sharedPref.edit();
         prefEditor.putString("PrinterModel", (String) boundedPrinters.get(position).get(PRINTERNAME));
-        prefEditor.commit();
+        //prefEditor.commit();
+        prefEditor.apply();
 
 //        SharedPreferences sharedPref = getSharedPreferences("FileName", MODE_PRIVATE);
         String PrinterModel = sharedPref.getString("PrinterModel", "unknown");

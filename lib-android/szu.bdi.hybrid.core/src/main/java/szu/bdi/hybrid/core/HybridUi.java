@@ -24,9 +24,9 @@ public class HybridUi extends Activity {
 
     private static String LOGTAG = "HybridUi";
 
-    JSO _uiData;
-    JSO _responseData;
-    Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
+    private JSO _uiData;
+    private JSO _responseData;
+    private Map<String, HybridCallback> _cba = new HashMap<String, HybridCallback>();
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -40,6 +40,13 @@ public class HybridUi extends Activity {
 
         Log.v(LOGTAG, "HybridUi onCreate() try push ");
 
+        hookCallback();
+
+        resetTopBar();
+    }
+
+    private void hookCallback() {
+
         //Very ugly tmp solution. but it should working well, because app is very low thread conflict
         //for the open new UI.
         if (tmpUiCallback != null) {
@@ -50,8 +57,6 @@ public class HybridUi extends Activity {
             }
             HybridUi.tmpUiCallback = null;
         }
-
-        resetTopBar();
     }
 
     public void resetTopBar() {
@@ -181,6 +186,7 @@ public class HybridUi extends Activity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         this.closeUi();
     }
 

@@ -126,7 +126,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
             handler.quitSynchronously();
             handler = null;
         }
-        CameraManager.get().closeDriver();
+        CameraManager.getShareInstance().closeDriver();
     }
 
 //    @Override
@@ -175,7 +175,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
         //TODO prompt user "OK?", if user NO, than start again, if YES, continue return....
 
 
-        CameraManager.get().stopPreview();
+        CameraManager.getShareInstance().stopPreview();
         if (null == resultString || resultString.equals("")) {
             quickShowMsg(MipcaActivityCapture.this, "Failed Scan");
 //            Toast.makeText(MipcaActivityCapture.this, "Failed Scan" //R.string.bitmap_scan_failed
@@ -196,7 +196,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
 
     private void initCamera(SurfaceHolder surfaceHolder) {
         try {
-            CameraManager.get().openDriver(surfaceHolder);
+            CameraManager.getShareInstance().openDriver(surfaceHolder);
         } catch (IOException ioe) {
             return;
         } catch (RuntimeException e) {
@@ -362,7 +362,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
             decodeThread.start();
             state = State.SUCCESS;
             // Start ourselves capturing previews and decoding.
-            CameraManager.get().startPreview();
+            CameraManager.getShareInstance().startPreview();
             restartPreviewAndDecode();
         }
 
@@ -373,7 +373,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
                 // When one auto focus pass finishes, start another. This is the closest thing to
                 // continuous AF. It does seem to hunt a bit, but I'm not sure what else to do.
                 if (state == State.PREVIEW) {
-                    CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
+                    CameraManager.getShareInstance().requestAutoFocus(this, R.id.auto_focus);
                 }
 
             } else if (message.what == R.id.restart_preview) {
@@ -392,7 +392,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
 
             } else if (message.what == R.id.decode_failed) {// We're decoding as fast as possible, so when one decode fails, start another.
                 state = State.PREVIEW;
-                CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
+                CameraManager.getShareInstance().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
 
             } else if (message.what == R.id.return_scan_result) {
                 Log.d(TAG, "Got return scan result message");
@@ -411,7 +411,7 @@ public class MipcaActivityCapture extends Activity implements Callback {
 
         public void quitSynchronously() {
             state = State.DONE;
-            CameraManager.get().stopPreview();
+            CameraManager.getShareInstance().stopPreview();
             Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
             quit.sendToTarget();
             try {
@@ -428,8 +428,8 @@ public class MipcaActivityCapture extends Activity implements Callback {
         private void restartPreviewAndDecode() {
             if (state == State.SUCCESS) {
                 state = State.PREVIEW;
-                CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
-                CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
+                CameraManager.getShareInstance().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
+                CameraManager.getShareInstance().requestAutoFocus(this, R.id.auto_focus);
                 activity.drawViewfinder();
             }
         }
