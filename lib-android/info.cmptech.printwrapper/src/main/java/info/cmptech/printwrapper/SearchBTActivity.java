@@ -159,7 +159,7 @@ public class SearchBTActivity extends Activity implements OnClickListener {
                     Button button = new Button(context);
                     button.setText(printerName + " - " + address);
                     button.setGravity(Gravity.CENTER_VERTICAL
-                            | Gravity.LEFT);
+                            | Gravity.START);
                     button.setOnClickListener(new OnClickListener() {
 
                         public void onClick(View arg0) {
