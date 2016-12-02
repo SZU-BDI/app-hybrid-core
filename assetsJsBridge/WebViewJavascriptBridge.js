@@ -98,6 +98,9 @@
 		//for app send js:
 		_app2js: _app2js,
 
+		//for old system...
+		init:function(){console.log('old init() is called.')},
+
 		registerHandler: registerHandler,
 		callHandler: callHandler
 	};
