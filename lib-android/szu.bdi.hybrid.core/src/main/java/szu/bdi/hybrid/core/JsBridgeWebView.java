@@ -125,6 +125,7 @@ public class JsBridgeWebView extends WebView {
             return "20161119";
         }
 
+        //NOTES: for native object injected into the webview, the parameters must be primitive.
         @JavascriptInterface
         public String js2app(final String callBackId, String handlerName, final String param_s) {
 
@@ -135,15 +136,38 @@ public class JsBridgeWebView extends WebView {
             //TODO !!!! 这里要有个 auth-mapping (url-regexp) check!!!!
 
             final HybridCallback responseFunction = new HybridCallback() {
+//                @Override
+//                public void onCallBack(final String data_s) {
+//                    ((Activity) _context).runOnUiThread(new Runnable() {
+//                        @TargetApi(Build.VERSION_CODES.KITKAT)
+//                        @Override
+//                        public void run() {
+//                            JSO msg = new JSO();
+//                            msg.setChild(RESPONSE_ID_STR, callBackId);
+//                            msg.setChild(RESPONSE_DATA_STR, data_s);
+//                            String s = msg.toString(true);
+//                            if ("".equals(s) || s == null) s = "null";
+//                            Log.v(LOGTAG, "js2app s ==> " + s);
+//                            evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
+//                                @Override
+//                                public void onReceiveValue(String value) {
+//                                    Log.v(LOGTAG, " onReceiveValue " + value);
+//                                }
+//                            });
+//                        }
+//                    });
+//                }
+
                 @Override
-                public void onCallBack(final String data_s) {
+                public void onCallBack(final JSO jso) {
                     ((Activity) _context).runOnUiThread(new Runnable() {
                         @TargetApi(Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
                             JSO msg = new JSO();
                             msg.setChild(RESPONSE_ID_STR, callBackId);
-                            msg.setChild(RESPONSE_DATA_STR, data_s);
+                            //msg.setChild(RESPONSE_DATA_STR, jso.toString(true));
+                            msg.setChild(RESPONSE_DATA_STR, jso);
                             String s = msg.toString(true);
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
@@ -155,11 +179,7 @@ public class JsBridgeWebView extends WebView {
                             });
                         }
                     });
-                }
-
-                @Override
-                public void onCallBack(JSO jso) {
-                    onCallBack(JSO.o2s(jso));
+                    //onCallBack(JSO.o2s(jso));
                 }
 
             };
@@ -170,7 +190,7 @@ public class JsBridgeWebView extends WebView {
                     @Override
                     public void run() {
                         Looper.prepare();
-                        handler.handler(param_s, responseFunction);
+                        handler.handler(JSO.s2o(param_s), responseFunction);
                     }
                 })).start();
             } else {

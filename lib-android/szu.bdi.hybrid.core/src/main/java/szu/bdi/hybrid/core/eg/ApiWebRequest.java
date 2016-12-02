@@ -13,13 +13,31 @@ import info.cmptech.JSO;
 public class ApiWebRequest extends HybridApi {
     public HybridHandler getHandler() {
         return new HybridHandler() {
+//            @Override
+//            public void handler(String dataStr, HybridCallback cb) {
+//                //HybridUi callerAct = getCallerUi();
+//
+//                Log.v("ApiWebRequest", dataStr);
+//
+//                JSO data_o = JSO.s2o(dataStr);
+//
+//                JSO urlJSO = data_o.getChild("url");
+//
+//                String url = urlJSO.toString();
+//                if (!HybridTools.isEmptyString(url)) {
+//                    String rt_s = HybridTools.webPost(url, "");
+//                    Log.v("ApiWebRequest", url + " => " + rt_s);
+//                    cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
+//                    return;
+//                } else {
+//                    cb.onCallBack("{\"STS\":\"KO\"}");
+//                }
+//            }
+
             @Override
-            public void handler(String dataStr, HybridCallback cb) {
-                //HybridUi callerAct = getCallerUi();
+            public void handler(JSO data_o, HybridCallback apiCallback) {
 
-                Log.v("ApiWebRequest", dataStr);
-
-                JSO data_o = JSO.s2o(dataStr);
+                JSO rt = new JSO();
 
                 JSO urlJSO = data_o.getChild("url");
 
@@ -27,16 +45,16 @@ public class ApiWebRequest extends HybridApi {
                 if (!HybridTools.isEmptyString(url)) {
                     String rt_s = HybridTools.webPost(url, "");
                     Log.v("ApiWebRequest", url + " => " + rt_s);
-                    cb.onCallBack("{\"STS\":\"URL\",\"len\":\"" + HybridTools.getStrLen(rt_s) + "\"}");
+                    rt.setChild("STS", "OK");
+                    rt.setChild("len", "HybridTools.getStrLen(rt_s)");
+                    rt.setChild("s", rt_s);
+                    apiCallback.onCallBack(rt);
                     return;
                 } else {
-                    cb.onCallBack("{\"STS\":\"KO\"}");
+                    rt.setChild("STS", "KO");
+                    apiCallback.onCallBack(rt);
                 }
-            }
-
-            @Override
-            public void handler(JSO jso, HybridCallback cbFunc) {
-                handler(JSO.o2s(jso), cbFunc);
+                //handler(JSO.o2s(jso), cbFunc);
             }
         };
     }
