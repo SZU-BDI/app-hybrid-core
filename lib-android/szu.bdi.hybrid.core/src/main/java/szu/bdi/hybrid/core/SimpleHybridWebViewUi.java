@@ -37,28 +37,28 @@ public class SimpleHybridWebViewUi extends HybridUi {
                 //if have schema already
                 url = address;
             } else {
-                //shuld be local?
+                //assume local...
                 url = "file://" + HybridTools.getLocalWebRoot() + address;
             }
         }
 
-        //TODO "binding" is somehow missleading, should be changed to ...preload/warmup?
         HybridTools.bindWebViewApi(_wv, this);
 
         setContentView(_wv);
-//        int _sdk_int = android.os.Build.VERSION.SDK_INT;
-//
-//        if (_sdk_int < Build.VERSION_CODES.KITKAT) {
-//            HybridTools.quickShowMsgMain("WARNING: Your Phone (API=" + _sdk_int + ") is too old !!!! ");
-//        }
-        //Log.v(LOGTAG, "load url=" + url);
         _wv.loadUrl(url);
     }
 
     protected void onPostResume() {
         super.onPostResume();
-        if(null!=_wv){
+        if (null != _wv) {
             _wv.loadUrl("javascript:try{$(document).trigger('postresume');}catch(ex){}");
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (null != _wv) {
+            _wv.loadUrl("javascript:try{$(document).trigger('resume');}catch(ex){}");
         }
     }
 }

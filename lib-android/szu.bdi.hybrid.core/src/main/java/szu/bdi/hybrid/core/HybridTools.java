@@ -32,19 +32,24 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class HybridTools {
+    final static String ANDROID_APPLICATION = "_android_applicaton_";
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
     final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
 
-    @SuppressLint("StaticFieldLeak")
-    private static Application _thisApp = null;
+    private static Map<String, Object> _memStore = new HashMap<String, Object>();
+
+    //private static Application _thisApp = null;
+
     //private static JSONObject _jAppConfig = new JSONObject();
     private static JSO _jAppConfig = null;//new info.cmptech.JSO();
     private static String _localWebRoot = "";
@@ -52,13 +57,15 @@ public class HybridTools {
     //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
 
     public static Application getApplication() {
+        Application _thisApp = null;
         try {
+            _thisApp = (Application) _memStore.get(ANDROID_APPLICATION);
             if (null == _thisApp) {
                 _thisApp = (Application) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication").invoke(null, (Object[]) null);
+                if (null != _thisApp) _memStore.put(ANDROID_APPLICATION, _thisApp);
             }
             if (null == _thisApp) KillAppSelf();
-            ;
         } catch (Exception ex) {
             ex.printStackTrace();
             KillAppSelf();
