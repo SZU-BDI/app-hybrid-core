@@ -158,7 +158,9 @@ public class JsBridgeWebView extends WebView {
                     }
                 })).start();
             } else {
-                Log.v(LOGTAG, " not found registered handlerName " + handlerName + " uiName " + uiName);
+                String msg = " api " + handlerName + " for uiName(" + uiName + ") not registered";
+                Log.v(LOGTAG, msg);
+                HybridTools.quickShowMsgMain(msg);
             }
             return "OK";
         }

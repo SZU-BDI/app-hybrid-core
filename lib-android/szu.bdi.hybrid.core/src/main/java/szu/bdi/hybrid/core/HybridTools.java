@@ -81,6 +81,7 @@ public class HybridTools {
         quickShowMsg(getAppContext(), msg);
     }
 
+    //NOTES: for alert blocking, using appAlert/appConfirm
     public static void quickShowMsg(Context mContext, String msg) {
         //@ref http://blog.csdn.net/droid_zhlu/article/details/7685084
         //A toast is a view containing a quick little message for the user.
