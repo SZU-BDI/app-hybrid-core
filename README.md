@@ -18,7 +18,7 @@ We just want to do some small app to make things work.
 
 # WebViewJavascriptBridge Specification (recomment)
 
-based on few JSB projects, we suggested a WVJSB protocol spec here (WVJSB_V1.md)
+based on few JSB projects, we suggested a WVJSB protocol spec [here](WVJSB_V1.md)
 
 # git
 
