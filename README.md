@@ -16,10 +16,13 @@ We just want to do some small app to make things work.
 
 【CHS】简单事情简单办，开发点小APP，即能教学又能实践。
 
+# WebViewJavascriptBridge Specification (recomment)
+
+based on few JSB projects, we suggested a WVJSB protocol spec here (WVJSB_V1.md)
+
 # git
 
 git clone --depth=1  https://github.com/SZU-BDI/app-hybrid-core.git
-
 
 # Design & Documentation
 
