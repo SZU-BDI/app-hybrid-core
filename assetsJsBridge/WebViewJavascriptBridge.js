@@ -1,7 +1,3 @@
-//NOTES: the comments will be removed when eval()
-//and this file share with iOS/Android JSB
-//and this function is called by the "app" to inject a WebViewJavascriptBridge
-//(function(win,doc,PROTOCOL_SCHEME)
 (function(win,doc){
 	if (win.WebViewJavascriptBridge) {
 		return;
@@ -17,11 +13,9 @@
 			msgId=(msgId + 1) % 1000000;
 			var callTime=new Date().getTime();
 			var callbackId = 'cb_' + msgId + '_' + callTime;
+			cb.time=callTime;
 			responseCallbacks[callbackId] = cb;
 			msg.callbackId = callbackId;
-
-			//TODO for gc in future
-			msg.time=callTime;
 		}
 		if("undefined"!=typeof nativejsb){
 			return nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
@@ -32,8 +26,23 @@
 		}
 	}
 
+	function _gc(){
+	    if(responseCallbacks){
+	        var nowTime=new Date().getTime();
+	        for(k in responseCallbacks){
+	            var cb=responseCallbacks[k];
+	            //alert("TODO "+(nowTime-cb.time));
+	            if( (nowTime-cb.time)>1800000 ){
+				    responseCallbacks[msg.responseId]=null;
+				    delete responseCallbacks[msg.responseId];
+				}
+	        }
+	    }
+	}
+
 	//handle msg from app
 	function _app2js(msg){
+	    var _this=this;
 		setTimeout(function(){
 			var callback=null;
 			if (msg.responseId) {
@@ -41,7 +50,11 @@
 				callback = responseCallbacks[msg.responseId];
 				if (!callback) { return; }
 				callback(msg.responseData);
+				try{
+				responseCallbacks[msg.responseId]=null;
 				delete responseCallbacks[msg.responseId];
+				_gc();
+				}catch(ex){console.log(ex);}
 			} else {
 				var handler = null;
 				if (msg.handlerName) {

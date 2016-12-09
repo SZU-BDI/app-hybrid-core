@@ -11,7 +11,7 @@ WebViewJavascript Protocol Specification V1
 	//
 });
 
-registerHandler(handlerName, handler(data){
+.registerHandler(handlerName, handler(data){
 	//
 });
 ```

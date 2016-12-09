@@ -876,7 +876,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     // Decoded NSString from the NSData
     NSString *base64Decoded = [[NSString alloc]
                                initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
-    NSLog(@"Decoded: %@", base64Decoded);
+    //NSLog(@"Decoded: %@", base64Decoded);
     return base64Decoded;
 }
 + (NSString *) base64decode:(NSString *)s
