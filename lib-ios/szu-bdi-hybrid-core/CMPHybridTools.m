@@ -100,6 +100,7 @@ NSString *PBResourceHost = @".resource.";
     return idid;
 }
 
+//---- protocol <WKScriptMessageHandler> ----
 - (void)userContentController: (WKUserContentController *)userContentController
       didReceiveScriptMessage:(WKScriptMessage *)message{
     
@@ -111,12 +112,18 @@ NSString *PBResourceHost = @".resource.";
     //HybridUi caller=self;
     HybridUi caller=_caller;
     
-    NSLog(@"message.body = %@", message.body);
+    //NSLog(@"message.body = %@", message.body);
+    
     //    NSLog(@"message.name = %@", message.name);
     //    NSLog(@"message.frameInfo = %@", message.frameInfo);
     //    NSLog(@"message.WKWebView = %@", message.webView);
+    
     JSO * msg=[JSO id2o:message.body];
     NSString * handlerName_s = [[msg getChild:@"handlerName"] toString];
+    if([CMPHybridTools isEmptyString:handlerName_s]){
+        NSLog(@"Unknow Message from WKWebview: %@", message.body);
+        return;
+    }
     __block NSString * callBackId_s =[[msg getChild:@"callbackId"] toString];
     JSO * param =[msg getChild:@"data"];
     WKWebView *webView=message.webView;
@@ -200,7 +207,7 @@ NSString *PBResourceHost = @".resource.";
     
     //NSString *callBackId_s=[callBackId toString];
     HybridCallback callback=^(JSO *responseData){
-        NSLog(@"HybridCallback responseData %@", [responseData toString]);
+        //NSLog(@"HybridCallback responseData %@", [responseData toString]);
         NSString *rt_s=[JSO id2s:@{@"responseId":callBackId_s,@"responseData":[responseData toId]}];
         
         @try {
@@ -213,7 +220,6 @@ NSString *PBResourceHost = @".resource.";
             NSLog(@" !!! error when callback to js %@",exception);
         } @finally {
         }
-        
     };
     
     //async delay 0.01 second
@@ -228,7 +234,6 @@ NSString *PBResourceHost = @".resource.";
              callback([JSO id2o:@{@"STS":@"KO",@"errmsg":[exception reason]}]);
          }
      });
-    
 }
 
 @end

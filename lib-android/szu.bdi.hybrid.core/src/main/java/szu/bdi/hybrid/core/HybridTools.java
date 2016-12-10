@@ -312,14 +312,14 @@ public class HybridTools {
         checkAppConfig();
 
         JSO uia = getAppConfig(UI_MAPPING);
-        if (uia == null) {
+        if (uia == null || uia.isNull()) {
             HybridTools.quickShowMsgMain("config.json error!!!");
             //HybridTools.appAlert(getAppContext(),"config.json error !",null);
             return;
         }
 
         JSO defaultParam = uia.getChild(name);
-        if (defaultParam == null) {
+        if (defaultParam == null || defaultParam.isNull()) {
             HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
             return;
         }
@@ -328,10 +328,15 @@ public class HybridTools {
         JSO callParam = JSO.basicMerge(defaultParam, overrideParam);
         Log.v(LOGTAG, "param after merge=" + callParam);
 
+        String mode = callParam.getChild("mode").toString();
         String clsName = callParam.getChild("class").toString();
         if (isEmptyString(clsName)) {
-            HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
-            return;
+            if ("WebView".equalsIgnoreCase(mode)) {
+                clsName = SimpleHybridWebViewUi.class.getName();
+            } else {
+                HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
+                return;
+            }
         }
 
         //////////////////////////////////////////////
@@ -577,10 +582,10 @@ public class HybridTools {
                 line = bufferedReader.readLine();
                 if (filterRowComments) {
                     if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                        sb.append(line +"\n");
+                        sb.append(line + "\n");
                     }
                 } else {
-                    sb.append(line +"\n");
+                    sb.append(line + "\n");
                 }
             } while (line != null);
 
