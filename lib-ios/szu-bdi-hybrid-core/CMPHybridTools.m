@@ -314,14 +314,28 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one otherwise the real one will be poluted
     
+    NSString *mode = [JSO o2s:[uiConfig getChild:@"mode"]];
     NSString *className = [JSO o2s:[uiConfig getChild:@"class"]];
     
 #warning TODO(1) if WKWebview Not avail (e.g. < ios8)
     //NSString *oldclassName = [JSO o2s:[uiConfig getChild:@"oldclass"]];
     
     if ( [self isEmptyString :className]) {
-        [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName]];
-        return nil;
+        //        [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName] callback:^(){
+        //            NSLog(@" completion after quickShowMsgMain()");
+        //            [self quitGracefully];
+        //        }];
+        //        [CMPHybridTools
+        //         quickAlertMsgForOldiOS:[NSString stringWithFormat:@"class is not found for %@",strUiName]
+        //         callback:^{
+        //             [CMPHybridTools quitGracefully];
+        //         }];
+        if( [@"WebView" isEqualToString:mode]){
+            //TODO if < ios8 using UIWebView
+            className=@"CMPHybridWKWebViewUi";//default to this now.
+        }else{
+            return nil;
+        }
     }
     
     Class uiClass = NSClassFromString(className);
