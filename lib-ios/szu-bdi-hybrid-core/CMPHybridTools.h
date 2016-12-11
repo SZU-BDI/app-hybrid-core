@@ -94,11 +94,11 @@
 + (NSString *) atob:(NSString *)s;
 + (NSString *) base64decode:(NSString *)s;
 
-//TODO
-//+ (NSString *) getLang:(NSString *)key;
 + (NSString *) I18N:(NSString *)key;
 + (void) setI18N:(NSString *)i18n;
-//+ (BOOL) checkCamera;
+
++ (void)saveUserConfig :(NSString *)key :(NSString *)value_s :(BOOL)autosave;
++ (id)loadUserConfig :(NSString *)key;
 
 // 手势密码读写
 + (NSString *)loadGesturesPassword;

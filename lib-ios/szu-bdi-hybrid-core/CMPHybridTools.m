@@ -850,6 +850,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     JSO *i18n =hybridManager.i18n;
     
     JSO *value_a=[i18n getChild:key];
+    //NSString *cached_lang=[self loadAppConfig:@"lang"];
     NSString *lang=@"en";//TODO
     JSO *value=[value_a getChild:lang];
     if(nil==value || [value isNull]){
@@ -921,32 +922,47 @@ SINGLETON_shareInstance(CMPHybridTools);
     return [self atob:s];
 }
 
-/****************************** STUB FOR LATER *********************************/
-+ (void)saveAppConfig{
-    
-    CMPHybridTools *hybridManager = [self shareInstance];
-    NSString *jsonString = [JSO o2s:hybridManager.jso];
-    
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:jsonString forKey:@"appConfig"];
-    [userDefaults synchronize];
-}
 
-+ (JSO *)loadAppConfig{
+//+ (void)saveAppConfig
+//{
+//    
+//    CMPHybridTools *hybridManager = [self shareInstance];
+//    NSString *jsonString = [JSO o2s:hybridManager.jso];
+//    
+////    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+////    [userDefaults setObject:jsonString forKey:@"appConfig"];
+////    [userDefaults synchronize];
+//    [self saveUserConfig:@"appConfig" :jsonString :true];
+//}
+//
+
++ (JSO *)loadAppConfig
+{
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString *jsonString =[userDefaults objectForKey:@"appConfig"];
+    //    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //    NSString *jsonString =[userDefaults objectForKey:@"appConfig"];
+    NSString *jsonString = (NSString *) [self loadUserConfig:@"appConfig"];
+    
     JSO *jsonJso = [JSO s2o:jsonString];
     
     return jsonJso;
 }
 
-+ (void)saveUserConfig{
-    
+//TODO use in app_cache_save
++ (void)saveUserConfig :(NSString *)key :(NSString *)value_s :(BOOL)autosave
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:value_s forKey:key];
+    if(autosave){
+        [userDefaults synchronize];
+    }
 }
 
-+ (void)loadUserConfig{
-    
+//TODO use in app_cache_load
++ (nullable id)loadUserConfig :(NSString *)key
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    return [userDefaults objectForKey:key];
 }
 
 #pragma mark - 手势密码读写
