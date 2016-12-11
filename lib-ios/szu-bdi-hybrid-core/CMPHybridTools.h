@@ -17,6 +17,11 @@
 //inner data store, hold until program exit.
 @property (strong) JSO *jso;
 
+//jso.i18n
+@property (strong) JSO *i18n;
+
+@property (strong) NSString *lang;//en,zh-cn,zh-*,kh,vn,th
+
 //Singleton Pattern:
 + (CMPHybridTools *) shareInstance;
 
@@ -90,7 +95,9 @@
 + (NSString *) base64decode:(NSString *)s;
 
 //TODO
-+ (NSString *) getLang:(NSString *)key;
+//+ (NSString *) getLang:(NSString *)key;
++ (NSString *) I18N:(NSString *)key;
++ (void) setI18N:(NSString *)i18n;
 //+ (BOOL) checkCamera;
 
 // 手势密码读写

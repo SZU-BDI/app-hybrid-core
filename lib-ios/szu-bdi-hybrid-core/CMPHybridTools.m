@@ -284,6 +284,7 @@ SINGLETON_shareInstance(CMPHybridTools);
         //TODO [CMPHybridTools stripComment:s]
         NSString *s =[self readAssetInStr:@"config.json" :YES];
         hybridManager.jso = [JSO s2o:s];
+        hybridManager.i18n =[hybridManager.jso getChild:@"I18N"];
     }
 }
 
@@ -309,7 +310,11 @@ SINGLETON_shareInstance(CMPHybridTools);
              objCaller:(HybridUi)objCaller
 {
     [self checkAppConfig];
+    ///
     
+    NSLog(@"test_i18n %@", [CMPHybridTools I18N:@"test_i18n"]);
+    
+    ///
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
     JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one otherwise the real one will be poluted
@@ -650,12 +655,10 @@ SINGLETON_shareInstance(CMPHybridTools);
     return rt;
 }
 
-
 +(BOOL) isEmptyString :(NSString *)s
 {
     return (nil==s || [@"" isEqualToString:s]);
 }
-
 
 +(NSArray *) quickRegExpMatch :(NSString *)regex_s :(NSString *)txt
 {
@@ -839,12 +842,27 @@ SINGLETON_shareInstance(CMPHybridTools);
     //TODO [CMPHybridTools stripComments:js];
     [ctx evaluateScript:js];
 }
-+ (NSString *) getLang:(NSString *)key
++ (NSString *) I18N:(NSString *)key
 {
-#warning TODO(9) getLang()
+    //JSO *i18n=[self getAppConfig:@"I18N"];
+    //    JSO *i18n = [self wholeAppConfig].i18n;
+    CMPHybridTools *hybridManager = [self shareInstance];
+    JSO *i18n =hybridManager.i18n;
+    
+    JSO *value_a=[i18n getChild:key];
+    NSString *lang=@"en";//TODO
+    JSO *value=[value_a getChild:lang];
+    if(nil==value || [value isNull]){
+        //
+    }else{
+        return [value toString];
+    }
     return key;
 }
-
++ (void) setI18N:(NSString *)i18n
+{
+    return;
+}
 + (NSInteger) os_compare:(Float32)tgt
 {
     //TODO improve by cache the floatValue to val?
