@@ -41,11 +41,13 @@
  [self initUi];
  }
  */
+
 - (void)initUi{}//STUB ONLY
 
+//do close
 - (void) closeUi
 {
-    NSLog(@"!!!!!!!!! closeUi() of UIViewController+CMPHybridUI.m   !!!!!!!!!!!!!!");
+    NSLog(@"!!!!!!!!! closeUi() called at UIViewController+CMPHybridUI.m   !!!!!!!!!!!!!!");
     
     BOOL flagIsLast=YES;
     
