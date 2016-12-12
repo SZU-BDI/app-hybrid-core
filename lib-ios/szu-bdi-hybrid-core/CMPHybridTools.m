@@ -925,10 +925,10 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 //+ (void)saveAppConfig
 //{
-//    
+//
 //    CMPHybridTools *hybridManager = [self shareInstance];
 //    NSString *jsonString = [JSO o2s:hybridManager.jso];
-//    
+//
 ////    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 ////    [userDefaults setObject:jsonString forKey:@"appConfig"];
 ////    [userDefaults synchronize];
@@ -982,6 +982,31 @@ SINGLETON_shareInstance(CMPHybridTools);
 #endif
     return build_type;
 }
+
++ (void) notifyPause
+{
+    CMPHybridTools *hybridManager = [self shareInstance];
+    if(nil!=hybridManager.uiRoot){
+        NSLog(@"TODO notifyPause() !!!!!");
+    }
+}
+
++ (void) notifyResume
+{
+    CMPHybridTools *hybridManager = [self shareInstance];
+    if(nil!=hybridManager.uiRoot){
+        NSLog(@"TODO notifyResume() !!!!!");
+    }
+}
+
+//+ (void) handlePause
+//{
+//    NSLog(@"handlePause() !!!!!");
+//}
+//+ (void) handleResume
+//{
+//    NSLog(@"handleResume() !!!!!");
+//}
 
 #pragma mark - 手势密码读写
 + (NSString *)loadGesturesPassword{

@@ -27,6 +27,8 @@
 
 @property (strong) NSString *lang;//en,zh-cn,zh-*,kh,vn,th
 
+@property (strong) HybridUi uiRoot;
+
 //Singleton Pattern:
 + (CMPHybridTools *) shareInstance;
 
@@ -106,6 +108,12 @@
 + (id)loadUserConfig :(NSString *)key;
 
 + (NSString *) getBuildType;
+
++ (void) notifyPause;
++ (void) notifyResume;
+
+//+ (void) handlePause;
+//+ (void) handleResume;
 
 // 手势密码读写
 + (NSString *)loadGesturesPassword;
