@@ -19,14 +19,14 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             HybridUi ui=[CMPHybridTools startUi:name_s initData:data objCaller:caller];
             if(ui!=nil){
-                //                [ui on:@"initdone" :^(NSString *eventName, id extraData){
-                //                    //responseCallback(extraData);
-                //                    NSLog(@" init done!!!");
-                //                }];
-                [ui on:@"close" :^(NSString *eventName, id extraData){
+                [ui on:@"initdone" :^(NSString *eventName, JSO * extraData){
+                    NSLog(@" init done!!!");
+                }];
+
+                [ui on:@"close" :^(NSString *eventName, JSO * extraData){
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [caller resetTopBarStatus];
-                        responseCallback([JSO id2o:@{@"STS":@"OK",@"name":name_s}]);
+                        responseCallback(extraData);
                     });
                 }];
             }

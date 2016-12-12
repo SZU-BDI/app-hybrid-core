@@ -9,7 +9,6 @@
             
             self.currentUi.responseData=ddd;
             [self.currentUi closeUi];
-            //responseCallback(ddd);
         });
     };
 }
