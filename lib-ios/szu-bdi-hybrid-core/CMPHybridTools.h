@@ -1,8 +1,13 @@
 #ifndef CMPHybridTools_h
 #define CMPHybridTools_h
 
-//#import <Foundation/Foundation.h>
 @import Foundation;
+
+//如果不是DEBUG就忽略NSLog()提升运行性能
+#ifndef DEBUG
+#undef NSLog
+#define NSLog(args, ...)
+#endif
 
 #import "JSO.h"
 
@@ -99,6 +104,8 @@
 
 + (void)saveUserConfig :(NSString *)key :(NSString *)value_s :(BOOL)autosave;
 + (id)loadUserConfig :(NSString *)key;
+
++ (NSString *) getBuildType;
 
 // 手势密码读写
 + (NSString *)loadGesturesPassword;

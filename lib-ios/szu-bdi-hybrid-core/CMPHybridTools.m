@@ -965,6 +965,24 @@ SINGLETON_shareInstance(CMPHybridTools);
     return [userDefaults objectForKey:key];
 }
 
++ (NSString *) getBuildType
+{
+    NSString * build_type = @"L";//default Live...
+#ifdef DEBUG
+    build_type = @"D";//DEBUG for "Run" in XCode
+#else
+    if ([[NSBundle mainBundle]
+         pathForResource:@"embedded"
+         ofType:@"mobileprovision"])
+    {
+        build_type = @"M";//DEMO for TestFlight
+    } else {
+        build_type = @"L";//LIVE for real app store
+    }
+#endif
+    return build_type;
+}
+
 #pragma mark - 手势密码读写
 + (NSString *)loadGesturesPassword{
     
