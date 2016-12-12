@@ -1,5 +1,7 @@
 #import "UIViewController+CMPHybridUi.h"
 
+#import "CMPHybridTools.h"
+
 @implementation UIViewController (CMHybridUi)
 
 
@@ -43,6 +45,8 @@
 
 - (void) closeUi
 {
+    NSLog(@"!!!!!!!!! closeUi() of UIViewController+CMPHybridUI.m   !!!!!!!!!!!!!!");
+    
     BOOL flagIsLast=YES;
     
     id<UIApplicationDelegate> ddd = [UIApplication sharedApplication].delegate;
@@ -67,7 +71,7 @@
             [self dismissViewControllerAnimated:YES completion:^{
                 NSLog(@"Current View dismissViewControllerAnimated");
             }];
-            [self trigger:@"close" :self.responseData];
+            [self trigger:CMPHybridEventWhenClose :self.responseData];
             return;
         }
     }
@@ -84,11 +88,11 @@
              }];
          }
          handlerNo:^(UIAlertAction *action) {
-             //[self trigger:@"close" :self.responseData];
+             NSLog(@"User said No to quit");
          }];
         return;
     }else{
-        [self trigger:@"close" :self.responseData];
+        [self trigger:CMPHybridEventWhenClose :self.responseData];
     }
 }
 
@@ -178,6 +182,8 @@
 
 - (void) resetTopBarBtn
 {
+    NSLog(@"resetTopBarBtn() %@",self.uiName);
+          
     self.navigationItem.leftBarButtonItem
     = [[UIBarButtonItem alloc]
        initWithBarButtonSystemItem:UIBarButtonSystemItemReply

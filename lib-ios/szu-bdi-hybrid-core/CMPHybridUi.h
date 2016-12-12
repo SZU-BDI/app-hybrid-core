@@ -1,12 +1,12 @@
 #import <Foundation/Foundation.h>
 
-#import <WebKit/WebKit.h>
+//for: UIAlertAction
 #import <UIKit/UIKit.h>
 
-//@import WebKit;
-//@import UIKit;
-
 @class JSO;
+
+
+
 
 #ifndef Hybrid_h
 #define Hybrid_h
@@ -21,6 +21,8 @@ typedef void (^HybridEventHandler)(NSString *eventName, JSO* extraData);
 
 #define CMPHybridEventBeforeDisplay @"BeforeDisplay"
 #define CMPHybridEventMemoryWarning @"MemoryWarning"
+#define CMPHybridEventWhenClose @"WhenClose"
+#define CMPHybridEventBeforeClose @"BeforeClose"
 
 #define SINGLETON_shareInstance(classname) \
 + (classname *)shareInstance\
@@ -33,10 +35,9 @@ _sharedInstance = [[self alloc] init];\
 return _sharedInstance;\
 }
 
-#define HybridUi id<CMPHybridUi>
-//#define HybridUi CMPHybridUi *
 
-//#define HybridApi id<CMPHybridApi>
+#define HybridUi id<CMPHybridUi>
+
 
 #endif /* Hybrid_h */
 
@@ -47,8 +48,6 @@ return _sharedInstance;\
 #ifndef CMPHybridUi_h
 #define CMPHybridUi_h
 
-//#import "JavaScriptCore/JavaScript.h"
-@import JavaScriptCore;
 
 @protocol CMPHybridUi <NSObject>
 
@@ -66,8 +65,8 @@ return _sharedInstance;\
 
 @optional
 
--(void) initUi;
--(void) closeUi;
+-(void) initUi;//do init
+-(void) closeUi;//do close
 
 -(void) on:(NSString *)eventName :(HybridEventHandler) handler;
 //for some case, some initData is sent and use when trigger

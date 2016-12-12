@@ -47,7 +47,6 @@ BOOL isFirstLoad=YES;
     NSLog(@" webview didFailNavigation for desc %@",[error description]);
     if(_myWebView==webView)
         [self spinnerOff];
-    //[self closeUi];
 }
 
 //----------------   <WKUIDelegate>   -----------------
@@ -150,28 +149,29 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
     
 }
 
-- (void) resetTopBarBtn
-{
-    UIBarButtonItem *leftBar
-    = [[UIBarButtonItem alloc]
-       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-       style:UIBarButtonItemStylePlain
-       target:self
-       action:@selector(closeUi) //on('click')=>close()
-       ];
-    leftBar.tintColor = [UIColor blueColor];
-    
-    //    self.navigationItem.leftBarButtonItem
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-    //       target:self
-    //       action:@selector(closeUi)];
-    
-    //    UIBarButtonItem *rightBtn
-    //    = [[UIBarButtonItem alloc]
-    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
-    //    self.navigationItem.rightBarButtonItem = rightBtn;
-}
+//- (void) resetTopBarBtn
+//{
+//    NSLog(@"resetTopBarBtn in CMPHybridWKWebViewUi....");
+//    UIBarButtonItem *leftBar
+//    = [[UIBarButtonItem alloc]
+//       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+//       style:UIBarButtonItemStylePlain
+//       target:self
+//       action:@selector(closeUi) //on('click')=>close()
+//       ];
+//    leftBar.tintColor = [UIColor blueColor];
+//    
+//    //    self.navigationItem.leftBarButtonItem
+//    //    = [[UIBarButtonItem alloc]
+//    //       initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+//    //       target:self
+//    //       action:@selector(closeUi)];
+//    
+//    //    UIBarButtonItem *rightBtn
+//    //    = [[UIBarButtonItem alloc]
+//    //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
+//    //    self.navigationItem.rightBarButtonItem = rightBtn;
+//}
 
 //register will cache the handler inside the memory for speeding up.  so it's important
 - (void)registerHandlerApi{

@@ -23,7 +23,7 @@
                     NSLog(@" init done!!!");
                 }];
 
-                [ui on:@"close" :^(NSString *eventName, JSO * extraData){
+                [ui on:CMPHybridEventWhenClose :^(NSString *eventName, JSO * extraData){
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [caller resetTopBarStatus];
                         responseCallback(extraData);

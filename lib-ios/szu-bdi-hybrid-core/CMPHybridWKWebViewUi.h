@@ -4,6 +4,8 @@
 #import "CMPHybridUi.h"
 #import "CMPHybridUi_UIViewController.h"
 
+#import <WebKit/WebKit.h>
+
 @interface CMPHybridWKWebViewUi :CMPHybridUi_UIViewController <WKNavigationDelegate, WKUIDelegate>
 {
 }

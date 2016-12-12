@@ -42,17 +42,31 @@
 
 //------------   <HybridUi> ------------
 
+//-(void) closeUi
+//{
+//    NSLog(@"[DEBUG] closeUi from NativeUi.....");
+//    //[self trigger:@"close" :self.responseData];
+//    [super closeUi];
+//}
+-(void) closeUiXXX
+{
+    NSLog(@"[DEBUG] closeUiXXX from NativeUi.....");
+    //[self trigger:@"close" :self.responseData];
+    [super closeUi];
+}
+
 //NOTES: for default only, child should override in most real cases.
 - (void) resetTopBarBtn
 {
-    UIBarButtonItem *leftBar
-    = [[UIBarButtonItem alloc]
-       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
-       style:UIBarButtonItemStylePlain
-       target:self
-       action:@selector(closeUi) //on('click')=>close()
-       ];
-    leftBar.tintColor = [UIColor blueColor];
+    NSLog(@"resetTopBarBtn in NativeUi....");
+//    UIBarButtonItem *leftBar
+//    = [[UIBarButtonItem alloc]
+//       initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
+//       style:UIBarButtonItemStylePlain
+//       target:self
+//       action:@selector(closeUiXXX) //on('click')=>close()
+//       ];
+//    leftBar.tintColor = [UIColor blueColor];
     
     //    self.navigationItem.leftBarButtonItem
     //    = [[UIBarButtonItem alloc]
@@ -64,6 +78,7 @@
     //    = [[UIBarButtonItem alloc]
     //       initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:nil];
     //    self.navigationItem.rightBarButtonItem = rightBtn;
+    [super resetTopBarBtn];
 }
 
 //- (void) evalJs :(NSString *)js_s
