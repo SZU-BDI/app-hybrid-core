@@ -43,6 +43,19 @@
 
 //----------------   <HybridUi>   -----------------
 
+-(instancetype) trigger :(NSString *)eventName :(JSO *) extraData
+{
+    if ([CMPHybridEventAppResume isEqualToString:eventName]){
+        //NSLog(@" !!!! TODO _myWebView trigger resume to page ...");
+        [self evalJs:@"try{$(document).trigger('postresume');}catch(ex){}"];
+    }else if([CMPHybridEventAppPause isEqualToString:eventName]){
+        //NSLog(@" !!!! TODO _myWebView trigger pause to page ...");
+        [self evalJs:@"try{$(document).trigger('pause');}catch(ex){}"];
+    }
+    [super trigger:eventName :extraData];
+    return self;
+}
+
 - (void) evalJs:(NSString *)js_s
 {
     dispatch_async(dispatch_get_main_queue(), ^{

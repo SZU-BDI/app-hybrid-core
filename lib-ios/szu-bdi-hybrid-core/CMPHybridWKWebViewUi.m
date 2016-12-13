@@ -97,9 +97,11 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 -(instancetype) trigger :(NSString *)eventName :(JSO *) extraData
 {
     if ([CMPHybridEventAppResume isEqualToString:eventName]){
-        NSLog(@" !!!! TODO _myWebView trigger resume to page ...");
+        //NSLog(@" !!!! TODO _myWebView trigger resume to page ...");
+        [self evalJs:@"try{$(document).trigger('postresume');}catch(ex){}"];
     }else if([CMPHybridEventAppPause isEqualToString:eventName]){
-        NSLog(@" !!!! TODO _myWebView trigger pause to page ...");
+        //NSLog(@" !!!! TODO _myWebView trigger pause to page ...");
+        [self evalJs:@"try{$(document).trigger('pause');}catch(ex){}"];
     }
     [super trigger:eventName :extraData];
     return self;
