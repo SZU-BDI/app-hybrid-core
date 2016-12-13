@@ -1,18 +1,16 @@
-#import "ApiUiSetTitle.h"
+#import "ApiUiTitle.h"
 #import "CMPHybridUi.h"
 #import "JSO.h"
 
-@interface ApiUiSetTitle ()
+@interface ApiUiTitle ()
 
 @end
 
-@implementation ApiUiSetTitle
+@implementation ApiUiTitle
 
 - (HybridHandler) getHandler
 {
     return ^(JSO * jso, HybridCallback responseCallback) {
-        
-        NSLog(@"ApiUiSetTitle()");
         
         NSString *titlename = [[jso getChild:@"title"] toString];
         

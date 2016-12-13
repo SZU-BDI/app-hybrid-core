@@ -53,18 +53,20 @@
 //NOTES: can be overrided
 -(void) initUi
 {
-    NSString *title = [[self.uiData getChild:@"title"] toString];
-    if ([CMPHybridTools isEmptyString:title]){
-        title=@" - - - ";//TODO
-    }
-    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
-        
-        NSLog(@"initUi() on eventName %@ ", eventName);
-        [self resetTopBarStatus];
-        [self resetTopBarBtn];
-        [self setTopBarTitle:title];
-        [self setNeedsStatusBarAppearanceUpdate];
-    } :nil];
+    [self initUi];
+//    [self resetTopBarBtn];
+//
+//    NSString *title = [[self.uiData getChild:@"title"] toString];
+//    if ([CMPHybridTools isEmptyString:title]){
+//        title=@" - - - ";//TODO
+//    }
+//    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+//        
+//        NSLog(@"initUi() on eventName %@ ", eventName);
+//        [self resetTopBarStatus];
+//        [self setTopBarTitle:title];
+//        [self setNeedsStatusBarAppearanceUpdate];
+//    } :nil];
     
     [self registerHandlerApi];
     

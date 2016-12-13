@@ -42,7 +42,21 @@
  }
  */
 
-- (void)initUi{}//STUB ONLY
+- (void)initUi
+{
+    [self resetTopBarBtn];
+    
+    NSString *title = [[self.uiData getChild:@"title"] toString];
+    
+    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+        
+        [self resetTopBarStatus];
+        if(nil!=title){
+            [self setTopBarTitle:title];
+        }
+        [self setNeedsStatusBarAppearanceUpdate];
+    } :nil];
+}
 
 //do close
 - (void) closeUi
@@ -145,6 +159,7 @@
     JSO *param =self.uiData;
     JSO *topbarmode=[param getChild:@"topbar"];
     NSString *topbarmode_s=[JSO o2s:topbarmode];
+    
     [self resetTopBar :topbarmode_s];
     
     NSString *topbar_color=[JSO o2s:[param getChild:@"topbar_color"]];
@@ -182,9 +197,10 @@
     }
 }
 
+//default, can be override
 - (void) resetTopBarBtn
 {
-    NSLog(@"resetTopBarBtn() %@",self.uiName);
+    NSLog(@"resetTopBarBtn() %@", self.uiName);
           
     self.navigationItem.leftBarButtonItem
     = [[UIBarButtonItem alloc]

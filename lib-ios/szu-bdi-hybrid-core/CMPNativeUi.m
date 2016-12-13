@@ -19,7 +19,7 @@
 //-(void) viewWillAppear:(BOOL)animated
 //{
 //    [super viewWillAppear:animated];
-//    
+//
 //    [self trigger:CMPHybridEventBeforeDisplay];
 //}
 
@@ -43,10 +43,10 @@
 //------------   <HybridUi> ------------
 
 
-//NOTES: for default only, child should override in most real cases.
 - (void) resetTopBarBtn
 {
     NSLog(@"resetTopBarBtn in NativeUi....");
+    
     UIBarButtonItem *leftBar
     = [[UIBarButtonItem alloc]
        initWithImage:[UIImage imageNamed:@"btn_nav bar_left arrow"]//see Images.xcassets
@@ -80,22 +80,7 @@
 - (void)initUi
 {
     [super initUi];
-    
-    NSString *title = [[self.uiData getChild:@"title"] toString];
-    if ([CMPHybridTools isEmptyString:title]){
-        title=@" - - - ";//TODO
-    }
-    
-    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
-        
-        NSLog(@"initUi() on eventName %@ ", eventName);
-        [self resetTopBarStatus];
-        [self resetTopBarBtn];
-        [self setTopBarTitle:title];
-        [self setNeedsStatusBarAppearanceUpdate];
-    } :nil];
-    
-    //[self resetTopBarBtn];
+
     self.view.backgroundColor=[UIColor blackColor];
     
     //self.navigationController.navigationBar.translucent=NO;

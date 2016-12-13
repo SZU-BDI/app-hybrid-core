@@ -102,21 +102,22 @@ completionHandler:(void (^)(NSString * _Nullable))completionHandler
 
 -(void) initUi
 {
-    NSString *title = [[self.uiData getChild:@"title"] toString];
-    if ([CMPHybridTools isEmptyString:title]){
-        title=@" - - - ";//TODO
-    }
-    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
-        
-        NSLog(@"initUi() on eventName %@ ", eventName);
-        [self resetTopBarStatus];
-        [self resetTopBarBtn];
-        [self setTopBarTitle:title];
-        [self setNeedsStatusBarAppearanceUpdate];
-    } :nil];
+    [super initUi];
+    
+//    NSString *title = [[self.uiData getChild:@"title"] toString];
+//    if ([CMPHybridTools isEmptyString:title]){
+//        title=@" - - - ";//TODO
+//    }
+//    [self on:CMPHybridEventBeforeDisplay :^(NSString *eventName, JSO *extraData) {
+//        
+//        NSLog(@"initUi() on eventName %@ ", eventName);
+//        [self resetTopBarStatus];
+//        
+//        [self setTopBarTitle:title];
+//        [self setNeedsStatusBarAppearanceUpdate];
+//    } :nil];
     
     [self registerHandlerApi];
-    //[self resetTopBarBtn];
     
     self.myWebView = [CMPHybridTools initHybridWebView :[WKWebView class] :self];
     

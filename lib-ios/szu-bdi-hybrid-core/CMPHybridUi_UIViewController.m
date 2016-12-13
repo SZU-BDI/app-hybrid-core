@@ -19,7 +19,7 @@
 #warning (7) TODO move to WKWebview/UIWebview override viewDidLoad()
 #warning (7) TODO make multi on/trigger and send event into the webview for pause/resume event.
     //[self on:<#(NSString *)#> :<#^(NSString *eventName, JSO *extraData)handler#>];
-
+    
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -58,9 +58,9 @@
     _myIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
     [_myIndicatorView setHidesWhenStopped:YES];
     _myIndicatorView.center=self.view.center;
+    
     [self.view addSubview:_myIndicatorView];
 }
-
 
 - (void) spinnerOn
 {

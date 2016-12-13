@@ -74,7 +74,9 @@ return _sharedInstance;\
 -(void) trigger :(NSString *)eventName :(JSO *)triggerData;
 -(void) trigger :(NSString *)eventName;
 
+//for top bar buttons:
 -(void) resetTopBarBtn;
+
 -(void) resetTopBar :(NSString *)mode;
 -(void) resetTopBarStatus;
 -(void) hideTopStatusBar;
