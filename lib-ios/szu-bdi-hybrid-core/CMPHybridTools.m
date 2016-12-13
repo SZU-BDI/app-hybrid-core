@@ -709,8 +709,8 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (void) injectJSB :(UIWebView *)webView :(HybridUi )caller
 {
-    NSString * uiname = caller.uiName;
-    NSLog(@"injecting JSB to %@", uiname);
+//    NSString * uiname = caller.uiName;
+    NSLog(@"injecting JSB to %@", caller.uiName);
     
     JSContext *ctx = [CMPHybridTools getWebViewJsCtx :webView];
     
