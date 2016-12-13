@@ -182,18 +182,22 @@
     if([@"F" isEqualToString:mode]){
         [self hideTopStatusBar];
         [self hideTopBar];
+        self.edgesForExtendedLayout=UIRectEdgeAll;
     }
     if([@"M" isEqualToString:mode]){
         [self hideTopStatusBar];
         [self showTopBar];
+        self.edgesForExtendedLayout=UIRectEdgeNone;
     }
     if([@"Y" isEqualToString:mode]){
         [self showTopStatusBar];
         [self showTopBar];
+        self.edgesForExtendedLayout=UIRectEdgeNone;
     }
     if([@"N" isEqualToString:mode]){
         [self showTopStatusBar];
         [self hideTopBar];
+        self.edgesForExtendedLayout=UIRectEdgeAll;
     }
 }
 
