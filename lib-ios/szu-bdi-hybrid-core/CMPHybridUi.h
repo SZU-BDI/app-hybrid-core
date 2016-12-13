@@ -68,9 +68,11 @@ return _sharedInstance;\
 -(void) initUi;//do init
 -(void) closeUi;//do close
 
--(void) on:(NSString *)eventName :(HybridEventHandler) handler;
+-(instancetype) on:(NSString *)eventName :(HybridEventHandler) handler;
 //for some case, some initData is sent and use when trigger
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData;
+-(instancetype) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData;
+-(instancetype) off:(NSString *)eventName;
+
 -(void) trigger :(NSString *)eventName :(JSO *)triggerData;
 -(void) trigger :(NSString *)eventName;
 

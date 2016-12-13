@@ -255,7 +255,7 @@ NSString *PBResourceHost = @".resource.";
 -(void) alertView :(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if(self.callback)
-        self.callback();
+    self.callback();
 }
 
 -(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback
@@ -310,11 +310,7 @@ SINGLETON_shareInstance(CMPHybridTools);
              objCaller:(HybridUi)objCaller
 {
     [self checkAppConfig];
-    ///
     
-    NSLog(@"test_i18n %@", [CMPHybridTools I18N:@"test_i18n"]);
-    
-    ///
     JSO *jso_uiMapping = [self getAppConfig:@"ui_mapping"];
     
     JSO *uiConfig = [[jso_uiMapping getChild:strUiName] copy];//important to copy one otherwise the real one will be poluted
@@ -322,22 +318,15 @@ SINGLETON_shareInstance(CMPHybridTools);
     NSString *mode = [JSO o2s:[uiConfig getChild:@"mode"]];
     NSString *className = [JSO o2s:[uiConfig getChild:@"class"]];
     
-#warning TODO(1) if WKWebview Not avail (e.g. < ios8)
-    //NSString *oldclassName = [JSO o2s:[uiConfig getChild:@"oldclass"]];
-    
     if ( [self isEmptyString :className]) {
-        //        [self quickShowMsgMain:[NSString stringWithFormat:@"class is not found for %@",strUiName] callback:^(){
-        //            NSLog(@" completion after quickShowMsgMain()");
-        //            [self quitGracefully];
-        //        }];
-        //        [CMPHybridTools
-        //         quickAlertMsgForOldiOS:[NSString stringWithFormat:@"class is not found for %@",strUiName]
-        //         callback:^{
-        //             [CMPHybridTools quitGracefully];
-        //         }];
         if( [@"WebView" isEqualToString:mode]){
             //TODO if < ios8 using UIWebView
-            className=@"CMPHybridWKWebViewUi";//default to this now.
+            if([CMPHybridTools os_compare:8.0]>=0)
+            {
+                className=@"CMPHybridWKWebViewUi";//default to this now.
+            }else{
+                className=@"CMPHybridWebViewUi";//for <iOS8, using UIWebView
+            }
         }else{
             return nil;
         }
@@ -709,7 +698,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 
 + (void) injectJSB :(UIWebView *)webView :(HybridUi )caller
 {
-//    NSString * uiname = caller.uiName;
+    //    NSString * uiname = caller.uiName;
     NSLog(@"injecting JSB to %@", caller.uiName);
     
     JSContext *ctx = [CMPHybridTools getWebViewJsCtx :webView];

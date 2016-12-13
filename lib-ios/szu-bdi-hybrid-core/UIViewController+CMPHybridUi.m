@@ -4,34 +4,57 @@
 
 @implementation UIViewController (CMHybridUi)
 
-
--(void) on:(NSString *)eventName :(HybridEventHandler) handler
+-(instancetype) on:(NSString *)eventName :(HybridEventHandler) handler
 {
     [self on:eventName :handler :nil];
+    return self;
 }
 
--(void) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData
+-(instancetype) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData
+{
+    if(nil==handler){
+        return self;
+    }
+    if(nil==self.uiEventHandlers){
+        self.uiEventHandlers=[NSMutableDictionary dictionary];
+    }
+    if(nil==self.uiEventHandlers[eventName]){
+        self.uiEventHandlers[eventName]=[NSMutableArray array];
+    }
+    [self.uiEventHandlers[eventName] addObject:handler];
+    return self;
+}
+
+-(instancetype) trigger :(NSString *)eventName :(JSO *)triggerData
+{
+    NSLog(@"trigger(%@) is called.", eventName);
+    NSArray * dict =self.uiEventHandlers[eventName];
+    if(nil!=dict){
+        NSUInteger c =[dict count];
+        for(int i=0; i<c; i++){
+            HybridEventHandler hdl=[dict objectAtIndex:i];
+            if(nil!=hdl){
+                if(nil==triggerData) triggerData=[JSO id2o:@{}];
+                NSLog(@"with triggerData %@", [triggerData toString]);
+                hdl(eventName, triggerData);
+            }
+        }
+    }
+    return self;
+}
+
+-(instancetype) off :(NSString *)eventName
 {
     if(nil==self.uiEventHandlers){
         self.uiEventHandlers=[NSMutableDictionary dictionary];
     }
-    self.uiEventHandlers[eventName]=handler;
+    self.uiEventHandlers[eventName]=[NSMutableArray array];
+    return self;
 }
 
--(void) trigger :(NSString *)eventName :(JSO *)triggerData
+-(instancetype) trigger :(NSString *)eventName
 {
-    NSLog(@"trigger(%@) is called.", eventName);
-    HybridEventHandler hdl=self.uiEventHandlers[eventName];
-    if(nil!=hdl){
-        if(nil==triggerData) triggerData=[JSO id2o:@{}];
-        NSLog(@"with triggerData %@", [triggerData toString]);
-        hdl(eventName, triggerData);
-    }
-}
-
--(void) trigger :(NSString *)eventName
-{
-    [self trigger:eventName :nil];
+    return [self trigger:eventName :nil];
 }
 
 /** NOTES: remember to call initUi at viewDidLoad
