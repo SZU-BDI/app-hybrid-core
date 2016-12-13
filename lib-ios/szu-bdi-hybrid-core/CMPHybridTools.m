@@ -976,7 +976,7 @@ SINGLETON_shareInstance(CMPHybridTools);
 {
     CMPHybridTools *hybridManager = [self shareInstance];
     if(nil!=hybridManager.uiRoot){
-        NSLog(@"TODO notifyPause() !!!!!");
+        [hybridManager.uiRoot trigger:CMPHybridEventAppPause];
     }
 }
 
@@ -984,18 +984,9 @@ SINGLETON_shareInstance(CMPHybridTools);
 {
     CMPHybridTools *hybridManager = [self shareInstance];
     if(nil!=hybridManager.uiRoot){
-        NSLog(@"TODO notifyResume() !!!!!");
+        [hybridManager.uiRoot trigger:CMPHybridEventAppResume];
     }
 }
-
-//+ (void) handlePause
-//{
-//    NSLog(@"handlePause() !!!!!");
-//}
-//+ (void) handleResume
-//{
-//    NSLog(@"handleResume() !!!!!");
-//}
 
 #pragma mark - 手势密码读写
 + (NSString *)loadGesturesPassword{

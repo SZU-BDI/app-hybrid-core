@@ -24,6 +24,9 @@ typedef void (^HybridEventHandler)(NSString *eventName, JSO* extraData);
 #define CMPHybridEventWhenClose @"WhenClose"
 #define CMPHybridEventBeforeClose @"BeforeClose"
 
+#define CMPHybridEventAppResume @"AppResume"
+#define CMPHybridEventAppPause @"AppPause"
+
 #define SINGLETON_shareInstance(classname) \
 + (classname *)shareInstance\
 {\
@@ -73,8 +76,8 @@ return _sharedInstance;\
 -(instancetype) on:(NSString *)eventName :(HybridEventHandler) handler :(JSO *)initData;
 -(instancetype) off:(NSString *)eventName;
 
--(void) trigger :(NSString *)eventName :(JSO *)triggerData;
--(void) trigger :(NSString *)eventName;
+-(instancetype) trigger :(NSString *)eventName :(JSO *)triggerData;
+-(instancetype) trigger :(NSString *)eventName;
 
 //for top bar buttons:
 -(void) resetTopBarBtn;
