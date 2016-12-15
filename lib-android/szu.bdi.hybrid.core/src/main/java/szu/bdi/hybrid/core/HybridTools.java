@@ -41,6 +41,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class HybridTools {
     final static String ANDROID_APPLICATION = "_android_applicaton_";
+    public final static String NETWORK_STATUS = "_network_status_";
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
@@ -59,11 +60,15 @@ public class HybridTools {
     public static Application getApplication() {
         Application _thisApp = null;
         try {
-            _thisApp = (Application) _memStore.get(ANDROID_APPLICATION);
+            //_thisApp = (Application) _memStore.get(ANDROID_APPLICATION);
+            _thisApp = (Application) getCacheFromMem(ANDROID_APPLICATION);
             if (null == _thisApp) {
                 _thisApp = (Application) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication").invoke(null, (Object[]) null);
-                if (null != _thisApp) _memStore.put(ANDROID_APPLICATION, _thisApp);
+                if (null != _thisApp) {
+                    //_memStore.put(ANDROID_APPLICATION, _thisApp);
+                    setCacheToMem(ANDROID_APPLICATION, _thisApp);
+                }
             }
             if (null == _thisApp) KillAppSelf();
         } catch (Exception ex) {
@@ -71,6 +76,14 @@ public class HybridTools {
             KillAppSelf();
         }
         return _thisApp;
+    }
+
+    public static Object getCacheFromMem(String key) {
+        return _memStore.get(key);
+    }
+
+    public static Object setCacheToMem(String key, Object val) {
+        return _memStore.put(key, val);
     }
 
     public static Context getAppContext() {
