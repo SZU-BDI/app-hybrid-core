@@ -56,4 +56,11 @@ public class SimpleHybridWebViewUi extends HybridUi {
             _wv.loadUrl("javascript:try{$(document).trigger('resume');}catch(ex){}");
         }
     }
+
+    protected void onPause() {
+        super.onPause();
+        if (null != _wv) {
+            _wv.loadUrl("javascript:try{$(document).trigger('pause');}catch(ex){}");
+        }
+    }
 }
