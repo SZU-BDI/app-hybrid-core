@@ -225,19 +225,26 @@ public class JsBridgeWebView extends WebView {
             progressDialog.setTitle("Loading...");
             //progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
             progressDialog.setCanceledOnTouchOutside(false);
-            progressDialog.show();
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             notifyPollingInject(view, url);
             super.onPageFinished(view, url);
-            progressDialog.hide();
+            try {
+                progressDialog.hide();
+            } catch (Throwable th) {
+                th.printStackTrace();
+            }
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
+            try {
+                progressDialog.show();
+            } catch (Throwable th) {
+                th.printStackTrace();
+            }
             notifyPollingInject(view, url);
             super.onPageStarted(view, url, favicon);
         }

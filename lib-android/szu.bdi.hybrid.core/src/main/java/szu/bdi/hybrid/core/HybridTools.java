@@ -358,8 +358,7 @@ public class HybridTools {
         try {
             intent = new Intent(caller, Class.forName(clsName));
         } catch (Exception ex) {
-            Looper.prepare();
-            HybridTools.quickShowMsgMain("not found " + clsName);
+            quickShowMsg(caller.getApplicationContext(), "not found " + clsName);
             return;
         }
 
