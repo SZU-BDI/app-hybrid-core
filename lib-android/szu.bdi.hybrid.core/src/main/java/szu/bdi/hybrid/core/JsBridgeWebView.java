@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -214,6 +215,7 @@ public class JsBridgeWebView extends WebView {
 
     class MyWebViewClient extends WebViewClient {
         Context _ctx = null;
+        private ProgressDialog progressDialog = null;
 
         public MyWebViewClient(Context context) {
             this._ctx = context;
@@ -223,10 +225,18 @@ public class JsBridgeWebView extends WebView {
         public void onPageFinished(WebView view, String url) {
             notifyPollingInject(view, url);
             super.onPageFinished(view, url);
+            progressDialog.hide();
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            if (null == progressDialog) {
+                progressDialog = new ProgressDialog(this._ctx);
+            }
+            progressDialog.setTitle("Loading...");
+            //progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
             notifyPollingInject(view, url);
             super.onPageStarted(view, url, favicon);
         }
