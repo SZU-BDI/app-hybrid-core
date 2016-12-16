@@ -126,7 +126,7 @@ public class JsBridgeWebView extends WebView {
                 @Override
                 public void onCallBack(final JSO jso) {
                     ((Activity) _context).runOnUiThread(new Runnable() {
-                        @TargetApi(Build.VERSION_CODES.KITKAT)
+                        //@TargetApi(Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
                             JSO msg = new JSO();
@@ -136,12 +136,16 @@ public class JsBridgeWebView extends WebView {
                             String s = msg.toString(true);
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
-                            evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
-                                @Override
-                                public void onReceiveValue(String value) {
-                                    Log.v(LOGTAG, " onReceiveValue " + value);
-                                }
-                            });
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
+                                    @Override
+                                    public void onReceiveValue(String value) {
+                                        Log.v(LOGTAG, " onReceiveValue " + value);
+                                    }
+                                });
+                            } else {
+                                loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
+                            }
                         }
                     });
                     //onCallBack(JSO.o2s(jso));
