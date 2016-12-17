@@ -278,10 +278,14 @@ public class JsBridgeWebView extends WebView {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            try {
-                this.wv.progressDialog.show();
-            } catch (Throwable th) {
-                th.printStackTrace();
+            if (url != null && url.startsWith("file:")) {
+                //for local no eed to show load indicator
+            } else {
+                try {
+                    this.wv.progressDialog.show();
+                } catch (Throwable th) {
+                    th.printStackTrace();
+                }
             }
 
             notifyPollingInject(view, url);

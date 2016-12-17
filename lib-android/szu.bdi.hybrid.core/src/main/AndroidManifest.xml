@@ -6,6 +6,7 @@
         <activity android:name="szu.bdi.hybrid.core.HybridUi" />
         <activity android:name="szu.bdi.hybrid.core.NativeUi" />
         <activity android:name="szu.bdi.hybrid.core.SimpleHybridWebViewUi" />
+        <activity android:name="szu.bdi.hybrid.core.eg.UiPhoto" />
     </application>
 
 </manifest>

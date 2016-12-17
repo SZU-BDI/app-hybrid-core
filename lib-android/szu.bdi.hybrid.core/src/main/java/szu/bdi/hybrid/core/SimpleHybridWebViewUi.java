@@ -42,6 +42,11 @@ public class SimpleHybridWebViewUi extends HybridUi {
         //pre-register api handlers base on config.json:
         HybridTools.preRegisterApiHandlers(_wv, this);
 
+//        String ind = HybridTools.optString(this.getUiData("ind"));
+//        if (!HybridTools.isEmptyString(ind)) {
+//            _wv.setInd(false);
+//        }
+//
         _wv.loadUrl(url);
 
         //fix the problem about the background for API(11-18)

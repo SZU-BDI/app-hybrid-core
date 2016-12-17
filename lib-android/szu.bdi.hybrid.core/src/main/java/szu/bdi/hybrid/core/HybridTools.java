@@ -312,7 +312,8 @@ public class HybridTools {
 
         JSO defaultParam = uia.getChild(name);
         if (defaultParam == null || defaultParam.isNull()) {
-            HybridTools.quickShowMsgMain("config.json not found " + name + " !!!");
+            //quickShowMsg(caller.getApplication(), "config not found " + name + " !");
+            quickShowMsgMain("config not found " + name + " !");
             return;
         }
 
@@ -326,7 +327,7 @@ public class HybridTools {
             if ("WebView".equalsIgnoreCase(mode)) {
                 clsName = SimpleHybridWebViewUi.class.getName();
             } else {
-                HybridTools.quickShowMsgMain("config.json error!!! config not found for name=" + name);
+                quickShowMsgMain("config.json error!!! config not found for name=" + name);
                 return;
             }
         }
@@ -337,7 +338,7 @@ public class HybridTools {
         try {
             intent = new Intent(caller, Class.forName(clsName));
         } catch (Exception ex) {
-            quickShowMsg(caller.getApplicationContext(), "not found " + clsName);
+            quickShowMsgMain("not found " + clsName);
             return;
         }
 
