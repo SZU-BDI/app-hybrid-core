@@ -8,18 +8,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
+
+import org.json.JSONArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,11 @@ import info.cmptech.JSO;
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
     final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
+
+    private static final String[] mFilterMethods = {"getClass", "hashCode", "notify", "notifyAll", "equals", "toString", "wait",};
     protected ProgressDialog progressDialog = null;
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
+    private nativejsb _nativejsb = null;
 
     public JsBridgeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,14 +50,21 @@ public class JsBridgeWebView extends WebView {
     public JsBridgeWebView(Context context) {
         super(context);
         init(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            this.addJavascriptInterface(new nativejsb(context), "nativejsb");
+        } else {
+            _nativejsb = new nativejsb(context);
+        }
+    }
 
-        //NOTES: <= JELLY_BEAN_MR1 will have a security problem... TODO....
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        this.addJavascriptInterface(new nativejsb(context), "nativejsb");
-        //} else {
-        // TODO limit for some security...
-        //    //HybridTools.quickShowMsg(context, "Your android is too low version");
-        //}
+    private boolean filterMethods(String methodName) {
+        for (String method : mFilterMethods) {
+            if (method.equals(methodName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void init(Context context) {
@@ -82,7 +93,7 @@ public class JsBridgeWebView extends WebView {
 
         @JavascriptInterface
         public String getVersion() {
-            return "20161119";
+            return "20161216";
         }
 
         //NOTES: for native object injected into the webview, the parameters must be primitive.
@@ -96,27 +107,6 @@ public class JsBridgeWebView extends WebView {
             //TODO !!!! 这里要有个 auth-mapping (url-regexp) check!!!!
 
             final HybridCallback responseFunction = new HybridCallback() {
-//                @Override
-//                public void onCallBack(final String data_s) {
-//                    ((Activity) _context).runOnUiThread(new Runnable() {
-//                        @TargetApi(Build.VERSION_CODES.KITKAT)
-//                        @Override
-//                        public void run() {
-//                            JSO msg = new JSO();
-//                            msg.setChild(RESPONSE_ID_STR, callBackId);
-//                            msg.setChild(RESPONSE_DATA_STR, data_s);
-//                            String s = msg.toString(true);
-//                            if ("".equals(s) || s == null) s = "null";
-//                            Log.v(LOGTAG, "js2app s ==> " + s);
-//                            evaluateJavascript("WebViewJavascriptBridge._app2js(" + s + ");", new ValueCallback<String>() {
-//                                @Override
-//                                public void onReceiveValue(String value) {
-//                                    Log.v(LOGTAG, " onReceiveValue " + value);
-//                                }
-//                            });
-//                        }
-//                    });
-//                }
 
                 @Override
                 public void onCallBack(final JSO jso) {
@@ -138,11 +128,10 @@ public class JsBridgeWebView extends WebView {
                                     }
                                 });
                             } else {
-                                loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ");");
+                                loadUrl("javascript:WebViewJavascriptBridge._app2js(" + s + ")");
                             }
                         }
                     });
-                    //onCallBack(JSO.o2s(jso));
                 }
 
             };
@@ -207,7 +196,41 @@ public class JsBridgeWebView extends WebView {
             return true;
         }
 
-        //TODO design a loading % bar in future
+        @Override
+        public boolean onJsPrompt(WebView view, String origin, String message, String defaultValue, final JsPromptResult result) {
+
+            if ("nativejsb:".equals(message)) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    try {
+                        JSONArray array = new JSONArray(defaultValue);
+                        final String callbackId = array.getString(0);
+                        final String handlerName = array.getString(1);
+                        final String data_s = array.getString(2);
+                        if (_nativejsb != null) {
+                            final Activity act = ((Activity) this._ctx);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    act.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            _nativejsb.js2app(callbackId, handlerName, data_s);
+                                        }
+                                    });
+                                }
+
+                            }, 11);
+                        }
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                    result.confirm();
+                    return true;
+                }
+            }
+            return super.onJsPrompt(view, origin, message, defaultValue, result);
+        }
+
         @Override
         public void onProgressChanged(WebView view, int progress) {
             super.onProgressChanged(view, progress);
@@ -260,6 +283,7 @@ public class JsBridgeWebView extends WebView {
             } catch (Throwable th) {
                 th.printStackTrace();
             }
+
             notifyPollingInject(view, url);
             super.onPageStarted(view, url, favicon);
         }
@@ -270,6 +294,12 @@ public class JsBridgeWebView extends WebView {
 
             //NOTES: no need to runOnUiThread() here...because called by onPageXXXX
             view.loadUrl("javascript:" + jsContent);
+
+            //NOTES: <= JELLY_BEAN_MR1 will have a security problem...
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                String nativejsb_s = "window.nativejsb=window.WebViewJavascriptBridge.nativejsb;";
+                view.loadUrl("javascript:" + nativejsb_s);
+            }
         }
 
         //NOTES

@@ -20,29 +20,29 @@
 		if("undefined"!=typeof nativejsb){
 			return nativejsb.js2app(msg.callbackId,msg.handlerName,o2s(msg.data));
 		}else if("undefined"!=typeof window.webkit.messageHandlers.nativejsb){
-            window.webkit.messageHandlers.nativejsb.postMessage(msg);
-        }else{
-            alert("ERROR nativejsb is missing");
+			window.webkit.messageHandlers.nativejsb.postMessage(msg);
+		}else{
+			alert("ERROR nativejsb is missing");
 		}
 	}
 
 	function _gc(){
-	    if(responseCallbacks){
-	        var nowTime=new Date().getTime();
-	        for(k in responseCallbacks){
-	            var cb=responseCallbacks[k];
-	            //alert("TODO "+(nowTime-cb.time));
-	            if( (nowTime-cb.time)>1800000 ){
-				    responseCallbacks[msg.responseId]=null;
-				    delete responseCallbacks[msg.responseId];
+		if(responseCallbacks){
+			var nowTime=new Date().getTime();
+			for(k in responseCallbacks){
+				var cb=responseCallbacks[k];
+				//alert("TODO "+(nowTime-cb.time));
+				if( (nowTime-cb.time)>1800000 ){
+					responseCallbacks[msg.responseId]=null;
+					delete responseCallbacks[msg.responseId];
 				}
-	        }
-	    }
+			}
+		}
 	}
 
 	//handle msg from app
 	function _app2js(msg){
-	    var _this=this;
+		var _this=this;
 		setTimeout(function(){
 			var callback=null;
 			if (msg.responseId) {
@@ -51,9 +51,9 @@
 				if (!callback) { return; }
 				callback(msg.responseData);
 				try{
-				responseCallbacks[msg.responseId]=null;
-				delete responseCallbacks[msg.responseId];
-				_gc();
+					responseCallbacks[msg.responseId]=null;
+					delete responseCallbacks[msg.responseId];
+					_gc();
 				}catch(ex){console.log(ex);}
 			} else {
 				var handler = null;
@@ -105,6 +105,14 @@
 	}
 
 	win.WebViewJavascriptBridge = {
+		//for < API 17
+		nativejsb:{
+			js2app:function(callbackId,handlerName,data_s){
+				//setTimeout(function(){
+				prompt('nativejsb:',JSON.stringify([callbackId,handlerName,data_s]));
+				//},1);
+			}
+		},
 		//for js send app
 		_js2app: _js2app,
 
