@@ -108,9 +108,9 @@
 		//for < API 17
 		nativejsb:{
 			js2app:function(callbackId,handlerName,data_s){
-				//setTimeout(function(){
-				prompt('nativejsb:',JSON.stringify([callbackId,handlerName,data_s]));
-				//},1);
+				setTimeout(function(){
+					prompt('nativejsb:',JSON.stringify([callbackId,handlerName,data_s]));
+				},1);
 			}
 		},
 		//for js send app
