@@ -38,13 +38,12 @@ import java.util.regex.PatternSyntaxException;
 import info.cmptech.JSO;
 
 public class HybridTools {
-    final static String ANDROID_APPLICATION = "_android_applicaton_";
     public final static String NETWORK_STATUS = "_network_status_";
+    final static String ANDROID_APPLICATION = "_android_applicaton_";
     final static String UI_MAPPING = "ui_mapping";
     final static String API_AUTH = "api_auth";
     final static String API_MAPPING = "api_mapping";
-    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
-
+    final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
     private static Map<String, Object> _memStore = new HashMap<String, Object>();
 
     private static JSO _jAppConfig = null;//new info.cmptech.JSO();

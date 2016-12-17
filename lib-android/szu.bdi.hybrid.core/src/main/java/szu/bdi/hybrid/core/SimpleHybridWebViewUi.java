@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class SimpleHybridWebViewUi extends HybridUi {
-
-    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
+    final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
     private JsBridgeWebView _wv = null;
 
     @Override

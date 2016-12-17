@@ -28,8 +28,7 @@ import info.cmptech.JSO;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
-
-    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
+    final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
     protected ProgressDialog progressDialog = null;
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
