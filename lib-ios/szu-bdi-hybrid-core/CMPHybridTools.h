@@ -102,7 +102,7 @@
 + (NSString *) base64decode:(NSString *)s;
 
 + (NSString *) I18N:(NSString *)key;
-+ (void) setI18N:(NSString *)i18n;
+//+ (void) setI18N:(NSString *)i18n;
 
 + (void)saveUserConfig :(NSString *)key :(NSString *)value_s :(BOOL)autosave;
 + (id)loadUserConfig :(NSString *)key;

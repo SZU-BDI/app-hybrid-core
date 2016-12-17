@@ -255,7 +255,7 @@ NSString *PBResourceHost = @".resource.";
 -(void) alertView :(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if(self.callback)
-    self.callback();
+        self.callback();
 }
 
 -(instancetype) initWithMsg:(NSString *)msg  callback:(void (^)())callback
@@ -840,7 +840,10 @@ SINGLETON_shareInstance(CMPHybridTools);
     
     JSO *value_a=[i18n getChild:key];
     //NSString *cached_lang=[self loadAppConfig:@"lang"];
-    NSString *lang=@"en";//TODO
+    NSString *lang=hybridManager.lang;
+    if([self isEmptyString:lang]){
+        lang=@"en";
+    }
     JSO *value=[value_a getChild:lang];
     if(nil==value || [value isNull]){
         //
@@ -849,10 +852,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     }
     return key;
 }
-+ (void) setI18N:(NSString *)i18n
-{
-    return;
-}
+
 + (NSInteger) os_compare:(Float32)tgt
 {
     //TODO improve by cache the floatValue to val?
