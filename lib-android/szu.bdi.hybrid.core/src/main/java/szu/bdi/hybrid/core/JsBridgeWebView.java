@@ -1,7 +1,6 @@
 package szu.bdi.hybrid.core;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -11,31 +10,27 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import info.cmptech.JSO;
+import android.widget.LinearLayout;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import info.cmptech.JSO;
+
 @SuppressLint("SetJavaScriptEnabled")
 public class JsBridgeWebView extends WebView {
 
-    private final static String RESPONSE_ID_STR = "responseId";
-    private final static String RESPONSE_DATA_STR = "responseData";
-
-//    private final static String CALLBACK_ID_STR = "callbackId";
-//    private final static String DATA_STR = "data";
-//    private final static String HANDLER_NAME_STR = "handlerName";
-
     final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
-
+    protected ProgressDialog progressDialog = null;
     Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
 
     public JsBridgeWebView(Context context, AttributeSet attrs) {
@@ -53,7 +48,8 @@ public class JsBridgeWebView extends WebView {
         super(context);
         init(context);
 
-//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        //NOTES: <= JELLY_BEAN_MR1 will have a security problem... TODO....
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
         this.addJavascriptInterface(new nativejsb(context), "nativejsb");
         //} else {
         // TODO limit for some security...
@@ -68,8 +64,8 @@ public class JsBridgeWebView extends WebView {
         //  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         //  WebView.setWebContentsDebuggingEnabled(true);
         //}
-        this.setWebViewClient(new MyWebViewClient(context));
-        this.setWebChromeClient(new MyWebChromeClient(context));
+        this.setWebViewClient(new MyWebViewClient(context, this));
+        this.setWebChromeClient(new MyWebChromeClient(context, this));
     }
 
     public void registerHandler(String handlerName, HybridHandler handler) {
@@ -130,9 +126,8 @@ public class JsBridgeWebView extends WebView {
                         @Override
                         public void run() {
                             JSO msg = new JSO();
-                            msg.setChild(RESPONSE_ID_STR, callBackId);
-                            //msg.setChild(RESPONSE_DATA_STR, jso.toString(true));
-                            msg.setChild(RESPONSE_DATA_STR, jso);
+                            msg.setChild("responseId", callBackId);
+                            msg.setChild("responseData", jso);
                             String s = msg.toString(true);
                             if ("".equals(s) || s == null) s = "null";
                             Log.v(LOGTAG, "js2app s ==> " + s);
@@ -173,9 +168,11 @@ public class JsBridgeWebView extends WebView {
 
     class MyWebChromeClient extends WebChromeClient {
         Context _ctx = null;
+        JsBridgeWebView wv = null;
 
-        public MyWebChromeClient(Context context) {
+        public MyWebChromeClient(Context context, JsBridgeWebView wv) {
             this._ctx = context;
+            this.wv = wv;
         }
 
         @Override
@@ -184,6 +181,7 @@ public class JsBridgeWebView extends WebView {
                 HybridTools.appAlert(_ctx, message, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         result.confirm();
                     }
                 });
@@ -209,34 +207,48 @@ public class JsBridgeWebView extends WebView {
             });
             return true;
         }
+
         //TODO design a loading % bar in future
-//        @Override
-//        public void onProgressChanged(WebView view, int progress) {
-//            super.onProgressChanged(view,progress);
-//            // Do something cool here
-//        }
+        @Override
+        public void onProgressChanged(WebView view, int progress) {
+            super.onProgressChanged(view, progress);
+            // Do something cool here
+            if (null != this.wv) {
+                try {
+                    //Log.v(LOGTAG, "onProgressChanged " + progress);
+                    this.wv.progressDialog.setProgress(progress);
+                } catch (Throwable th) {
+                    th.printStackTrace();
+                }
+            }
+        }
     }
 
     class MyWebViewClient extends WebViewClient {
         Context _ctx = null;
-        private ProgressDialog progressDialog = null;
+        JsBridgeWebView wv = null;
 
-        public MyWebViewClient(Context context) {
+        public MyWebViewClient(Context context, JsBridgeWebView wv) {
             this._ctx = context;
-            if (null == progressDialog) {
-                progressDialog = new ProgressDialog(this._ctx);
+            this.wv = wv;
+            if (null == this.wv.progressDialog) {
+                this.wv.progressDialog = new ProgressDialog(this._ctx);
+                this.wv.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                this.wv.progressDialog.setMax(100);
             }
-            progressDialog.setTitle("Loading...");
-            //progressDialog.setMessage(getText(R.string.text_progressdialog_open_website));
-            progressDialog.setCanceledOnTouchOutside(false);
+            this.wv.progressDialog.setTitle("Loading...");
+            this.wv.progressDialog.setCanceledOnTouchOutside(false);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            //Log.v(LOGTAG, "onPageFinished " + url);
+
             notifyPollingInject(view, url);
             super.onPageFinished(view, url);
             try {
-                progressDialog.hide();
+                this.wv.progressDialog.hide();
+                this.wv.progressDialog.dismiss();
             } catch (Throwable th) {
                 th.printStackTrace();
             }
@@ -245,7 +257,7 @@ public class JsBridgeWebView extends WebView {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             try {
-                progressDialog.show();
+                this.wv.progressDialog.show();
             } catch (Throwable th) {
                 th.printStackTrace();
             }
@@ -260,7 +272,6 @@ public class JsBridgeWebView extends WebView {
             //NOTES: no need to runOnUiThread() here...because called by onPageXXXX
             view.loadUrl("javascript:" + jsContent);
         }
-
 
         //NOTES
         //for <input type=file/> we suggest to give it up. using api to invoke activity to handle it...

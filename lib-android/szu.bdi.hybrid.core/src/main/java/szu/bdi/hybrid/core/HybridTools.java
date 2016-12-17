@@ -1,6 +1,5 @@
 package szu.bdi.hybrid.core;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -9,13 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.Looper;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
-
-import info.cmptech.JSO;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -39,6 +35,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import info.cmptech.JSO;
+
 public class HybridTools {
     final static String ANDROID_APPLICATION = "_android_applicaton_";
     public final static String NETWORK_STATUS = "_network_status_";
@@ -49,24 +47,17 @@ public class HybridTools {
 
     private static Map<String, Object> _memStore = new HashMap<String, Object>();
 
-    //private static Application _thisApp = null;
-
-    //private static JSONObject _jAppConfig = new JSONObject();
     private static JSO _jAppConfig = null;//new info.cmptech.JSO();
     private static String _localWebRoot = "";
-
-    //public static boolean flagAppWorking = true;//NOTES: backgroundService might use it.
 
     public static Application getApplication() {
         Application _thisApp = null;
         try {
-            //_thisApp = (Application) _memStore.get(ANDROID_APPLICATION);
             _thisApp = (Application) getCacheFromMem(ANDROID_APPLICATION);
             if (null == _thisApp) {
                 _thisApp = (Application) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication").invoke(null, (Object[]) null);
                 if (null != _thisApp) {
-                    //_memStore.put(ANDROID_APPLICATION, _thisApp);
                     setCacheToMem(ANDROID_APPLICATION, _thisApp);
                 }
             }
@@ -119,7 +110,7 @@ public class HybridTools {
     public static void saveSetting(Context mContext, String whichSp, String field, String value) {
         SharedPreferences sp = (SharedPreferences) mContext.getSharedPreferences(whichSp, Context.MODE_PRIVATE);
         if (null == value) value = "";//I want to store sth not null
-        //sp.edit().putString(field, value).commit();
+
         sp.edit().putString(field, value).apply();
     }
 
@@ -178,12 +169,7 @@ public class HybridTools {
         JSO rt = new JSO();
         rt.setChild("STS", JSO.s2o("KO"));
         rt.setChild("errmsg", JSO.s2o(return_s));
-//        try {
-//            rt.put("STS", "KO");
-//            rt.put("errmsg", "" + return_s);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+
         return rt;
     }
 
@@ -240,13 +226,7 @@ public class HybridTools {
     }
 
     public static void setAppConfig(String K, JSO V) {
-//        try {
-        //_jAppConfig.put(K, V);
         _jAppConfig.setChild(K, V);
-//        } catch (JSONException e) {
-//            Log.d(LOGTAG, "setConfig " + K);
-//            e.printStackTrace();
-//        }
     }
 
     public static void checkAppConfig() {
@@ -618,25 +598,6 @@ public class HybridTools {
         }
         return null;
     }
-
-    ///////////////////////////////////////////////////////
-    //UI-Holders
-//    private static ArrayList<HybridUi> _uia = new ArrayList<HybridUi>();
-//
-//    public static ArrayList<HybridUi> debugHybridUis() {
-//        Log.v(LOGTAG, "debugHybridUis size = " + _uia.size());
-//        return _uia;
-//    }
-//
-//    public static void addHybridUi(HybridUi ui) {
-//        _uia.add(ui);
-//    }
-//
-//    public static void closeHybridUi(HybridUi ui) {
-//        if (_uia.contains(ui))
-//            _uia.remove(ui);
-//    }
-
 }
 
 

@@ -1,6 +1,8 @@
 package szu.bdi.hybrid.core;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,6 +25,8 @@ public class SimpleHybridWebViewUi extends HybridUi {
 
         _wv = new JsBridgeWebView(_ctx);
 
+        setContentView(_wv);
+
         String address = HybridTools.optString(this.getUiData("address"));
         String url = "";
         if (address == null || "".equals(address)) {
@@ -38,9 +42,11 @@ public class SimpleHybridWebViewUi extends HybridUi {
         }
 
         HybridTools.bindWebViewApi(_wv, this);
-
-        setContentView(_wv);
         _wv.loadUrl(url);
+        _wv.setBackgroundColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            _wv.setLayerType(_wv.LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     protected void onPostResume() {
