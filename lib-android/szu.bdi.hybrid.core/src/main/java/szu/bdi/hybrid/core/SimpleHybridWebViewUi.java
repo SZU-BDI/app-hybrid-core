@@ -1,6 +1,7 @@
 package szu.bdi.hybrid.core;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -21,7 +22,7 @@ public class SimpleHybridWebViewUi extends HybridUi {
         final Context _ctx = this;
 
         _wv = new JsBridgeWebView(_ctx);
-
+        _wv.setBackgroundColor(Color.TRANSPARENT);
         setContentView(_wv);
 
         String address = HybridTools.optString(this.getUiData("address"));
@@ -50,7 +51,7 @@ public class SimpleHybridWebViewUi extends HybridUi {
         _wv.loadUrl(url);
 
         //fix the problem about the background for API(11-18)
-        //_wv.setBackgroundColor(Color.TRANSPARENT);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT
                 ) {

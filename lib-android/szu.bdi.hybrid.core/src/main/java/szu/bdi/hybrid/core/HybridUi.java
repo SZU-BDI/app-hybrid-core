@@ -183,7 +183,7 @@ public class HybridUi extends Activity {
     }
 
     public JSO getUiData(String k) {
-        if (null == _uiData) return null;
+        if (null == _uiData) return new JSO();
         return _uiData.getChild(k);
     }
 

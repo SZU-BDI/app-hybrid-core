@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
@@ -598,6 +600,37 @@ public class HybridTools {
         }
         return null;
     }
+
+    public static boolean checkPermission(HybridUi thisHybriUi, String perm) {
+        int permissionCheck = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            permissionCheck = thisHybriUi.getApplicationContext().checkSelfPermission(perm);
+            Log.v(LOGTAG, "permissionCheck(" + perm + ")=" + permissionCheck);
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                thisHybriUi.requestPermissions(new String[]{perm}, 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static File getTempDirectoryPath() {
+        return getAppContext().getCacheDir();
+    }
+
+//    public static String getMimeType(String uriString) {
+//        String mimeType = null;
+//
+//        Uri uri = Uri.parse(uriString);
+//        if (uriString.startsWith("content://")) {
+//            mimeType = cordova.getActivity().getContentResolver().getType(uri);
+//        } else {
+//            mimeType = getMimeTypeForExtension(uri.getPath());
+//        }
+//
+//        return mimeType;
+//    }
 }
 
 
