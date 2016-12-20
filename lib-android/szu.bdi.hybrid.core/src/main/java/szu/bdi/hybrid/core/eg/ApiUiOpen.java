@@ -5,40 +5,34 @@ package szu.bdi.hybrid.core.eg;
 import szu.bdi.hybrid.core.*;
 import info.cmptech.JSO;
 
-
 public class ApiUiOpen extends HybridApi {
-    //    final private static String LOGTAG = (((new Throwable()).getStackTrace())[0]).getClassName();
-    public HybridHandler getHandler() {
-        return new HybridHandler() {
+    final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
+
+    @Override
+    public void handler(JSO jso, final HybridCallback apiCallback) {
+
+        String t = jso.getChild("name").toString();
+        String uiName = (!HybridTools.isEmptyString(t)) ? t : "UiContent";//default to UiContent
+
+        HybridTools.startUi(uiName, jso.toString(true), getCallerUi(), new HybridUiCallback() {
             @Override
-            public void handler(JSO jso, final HybridCallback apiCallback) {
-                HybridUi callerUi = getCallerUi();
+            public void onCallBack(final HybridUi ui) {
 
-                //JSO data_o = JSO.s2o(dataStr);
+                //listen "close" event
+                ui.on("close", new HybridCallback() {
 
-                String t = jso.getChild("name").toString();
-                String uiName = (!HybridTools.isEmptyString(t)) ? t : "UiContent";//default to UiContent
-
-                HybridTools.startUi(uiName, jso.toString(true), callerUi, new HybridUiCallback() {
                     @Override
-                    public void onCallBack(final HybridUi ui) {
+                    public void onCallBack(JSO jsoCallback) {
 
-                        //listen "close" event
-                        ui.on("close", new HybridCallback() {
+                        //manually close it
+                        ui.finish();
 
-                            @Override
-                            public void onCallBack(JSO jso) {
-
-                                //manually close it
-                                ui.finish();
-
-                                //api callback
-                                apiCallback.onCallBack(jso);
-                            }
-                        });
+                        //api callback
+                        if (null != apiCallback)
+                            apiCallback.onCallBack(jsoCallback);
                     }
                 });
             }
-        };
+        });
     }
 }

@@ -11,5 +11,5 @@ abstract public class HybridApi {
         return __callerUi;
     }
 
-    abstract public HybridHandler getHandler();
+    abstract public void handler(info.cmptech.JSO jso, HybridCallback cbFunc);
 }

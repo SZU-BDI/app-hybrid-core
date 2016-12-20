@@ -818,7 +818,7 @@ SINGLETON_shareInstance(CMPHybridTools);
     };//end nativejsb.js2app...
     
     ctx[@"nativejsb"][@"getVersion"] = ^() {
-        return @"20161120";
+        return @"20161222";
     };
     
     //STUB

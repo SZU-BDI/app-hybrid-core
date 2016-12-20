@@ -5,16 +5,12 @@ import info.cmptech.JSO;
 import szu.bdi.hybrid.core.*;
 
 public class ApiUiClose extends HybridApi {
-    public HybridHandler getHandler() {
-        return new HybridHandler() {
+    @Override
+    public void handler(JSO jso, HybridCallback cbFunc) {
+        HybridUi ui = getCallerUi();
 
-            @Override
-            public void handler(JSO jso, HybridCallback cbFunc) {
-                HybridUi ui = getCallerUi();
+        ui.closeUi(jso);
 
-                ui.closeUi(jso);
-                if (null != cbFunc) cbFunc.onCallBack(jso);
-            }
-        };
+        if (null != cbFunc) cbFunc.onCallBack(jso);
     }
 }

@@ -122,9 +122,10 @@ public class HybridTools {
             URL url = new URL(uu);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
+
                 conn.setDoOutput(true);
-                //conn.setChunkedStreamingMode(0);
                 conn.setRequestMethod("POST");
+
                 OutputStream out = new BufferedOutputStream(conn.getOutputStream());
 
                 //write to the stream
@@ -147,6 +148,65 @@ public class HybridTools {
             }
         }
         return return_s;
+    }
+
+    public static void fileUpload(String url, String localFile, HybridCallback progressUploadListener) {
+        //                con.setChunkedStreamingMode(256 * 1024);// 256KB
+//
+//                // Allow Inputs & Outputs
+//                con.setDoInput(true);
+//                con.setDoOutput(true);
+//                con.setUseCaches(false);
+//
+        //conn.setChunkedStreamingMode(0);
+//                // Enable POST method
+//                con.setRequestMethod("POST");
+//                con.setRequestProperty("Connection", "Keep-Alive");
+//                con.setRequestProperty("Charset", "UTF-8");
+//                con.setRequestProperty("Content-Type",
+//                        "multipart/form-data;boundary=" + boundary);
+//                outputStream = new DataOutputStream(
+//                        con.getOutputStream());
+//                outputStream.writeBytes(mTwoHyphens + boundary + mLineEnd);
+//                outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"" + mLineEnd);
+//                outputStream.writeBytes("Content-Type:application/octet-stream \r\n");
+//                outputStream.writeBytes(mLineEnd);
+//
+//                mbytesAvailable = fileInputStream.available();
+//                mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
+//                buffer = new byte[mBufferSize];
+//
+//                // Read file
+//                mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
+//
+//                while (mBytesRead > 0) {
+//                    outputStream.write(buffer, 0, mBufferSize);
+//                    length += mBufferSize;
+//
+//                    publishProgress((int) ((length * 100) / mTtotalSize));
+//
+//                    mbytesAvailable = fileInputStream.available();
+//
+//                    mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
+//
+//                    mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
+//                }
+//                outputStream.writeBytes(mLineEnd);
+//                outputStream.writeBytes(mTwoHyphens + boundary + mTwoHyphens
+//                        + mLineEnd);
+//                publishProgress(100);
+//
+//                // Responses from the server (code and message)
+//                int serverResponseCode = con.getResponseCode();
+//                String serverResponseMessage = con.getResponseMessage();
+//                fileInputStream.close();
+//                outputStream.flush();
+//                outputStream.close();
+
+        //TODO @ref http://www.jb51.net/article/96863.htm
+
+
+        return;
     }
 
     //Wrap the raw webPost for cmp api call
@@ -437,7 +497,7 @@ public class HybridTools {
                 try {
                     HybridApi api = (HybridApi) targetClass.newInstance();
                     api.setCallerUi(callerAct);
-                    wv.registerHandler(v, api.getHandler());
+                    wv.registerHandler(v, api);
                 } catch (Throwable t) {
                     t.printStackTrace();
                     HybridTools.quickShowMsgMain("ConfigError: faile to create api of " + clsName);

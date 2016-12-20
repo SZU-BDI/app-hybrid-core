@@ -1,5 +1,5 @@
 //from cordova
-package szu.bdi.hybrid.core;
+package szu.bdi.hybrid.core.eg;
 
 import android.media.ExifInterface;
 

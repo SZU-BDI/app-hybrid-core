@@ -4,34 +4,29 @@ import info.cmptech.JSO;
 import szu.bdi.hybrid.core.*;
 
 public class ApiPhoto extends HybridApi {
-    public HybridHandler getHandler() {
-        return new HybridHandler() {
+    @Override
+    public void handler(JSO jso, final HybridCallback cbFunc) {
+        final HybridUi ui = getCallerUi();
 
+        HybridTools.startUi("UiPhoto", jso.toString(true), ui, new HybridUiCallback() {
             @Override
-            public void handler(JSO jso, final HybridCallback cbFunc) {
-                final HybridUi ui = getCallerUi();
+            public void onCallBack(final HybridUi ui) {
 
-                HybridTools.startUi("UiPhoto", jso.toString(true), ui, new HybridUiCallback() {
+                //bind "close"
+                ui.on("close", new HybridCallback() {
+
                     @Override
-                    public void onCallBack(final HybridUi ui) {
+                    public void onCallBack(JSO jsoCallback) {
 
-                        //bind "close"
-                        ui.on("close", new HybridCallback() {
+                        //manually handle finishing the ui
+                        ui.finish();
 
-                            @Override
-                            public void onCallBack(JSO jsoCallback) {
-
-                                //manually handle finishing the ui
-                                ui.finish();
-
-                                //back to api caller
-                                cbFunc.onCallBack(jsoCallback);
-                            }
-                        });
+                        //back to api caller
+                        cbFunc.onCallBack(jsoCallback);
                     }
+                });
+            }
 
-                });//startUi()
-            }//handler()
-        };
-    }
+        });//startUi()
+    }//handler()
 }

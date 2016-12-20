@@ -33,7 +33,7 @@ public class JsBridgeWebView extends WebView {
 
     private static final String[] mFilterMethods = {"getClass", "hashCode", "notify", "notifyAll", "equals", "toString", "wait",};
     protected ProgressDialog progressDialog = null;
-    Map<String, HybridHandler> messageHandlers = new HashMap<String, HybridHandler>();
+    Map<String, HybridApi> messageHandlers = new HashMap<String, HybridApi>();
     private nativejsb _nativejsb = null;
 
     public JsBridgeWebView(Context context, AttributeSet attrs) {
@@ -78,7 +78,7 @@ public class JsBridgeWebView extends WebView {
         this.setWebChromeClient(new MyWebChromeClient(context, this));
     }
 
-    public void registerHandler(String handlerName, HybridHandler handler) {
+    public void registerHandler(String handlerName, HybridApi handler) {
         if (handler != null) {
             messageHandlers.put(handlerName, handler);
         }
@@ -135,7 +135,7 @@ public class JsBridgeWebView extends WebView {
                 }
 
             };
-            final HybridHandler handler = messageHandlers.get(handlerName);
+            final HybridApi handler = messageHandlers.get(handlerName);
 
             if (handler != null) {
                 (new Thread(new Runnable() {

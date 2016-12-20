@@ -16,9 +16,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +30,6 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 import info.cmptech.JSO;
-import szu.bdi.hybrid.core.ExifHelper;
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.NativeUi;
 
@@ -38,15 +39,8 @@ public class UiPhoto extends NativeUi {
     final public static int REQUEST_CODE_CAMERA = 1;
     final public static int REQUEST_CODE_ALBUM = 2;
     final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
-    private static final int JPEG = 0;                  // Take a picture of type JPEG
-    private static final int PNG = 1;                   // Take a picture of type PNG
-    private ExifHelper exifData;            // Exif data from source
-    //private int encodingType = 0;               // Type of encoding to use
-    //private boolean orientationCorrected = true;   // Has the picture's orientation been corrected
-    //    private int mQuality;                   // Compression quality hint (0-100: 0=low quality & high compression, 100=compress of max quality)
-    private int targetWidth;                // desired width of the image
-    private int targetHeight;               // desired height of the image
-    private boolean correctOrientation = false;     // Should the pictures orientation be corrected
+
+    final private static String FILE_TO_UPLOAD = "ToUpload.jpg";
 
     private static void createWritableFile(File file) throws IOException {
         file.createNewFile();
@@ -316,12 +310,21 @@ public class UiPhoto extends NativeUi {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        boolean KO = true;
         String srcType = getUiData("from").asString();
         if (REQUEST_CAMERA.equals(srcType)) {
             this.takePicture();
+            KO = false;
         } else if (REQUEST_ALBUM.equals(srcType)) {
             this.getImage();
-        } else {
+            KO = false;
+        }
+        String upload_url = getUiData("upload").asString();
+        if (HybridTools.isEmptyString(upload_url)) {
+            this.doUpload(upload_url);
+            KO = false;
+        }
+        if (KO) {
             JSO rt = new JSO();
             rt.setChild("STS", "KO");
             rt.setChild("errmsg", "Need param 'from'");
@@ -329,12 +332,16 @@ public class UiPhoto extends NativeUi {
         }
     }
 
+    private void doUpload(String url) {
+        HybridTools.fileUpload(url, FILE_TO_UPLOAD, null);
+    }
+
     private void takePicture() {
 
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
         // Specify file so that large image is captured and returned
-        File photo = new File(HybridTools.getTempDirectoryPath(), "Capture.jpg");
+        File photo = new File(HybridTools.getTempDirectoryPath(), FILE_TO_UPLOAD);
         try {
             // the ACTION_IMAGE_CAPTURE is run under different credentials and has to be granted write permissions
             createWritableFile(photo);
@@ -347,6 +354,7 @@ public class UiPhoto extends NativeUi {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//do top
 
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
+
     }
 
     private void writeUncompressedImage(InputStream fis, Uri dest) throws FileNotFoundException,
@@ -404,9 +412,9 @@ public class UiPhoto extends NativeUi {
         }
     }
 
-    public int[] calculateAspectRatio(int origWidth, int origHeight) {
-        int newWidth = this.targetWidth;
-        int newHeight = this.targetHeight;
+    public int[] calculateAspectRatio(int origWidth, int origHeight, int targetWidth, int targetHeight) {
+        int newWidth = targetWidth;
+        int newHeight = targetHeight;
 
         // If no new width or height were specified return the original bitmap
         if (newWidth <= 0 && newHeight <= 0) {
@@ -444,9 +452,9 @@ public class UiPhoto extends NativeUi {
         return retval;
     }
 
-    private Bitmap getScaledAndRotatedBitmap(String imageUrl) throws IOException {
+    private Bitmap getScaledAndRotatedBitmap(String imageUrl, int targetWidth, int targetHeight, boolean correctOrientation) throws IOException {
         // If no new width or height were specified, and orientation is not needed return the original bitmap
-        if (this.targetWidth <= 0 && this.targetHeight <= 0 && !(this.correctOrientation)) {
+        if (targetWidth <= 0 && targetHeight <= 0 && !(correctOrientation)) {
             InputStream fileStream = null;
             Bitmap image = null;
             try {
@@ -491,10 +499,10 @@ public class UiPhoto extends NativeUi {
                         //  ExifInterface doesn't like the file:// prefix
                         String filePath = galleryUri.toString().replace("file://", "");
                         // read exifData of source
-                        exifData = new ExifHelper();
+                        ExifHelper exifData = new ExifHelper();
                         exifData.createInFile(filePath);
                         // Use ExifInterface to pull rotation information
-                        if (this.correctOrientation) {
+                        if (correctOrientation) {
                             ExifInterface exif = new ExifInterface(filePath);
                             rotate = exifToDegrees(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED));
                         }
@@ -534,9 +542,9 @@ public class UiPhoto extends NativeUi {
             }
 
             // User didn't specify output dimensions, but they need orientation
-            if (this.targetWidth <= 0 && this.targetHeight <= 0) {
-                this.targetWidth = options.outWidth;
-                this.targetHeight = options.outHeight;
+            if (targetWidth <= 0 && targetHeight <= 0) {
+                targetWidth = options.outWidth;
+                targetHeight = options.outHeight;
             }
 
             // Setup target width/height based on orientation
@@ -552,7 +560,7 @@ public class UiPhoto extends NativeUi {
             }
 
             // determine the correct aspect ratio
-            int[] widthHeight = calculateAspectRatio(rotatedWidth, rotatedHeight);
+            int[] widthHeight = calculateAspectRatio(rotatedWidth, rotatedHeight, targetWidth, targetHeight);
 
             // Load in the smallest bitmap possible that is closest to the size we want
             options.inJustDecodeBounds = false;
@@ -582,7 +590,7 @@ public class UiPhoto extends NativeUi {
                 unscaledBitmap.recycle();
                 unscaledBitmap = null;//release it like js
             }
-            if (this.correctOrientation && (rotate != 0)) {
+            if (correctOrientation && (rotate != 0)) {
                 Matrix matrix = new Matrix();
                 matrix.setRotate(rotate);
                 try {
@@ -601,6 +609,52 @@ public class UiPhoto extends NativeUi {
         }
     }
 
+    public String bitmaptoString(Bitmap bitmap) {
+
+
+        // 将Bitmap转换成字符串
+
+        String string = null;
+
+        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+
+        byte[] bytes = bStream.toByteArray();
+
+        string = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+        return string;
+
+    }
+
+    public Bitmap stringtoBitmap(String string) {
+
+        // 将字符串转换成Bitmap类型
+
+        Bitmap bitmap = null;
+
+        try {
+
+            byte[] bitmapArray;
+
+            bitmapArray = Base64.decode(string, Base64.DEFAULT);
+
+            bitmap = BitmapFactory.decodeByteArray(bitmapArray, 0,
+
+                    bitmapArray.length);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+
+        return bitmap;
+
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         JSO jso = new JSO();
@@ -613,7 +667,7 @@ public class UiPhoto extends NativeUi {
                     srcPhoto = uri.toString();
                 }
             } else if (this.REQUEST_CODE_CAMERA == requestCode) {
-                srcPhoto = HybridTools.getTempDirectoryPath() + "/Capture.jpg";
+                srcPhoto = HybridTools.getTempDirectoryPath() + FILE_TO_UPLOAD;
             }
 
             String fileToUpload = null;
@@ -636,18 +690,23 @@ public class UiPhoto extends NativeUi {
                 int h0 = image.getHeight();
                 jso.setChild("w0", "" + w0);
                 jso.setChild("h0", "" + h0);
+
+                int targetWidth = 0;                // desired width of the image
+                int targetHeight = 0;               // desired height of the image
+                boolean correctOrientation = false;     // Should the pictures orientation be corrected
+
                 if (w0 > 1920 || h0 > 1080) {
-                    this.targetWidth = 1920;
-                    this.targetHeight = 1080;
+                    targetWidth = 1920;
+                    targetHeight = 1080;
                 }
 
-                Bitmap bitmap = getScaledAndRotatedBitmap(srcPhoto);
+                Bitmap bitmap = getScaledAndRotatedBitmap(srcPhoto, targetWidth, targetHeight, correctOrientation);
                 int w = bitmap.getWidth();
                 int h = bitmap.getHeight();
                 jso.setChild("w", "" + w);
                 jso.setChild("h", "" + h);
 
-                File tgtFile = new File(HybridTools.getTempDirectoryPath(), "ToUpload.jpg");
+                File tgtFile = new File(HybridTools.getTempDirectoryPath(), FILE_TO_UPLOAD);
                 Uri uriTgt = Uri.fromFile(tgtFile);
 
                 // Add compressed version of captured image to returned media store Uri
@@ -656,8 +715,12 @@ public class UiPhoto extends NativeUi {
 
                 //write bitmap to output stream with compress+quality
                 bitmap.compress(compressFormat, 90, os);
+
+                String tgt64 = bitmaptoString(bitmap);
+                jso.setChild("bin", tgt64);
                 os.close();
                 if (tgtFile.exists()) {
+
                     FileInputStream fis = new FileInputStream(tgtFile);
                     int tgtFileSize = fis.available();
                     jso.setChild("size", "" + tgtFileSize);
