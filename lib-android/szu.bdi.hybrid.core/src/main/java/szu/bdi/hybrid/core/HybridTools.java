@@ -18,7 +18,9 @@ import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,63 +152,103 @@ public class HybridTools {
         return return_s;
     }
 
-    public static void fileUpload(String url, String localFile, HybridCallback progressUploadListener) {
-        //                con.setChunkedStreamingMode(256 * 1024);// 256KB
-//
-//                // Allow Inputs & Outputs
-//                con.setDoInput(true);
-//                con.setDoOutput(true);
-//                con.setUseCaches(false);
-//
-        //conn.setChunkedStreamingMode(0);
-//                // Enable POST method
-//                con.setRequestMethod("POST");
-//                con.setRequestProperty("Connection", "Keep-Alive");
-//                con.setRequestProperty("Charset", "UTF-8");
-//                con.setRequestProperty("Content-Type",
-//                        "multipart/form-data;boundary=" + boundary);
-//                outputStream = new DataOutputStream(
-//                        con.getOutputStream());
-//                outputStream.writeBytes(mTwoHyphens + boundary + mLineEnd);
-//                outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"" + mLineEnd);
-//                outputStream.writeBytes("Content-Type:application/octet-stream \r\n");
-//                outputStream.writeBytes(mLineEnd);
-//
-//                mbytesAvailable = fileInputStream.available();
-//                mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
-//                buffer = new byte[mBufferSize];
-//
-//                // Read file
-//                mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
-//
-//                while (mBytesRead > 0) {
-//                    outputStream.write(buffer, 0, mBufferSize);
-//                    length += mBufferSize;
-//
-//                    publishProgress((int) ((length * 100) / mTtotalSize));
-//
-//                    mbytesAvailable = fileInputStream.available();
-//
-//                    mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
-//
-//                    mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
-//                }
-//                outputStream.writeBytes(mLineEnd);
-//                outputStream.writeBytes(mTwoHyphens + boundary + mTwoHyphens
-//                        + mLineEnd);
-//                publishProgress(100);
-//
-//                // Responses from the server (code and message)
-//                int serverResponseCode = con.getResponseCode();
-//                String serverResponseMessage = con.getResponseMessage();
-//                fileInputStream.close();
-//                outputStream.flush();
-//                outputStream.close();
+    public static JSO fileUpload(String u, String localFile, HybridCallback progressUploadListener) {
+        String mLineEnd = "\r\n";
 
-        //TODO @ref http://www.jb51.net/article/96863.htm
+        String mTwoHyphens = "--";
 
+        String boundary = "*****";
 
-        return;
+        long length = 0;
+        int mBytesRead, mbytesAvailable, mBufferSize;
+        byte[] buffer;
+        int maxBufferSize = 64 * 1024;
+        String return_s = "";
+        JSO rt = new JSO();
+        try {
+
+            File uploadFile = new File(HybridTools.getTempDirectoryPath() + localFile);//TODO TMP...
+            long mTtotalSize = uploadFile.length();
+            FileInputStream fileInputStream = new FileInputStream(uploadFile);
+
+            URL url = new URL(u);
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            //如果有必要则可以设置Cookie
+//                conn.setRequestProperty("Cookie","JSESSIONID="+cookie);
+
+            // Set size of every block for post
+
+            con.setChunkedStreamingMode(64 * 1024);
+
+            // Allow Inputs & Outputs
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setUseCaches(false);
+
+            // Enable POST method
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Connection", "Keep-Alive");
+            con.setRequestProperty("Charset", "UTF-8");
+            con.setRequestProperty("Content-Type",
+                    "multipart/form-data;boundary=" + boundary);
+            DataOutputStream outputStream = null;
+            outputStream = new DataOutputStream(con.getOutputStream());
+            outputStream.writeBytes(mTwoHyphens + boundary + mLineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + uploadFile.getName() + "\"" + mLineEnd);
+            outputStream.writeBytes("Content-Type:application/octet-stream \r\n");
+            outputStream.writeBytes(mLineEnd);
+
+            mbytesAvailable = fileInputStream.available();
+            mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
+            buffer = new byte[mBufferSize];
+
+            // Read file
+            mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
+
+            while (mBytesRead > 0) {
+                outputStream.write(buffer, 0, mBufferSize);
+                length += mBufferSize;
+
+                //progressUploadListener((int) ((length * 100) / mTtotalSize));
+                int i = ((int) ((length * 100) / mTtotalSize));
+                if (null != progressUploadListener)
+                    progressUploadListener.onCallBack(JSO.s2o("{\"i\":" + i + "}"));
+                Log.v(LOGTAG, "fileUpload ... " + i);
+
+                mbytesAvailable = fileInputStream.available();
+
+                mBufferSize = Math.min(mbytesAvailable, maxBufferSize);
+
+                mBytesRead = fileInputStream.read(buffer, 0, mBufferSize);
+            }
+            outputStream.writeBytes(mLineEnd);
+            outputStream.writeBytes(mTwoHyphens + boundary + mTwoHyphens + mLineEnd);
+            if (null != progressUploadListener)
+                progressUploadListener.onCallBack(JSO.s2o("{\"i\":" + 100 + "}"));
+            Log.v(LOGTAG, "fileUpload ... " + (100));
+
+            // Responses from the server (code and message)
+            //int serverResponseCode = con.getResponseCode();
+            //String serverResponseMessage = con.getResponseMessage();
+
+            InputStream in = new BufferedInputStream(con.getInputStream());
+            return_s = HybridTools.stream2string(in);
+
+            fileInputStream.close();
+            outputStream.flush();
+            outputStream.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return_s = ex.toString();
+            Log.v(LOGTAG, "uploadError");
+        }
+
+        rt.setChild("STS", "TODO");
+        rt.setChild("s", return_s);
+        return rt;
     }
 
     //Wrap the raw webPost for cmp api call

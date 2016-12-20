@@ -2,6 +2,7 @@ package szu.bdi.hybrid.core.eg;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +32,7 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 import info.cmptech.JSO;
+import szu.bdi.hybrid.core.HybridCallback;
 import szu.bdi.hybrid.core.HybridTools;
 import szu.bdi.hybrid.core.NativeUi;
 
@@ -40,7 +43,8 @@ public class UiPhoto extends NativeUi {
     final public static int REQUEST_CODE_ALBUM = 2;
     final private static String LOGTAG = new Throwable().getStackTrace()[0].getClassName();
 
-    final private static String FILE_TO_UPLOAD = "ToUpload.jpg";
+    final private static String FILE_TO_UPLOAD = "/ToUpload.jpg";
+    protected ProgressDialog mProgressDialog = null;
 
     private static void createWritableFile(File file) throws IOException {
         file.createNewFile();
@@ -310,19 +314,33 @@ public class UiPhoto extends NativeUi {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setTitle("Uploading...");
+//        mProgressDialog.setTitle("提示");
+//        mProgressDialog.setMessage("正在上传文件,已上传 0 / " + progressCount);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setProgress(0);
+        mProgressDialog.setMax(100);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
+        mProgressDialog.show();
+
         boolean KO = true;
-        String srcType = getUiData("from").asString();
+        String srcType = getUiData("from").toString();
         if (REQUEST_CAMERA.equals(srcType)) {
             this.takePicture();
             KO = false;
         } else if (REQUEST_ALBUM.equals(srcType)) {
             this.getImage();
             KO = false;
-        }
-        String upload_url = getUiData("upload").asString();
-        if (HybridTools.isEmptyString(upload_url)) {
-            this.doUpload(upload_url);
-            KO = false;
+        } else {
+            final String upload_url = getUiData("upload").toString();
+            if (!HybridTools.isEmptyString(upload_url)) {
+
+                new UploadTask().execute(upload_url);
+                KO = false;
+            }
         }
         if (KO) {
             JSO rt = new JSO();
@@ -330,10 +348,6 @@ public class UiPhoto extends NativeUi {
             rt.setChild("errmsg", "Need param 'from'");
             closeUi(rt);
         }
-    }
-
-    private void doUpload(String url) {
-        HybridTools.fileUpload(url, FILE_TO_UPLOAD, null);
     }
 
     private void takePicture() {
@@ -354,7 +368,6 @@ public class UiPhoto extends NativeUi {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//do top
 
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
-
     }
 
     private void writeUncompressedImage(InputStream fis, Uri dest) throws FileNotFoundException,
@@ -386,6 +399,18 @@ public class UiPhoto extends NativeUi {
         }
     }
 
+    private int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        } else {
+            return 0;
+        }
+    }
+
 //    private void writeUncompressedImage(Uri src, Uri dest) throws FileNotFoundException,
 //            IOException {
 //
@@ -399,18 +424,6 @@ public class UiPhoto extends NativeUi {
 //        if (outputFormat == JPEG) return "image/jpeg";
 //        return "";
 //    }
-
-    private int exifToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        } else {
-            return 0;
-        }
-    }
 
     public int[] calculateAspectRatio(int origWidth, int origHeight, int targetWidth, int targetHeight) {
         int newWidth = targetWidth;
@@ -764,5 +777,42 @@ public class UiPhoto extends NativeUi {
         }
 
         closeUi(jso);
+    }
+
+    private class UploadTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String url = (String) params[0];
+
+            JSO rt = HybridTools.fileUpload(url, FILE_TO_UPLOAD, new HybridCallback() {
+                @Override
+                public void onCallBack(JSO jso) {
+                    //boolean hideBar = true;
+                    if (null != jso) {
+                        String i_s = jso.getChild("i").toString();
+                        try {
+                            final int i = Integer.parseInt(i_s);
+                            if (i > 0) {
+                                if (i > 0 && i < 100) {
+                                    mProgressDialog.setProgress(i);
+                                }
+                            }
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            closeUi(rt);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            //mProgressDialog.hide();
+            mProgressDialog.dismiss();
+        }
     }
 }
