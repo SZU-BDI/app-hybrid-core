@@ -337,7 +337,6 @@ public class UiPhoto extends NativeUi {
         } else {
             final String upload_url = getUiData("upload").toString();
             if (!HybridTools.isEmptyString(upload_url)) {
-
                 new UploadTask().execute(upload_url);
                 KO = false;
             }
@@ -624,9 +623,6 @@ public class UiPhoto extends NativeUi {
 
     public String bitmaptoString(Bitmap bitmap) {
 
-
-        // 将Bitmap转换成字符串
-
         String string = null;
 
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
@@ -780,12 +776,13 @@ public class UiPhoto extends NativeUi {
     }
 
     private class UploadTask extends AsyncTask<String, Integer, String> {
+        private JSO rt = null;
 
         @Override
         protected String doInBackground(String... params) {
             String url = (String) params[0];
 
-            JSO rt = HybridTools.fileUpload(url, FILE_TO_UPLOAD, new HybridCallback() {
+            rt = HybridTools.fileUpload(url, FILE_TO_UPLOAD, new HybridCallback() {
                 @Override
                 public void onCallBack(JSO jso) {
                     //boolean hideBar = true;
@@ -805,7 +802,6 @@ public class UiPhoto extends NativeUi {
                 }
             });
 
-            closeUi(rt);
             return null;
         }
 
@@ -813,6 +809,8 @@ public class UiPhoto extends NativeUi {
         protected void onPostExecute(String result) {
             //mProgressDialog.hide();
             mProgressDialog.dismiss();
+
+            closeUi(rt);
         }
     }
 }

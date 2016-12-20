@@ -196,7 +196,10 @@ public class HybridTools {
             DataOutputStream outputStream = null;
             outputStream = new DataOutputStream(con.getOutputStream());
             outputStream.writeBytes(mTwoHyphens + boundary + mLineEnd);
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + uploadFile.getName() + "\"" + mLineEnd);
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + timeStamp + ".jpg\"" + mLineEnd);
             outputStream.writeBytes("Content-Type:application/octet-stream \r\n");
             outputStream.writeBytes(mLineEnd);
 
@@ -236,6 +239,8 @@ public class HybridTools {
             InputStream in = new BufferedInputStream(con.getInputStream());
             return_s = HybridTools.stream2string(in);
 
+            rt = JSO.s2o(return_s);
+
             fileInputStream.close();
             outputStream.flush();
             outputStream.close();
@@ -245,9 +250,10 @@ public class HybridTools {
             return_s = ex.toString();
             Log.v(LOGTAG, "uploadError");
         }
-
-        rt.setChild("STS", "TODO");
-        rt.setChild("s", return_s);
+        if (HybridTools.isEmptyString(rt.getChild("STS").toString())) {
+            rt.setChild("STS", "KO");
+            rt.setChild("s", return_s);
+        }
         return rt;
     }
 
