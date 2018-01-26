@@ -1,22 +1,20 @@
 # WVJSB V1
 
-## from WebView Js => Wrapper(MobileApp/DesktopApp/etc)
-
 ### Declaration
 
-WebViewJavascript Protocol Specification V1
+Protocol Specification V1
 
 ```
-.callHandler(handlerName, data, callback(responseData){
+.callHandler(handlerName, callMsg, callback(callbackMsg){
 	//
 });
 
-.registerHandler(handlerName, handler(data){
+.registerHandler(handlerName, handler(callMsg){
 	//
 });
 ```
 
-### Implementation DataStructure (Suggestion)
+### DataStructure (Base Suggestion)
 
 ```
 callMsg:{
